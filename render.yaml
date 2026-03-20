@@ -1,0 +1,30 @@
+databases:
+  - name: lendsolo-db
+    plan: free
+    databaseName: lendsolo_production
+    user: lendsolo
+
+services:
+  - type: web
+    name: lendsolo
+    runtime: ruby
+    plan: free
+    buildCommand: |
+      bundle install &&
+      npm install &&
+      npx vite build &&
+      bundle exec rails db:migrate
+    startCommand: bundle exec puma -C config/puma.rb
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: lendsolo-db
+          property: connectionString
+      - key: RAILS_MASTER_KEY
+        sync: false
+      - key: RAILS_ENV
+        value: production
+      - key: RAILS_LOG_TO_STDOUT
+        value: "true"
+      - key: RAILS_SERVE_STATIC_FILES
+        value: "true"
