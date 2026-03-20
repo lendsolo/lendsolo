@@ -14,4 +14,9 @@ Rails.application.routes.draw do
   resources :expenses, only: %i[index]
   get "calculators", to: "calculators#index"
   get "settings", to: "settings#index"
+
+  # Public calculator tools (no auth required)
+  get "tools/loan-amortization-calculator", to: "tools#amortization_calculator"
+  get "tools/roi-calculator", to: "tools#roi_calculator"
+  get "tools/loan-comparison", to: "tools#loan_comparison"
 end
