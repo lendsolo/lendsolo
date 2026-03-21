@@ -2,7 +2,7 @@
 title: "Private Lending Tax Guide: What You Need to Know"
 date: 2026-03-21
 excerpt: "How to report interest income from private loans, when you're required to file a 1098, what you can deduct, and how to structure your tax reporting — whether you're on Schedule C or Schedule E."
-category: "Tax & Accounting"
+category: "Tax & Compliance"
 meta_title: "Private Lending Tax Guide: Interest & 1098 Rules"
 meta_description: "How to report private loan interest income, 1098 filing rules, deductible expenses, Schedule C vs E, and quarterly estimated tax requirements."
 slug: "private-lending-tax-guide"

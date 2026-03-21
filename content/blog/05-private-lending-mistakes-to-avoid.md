@@ -2,7 +2,7 @@
 title: "5 Mistakes New Private Lenders Make (And How to Avoid Them)"
 date: 2026-03-21
 excerpt: "The most common and costly mistakes new private lenders make — poor collateral evaluation, concentration risk, missing documentation, legal blind spots, and poor tracking — and exactly how to avoid them."
-category: "Risk Management"
+category: "Getting Started"
 meta_title: "5 Mistakes New Private Lenders Make"
 meta_description: "Poor collateral, concentration risk, missing docs, ignoring usury laws, and bad tracking. The 5 mistakes that hurt new private lenders and how to avoid them."
 slug: "private-lending-mistakes-to-avoid"

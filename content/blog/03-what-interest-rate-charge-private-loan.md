@@ -2,7 +2,7 @@
 title: "What Interest Rate Should I Charge on a Private Loan?"
 date: 2026-03-21
 excerpt: "How to set interest rates on private loans — market rate benchmarks by deal type, how LTV affects pricing, usury law considerations, worked examples, and a free loan pricing calculator."
-category: "Deal Structuring"
+category: "Loan Structures"
 meta_title: "What Rate to Charge on a Private Loan?"
 meta_description: "Market rate benchmarks for private loans by deal type, LTV impact on pricing, usury law basics, and worked examples to help you set your rate."
 slug: "what-interest-rate-charge-private-loan"

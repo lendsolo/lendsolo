@@ -2,7 +2,7 @@
 title: "Private Lending vs REITs: Where Should You Put Your Capital?"
 date: 2026-03-21
 excerpt: "An honest side-by-side comparison of private lending and REITs across returns, risk, liquidity, effort required, and tax treatment — to help you decide where your capital actually belongs."
-category: "Investment Strategy"
+category: "Portfolio Strategy"
 meta_title: "Private Lending vs REITs: Honest Comparison"
 meta_description: "Returns, risk, liquidity, effort, and tax treatment compared honestly. How private lending and REITs actually stack up for individual investors."
 slug: "private-lending-vs-reits"
