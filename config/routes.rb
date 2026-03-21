@@ -14,6 +14,7 @@ Rails.application.routes.draw do
   post "onboarding/seed", to: "onboarding#seed_sample_data"
   post "onboarding/complete", to: "onboarding#complete"
 
+  get "admin", to: "admin#index"
   get "dashboard", to: "dashboard#index"
   resources :loans do
     member do
