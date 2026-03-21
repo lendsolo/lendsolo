@@ -6,6 +6,7 @@
     "vite-plugin-ruby": "^5.2.0"
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.9",
     "@inertiajs/react": "^2.3.18",
     "@tailwindcss/vite": "^4.2.2",
     "@types/react": "^19.2.14",

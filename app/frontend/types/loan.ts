@@ -33,5 +33,14 @@ export interface LoanProps {
   next_payment_due: string | null
   days_since_start: number
   capital_percentage: number
+  overdue: boolean
+  days_overdue: number
+  expected_next_payment: {
+    payment_number: number
+    amount: number
+    principal: number
+    interest: number
+    due_date: string
+  } | null
   payments: PaymentRecord[]
 }

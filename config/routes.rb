@@ -14,6 +14,7 @@ Rails.application.routes.draw do
       patch :mark_paid_off
       patch :mark_defaulted
     end
+    resources :payments, only: %i[create]
   end
   resources :payments, only: %i[index]
   resources :expenses, only: %i[index]

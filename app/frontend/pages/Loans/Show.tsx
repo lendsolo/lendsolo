@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { Link, router } from '@inertiajs/react'
 import AppLayout from '@/layouts/AppLayout'
+import RecordPaymentModal from '@/components/RecordPaymentModal'
 import type { LoanProps, PaymentRecord } from '@/types/loan'
 import { calculateAmortization, type LoanType } from '@/lib/calculations'
 
@@ -26,6 +27,7 @@ export default function LoansShow({ loan, total_capital }: Props) {
   const [actionsOpen, setActionsOpen] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState(false)
   const [detailsOpen, setDetailsOpen] = useState(false)
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false)
 
   const badge = STATUS_BADGES[loan.status] || STATUS_BADGES.active
 
@@ -44,7 +46,13 @@ export default function LoansShow({ loan, total_capital }: Props) {
   const guardrails = useMemo(() => {
     const alerts: { type: 'red' | 'amber' | 'blue'; message: string }[] = []
 
-    if (loan.status === 'active' && loan.payments_made_count === 0 && loan.days_since_start >= 30) {
+    if (loan.overdue && loan.days_overdue > 0) {
+      const expectedAmt = loan.expected_next_payment?.amount
+      alerts.push({
+        type: 'red',
+        message: `Payment is ${loan.days_overdue} days overdue${expectedAmt ? ` — $${expectedAmt.toLocaleString('en-US', { minimumFractionDigits: 2 })} expected` : ''}.`,
+      })
+    } else if (loan.status === 'active' && loan.payments_made_count === 0 && loan.days_since_start >= 30) {
       alerts.push({ type: 'red', message: 'No payments recorded — is this loan current?' })
     }
     if (loan.capital_percentage > 50) {
@@ -172,7 +180,7 @@ export default function LoansShow({ loan, total_capital }: Props) {
           <StatCard label="Interest Earned" value={loan.interest_earned} prefix="$" color="text-indigo-600" />
           <StatCard label="Principal Returned" value={loan.principal_returned} prefix="$" color="text-emerald-600" />
           <StatCard label="Remaining Balance" value={loan.remaining_balance} prefix="$" color="text-gray-900" />
-          <StatCard label="Next Payment Due" textValue={loan.next_payment_due || 'N/A'} color="text-gray-900" />
+          <StatCard label="Next Payment Due" textValue={loan.next_payment_due || 'N/A'} color={loan.overdue ? 'text-red-600' : 'text-gray-900'} />
         </div>
 
         {/* Amortization Schedule */}
@@ -234,13 +242,14 @@ export default function LoansShow({ loan, total_capital }: Props) {
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden mb-6">
           <div className="p-5 border-b border-gray-100 flex items-center justify-between">
             <h3 className="text-lg font-semibold text-gray-900">Payment History</h3>
-            <button
-              disabled
-              className="px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg opacity-60 cursor-not-allowed"
-              title="Coming next sprint"
-            >
-              Record Payment
-            </button>
+            {loan.status === 'active' && (
+              <button
+                onClick={() => setPaymentModalOpen(true)}
+                className="px-4 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors"
+              >
+                Record Payment
+              </button>
+            )}
           </div>
 
           {loan.payments.length === 0 ? (
@@ -315,6 +324,12 @@ export default function LoansShow({ loan, total_capital }: Props) {
             </div>
           </div>
         )}
+
+        <RecordPaymentModal
+          open={paymentModalOpen}
+          onClose={() => setPaymentModalOpen(false)}
+          loan={loan}
+        />
       </div>
     </AppLayout>
   )

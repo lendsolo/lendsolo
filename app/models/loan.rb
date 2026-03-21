@@ -72,6 +72,48 @@ class Loan < ApplicationRecord
     ((principal / total_capital.to_f) * 100).round(1)
   end
 
+  def overdue?
+    return false unless active?
+
+    due = next_payment_due_date
+    return false if due.nil?
+
+    Date.current > due
+  end
+
+  def days_overdue
+    return 0 unless overdue?
+
+    due = next_payment_due_date
+    (Date.current - due).to_i
+  end
+
+  def next_payment_due_date
+    return nil unless active?
+
+    paid_count = payments_made_count
+    return nil if paid_count >= term_months
+
+    start_date >> (paid_count + 1)
+  end
+
+  def expected_next_payment
+    return nil unless active?
+
+    schedule = amortization.schedule
+    payment_number = payments_made_count + 1
+    return nil if payment_number > schedule.length
+
+    row = schedule[payment_number - 1]
+    {
+      payment_number: payment_number,
+      amount: row.payment.to_f,
+      principal: row.principal_portion.to_f,
+      interest: row.interest_portion.to_f,
+      due_date: (start_date >> payment_number).to_s
+    }
+  end
+
   # ── Serialization ──────────────────────────────────────────────────────────
 
   def as_inertia_props(total_capital: nil)
@@ -101,6 +143,9 @@ class Loan < ApplicationRecord
       next_payment_due: next_payment_due,
       days_since_start: days_since_start,
       capital_percentage: capital_percentage(total_capital),
+      overdue: overdue?,
+      days_overdue: days_overdue,
+      expected_next_payment: expected_next_payment,
       payments: payments.order(date: :desc).map { |p|
         {
           id: p.id,

@@ -131,9 +131,16 @@ function LoanCard({ loan }: { loan: LoanProps }) {
           </h3>
           <p className="text-xs text-gray-400 mt-0.5">{LOAN_TYPE_LABELS[loan.loan_type]}</p>
         </div>
-        <span className={`px-2 py-0.5 text-[10px] font-medium rounded-full shrink-0 ${badge.bg} ${badge.text}`}>
-          {badge.label}
-        </span>
+        <div className="flex items-center gap-1.5 shrink-0">
+          {loan.overdue && (
+            <span className="px-2 py-0.5 text-[10px] font-medium rounded-full bg-red-50 text-red-700">
+              Overdue
+            </span>
+          )}
+          <span className={`px-2 py-0.5 text-[10px] font-medium rounded-full ${badge.bg} ${badge.text}`}>
+            {badge.label}
+          </span>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs mb-4">
