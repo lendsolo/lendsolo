@@ -2,6 +2,7 @@ import { Head } from '@inertiajs/react'
 import StickyNav from './sections/StickyNav'
 import Hero from './sections/Hero'
 import Problem from './sections/Problem'
+import WhyNotSpreadsheets from './sections/WhyNotSpreadsheets'
 import ProductShowcase from './sections/ProductShowcase'
 import FeaturesGrid from './sections/FeaturesGrid'
 import Pricing from './sections/Pricing'
@@ -56,6 +57,7 @@ export default function LandingPage() {
         <StickyNav />
         <Hero />
         <Problem />
+        <WhyNotSpreadsheets />
         <ProductShowcase />
         <FeaturesGrid />
         <Pricing />
