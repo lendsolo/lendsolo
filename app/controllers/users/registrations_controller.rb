@@ -1,4 +1,6 @@
 class Users::RegistrationsController < Devise::RegistrationsController
+  skip_before_action :redirect_to_onboarding
+
   def new
     render inertia: "Auth/Register"
   end

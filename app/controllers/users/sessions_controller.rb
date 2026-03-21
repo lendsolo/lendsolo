@@ -1,4 +1,6 @@
 class Users::SessionsController < Devise::SessionsController
+  skip_before_action :redirect_to_onboarding
+
   def new
     render inertia: "Auth/Login"
   end

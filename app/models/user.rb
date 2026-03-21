@@ -5,6 +5,7 @@ class User < ApplicationRecord
   has_many :loans, dependent: :destroy
   has_many :expenses, dependent: :destroy
 
+  attribute :subscription_plan, :string, default: "free"
   enum :subscription_plan, { free: "free", solo: "solo", pro: "pro", fund: "fund" }
 
   # ── Subscription helpers ────────────────────────────────────────────────────
