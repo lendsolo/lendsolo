@@ -12,4 +12,8 @@ class ToolsController < ApplicationController
   def loan_comparison
     render inertia: "Tools/LoanComparison"
   end
+
+  def interest_only_calculator
+    render inertia: "Tools/InterestOnlyCalculator"
+  end
 end

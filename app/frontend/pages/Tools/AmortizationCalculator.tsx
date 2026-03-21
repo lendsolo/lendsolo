@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { Link } from '@inertiajs/react'
 import PublicLayout from '@/layouts/PublicLayout'
 import SeoHead from '@/components/SeoHead'
 import AnimatedNumber from '@/components/AnimatedNumber'
@@ -149,6 +150,19 @@ export default function AmortizationCalculatorPage() {
             )}
           </div>
         </div>
+      </div>
+
+      {/* Cross-link */}
+      <div className="mt-8 text-center">
+        <Link
+          href="/tools/interest-only-calculator"
+          className="inline-flex items-center gap-1.5 text-sm text-emerald-600 hover:text-emerald-700 font-medium"
+        >
+          Comparing loan structures? Try our interest-only calculator
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+          </svg>
+        </Link>
       </div>
 
       <CtaBanner headline="Track this loan for real" buttonText="Create free account" />

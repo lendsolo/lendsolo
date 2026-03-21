@@ -70,6 +70,7 @@ export default function PublicLayout({ children, title, description }: Props) {
               <Link href="/tools/loan-amortization-calculator" className="hover:text-gray-700">Amortization</Link>
               <Link href="/tools/roi-calculator" className="hover:text-gray-700">ROI Calculator</Link>
               <Link href="/tools/loan-comparison" className="hover:text-gray-700">Loan Comparison</Link>
+              <Link href="/tools/interest-only-calculator" className="hover:text-gray-700">Interest-Only</Link>
             </nav>
           </div>
         </div>

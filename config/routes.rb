@@ -19,4 +19,5 @@ Rails.application.routes.draw do
   get "tools/loan-amortization-calculator", to: "tools#amortization_calculator"
   get "tools/roi-calculator", to: "tools#roi_calculator"
   get "tools/loan-comparison", to: "tools#loan_comparison"
+  get "tools/interest-only-calculator", to: "tools#interest_only_calculator"
 end

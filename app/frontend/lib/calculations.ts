@@ -142,6 +142,37 @@ function buildInterestOnlySchedule(
   return schedule
 }
 
+// ─── Interest-Only Calculator (convenience wrapper) ─────────────────────────
+
+export interface InterestOnlyResult {
+  monthlyInterestPayment: number
+  balloonPayment: number
+  totalInterest: number
+  totalCost: number
+  schedule: ScheduleRow[]
+}
+
+export function calculateInterestOnly(
+  principal: number,
+  annualRate: number,
+  termMonths: number,
+  startDate: Date,
+): InterestOnlyResult {
+  if (termMonths <= 0 || principal <= 0) {
+    return { monthlyInterestPayment: 0, balloonPayment: principal, totalInterest: 0, totalCost: principal, schedule: [] }
+  }
+
+  const monthlyRate = annualRate / 1200
+  const monthlyInterestPayment = round2(principal * monthlyRate)
+  const totalInterest = round2(monthlyInterestPayment * termMonths)
+  const totalCost = round2(principal + totalInterest)
+  const balloonPayment = principal
+
+  const schedule = buildInterestOnlySchedule(principal, monthlyRate, termMonths, startDate)
+
+  return { monthlyInterestPayment, balloonPayment, totalInterest, totalCost, schedule }
+}
+
 // ─── ROI Calculator ─────────────────────────────────────────────────────────
 
 export interface RoiResult {
