@@ -107,9 +107,9 @@ class Loan < ApplicationRecord
     row = schedule[payment_number - 1]
     {
       payment_number: payment_number,
-      amount: row.payment.to_f,
-      principal: row.principal_portion.to_f,
-      interest: row.interest_portion.to_f,
+      amount: row[:payment].to_f,
+      principal: row[:principal_portion].to_f,
+      interest: row[:interest_portion].to_f,
       due_date: (start_date >> payment_number).to_s
     }
   end

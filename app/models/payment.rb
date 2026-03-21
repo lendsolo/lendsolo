@@ -21,8 +21,8 @@ class Payment < ApplicationRecord
 
     if payment_number <= schedule.length
       expected = schedule[payment_number - 1]
-      expected_interest = BigDecimal(expected.interest_portion.to_s)
-      expected_principal = BigDecimal(expected.principal_portion.to_s)
+      expected_interest = BigDecimal(expected[:interest_portion].to_s)
+      expected_principal = BigDecimal(expected[:principal_portion].to_s)
       payment_amount = BigDecimal(amount.to_s)
 
       if payment_amount >= expected_interest + expected_principal
