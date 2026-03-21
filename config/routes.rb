@@ -17,9 +17,11 @@ Rails.application.routes.draw do
     resources :payments, only: %i[create]
   end
   resources :payments, only: %i[index]
-  resources :expenses, only: %i[index]
+  resources :expenses, only: %i[index create destroy]
   get "calculators", to: "calculators#index"
   get "settings", to: "settings#index"
+  patch "settings", to: "settings#update"
+  delete "settings/reset_data", to: "settings#reset_data"
 
   # Public calculator tools (no auth required)
   get "tools/loan-amortization-calculator", to: "tools#amortization_calculator"
