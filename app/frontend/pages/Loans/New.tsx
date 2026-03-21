@@ -1,0 +1,241 @@
+import { useForm } from '@inertiajs/react'
+import { useMemo } from 'react'
+import AppLayout from '@/layouts/AppLayout'
+import AnimatedNumber from '@/components/AnimatedNumber'
+import { calculateAmortization, type LoanType } from '@/lib/calculations'
+
+export default function NewLoan() {
+  const { data, setData, post, processing, errors } = useForm({
+    borrower_name: '',
+    principal: '',
+    annual_rate: '',
+    term_months: '',
+    loan_type: 'standard' as LoanType,
+    start_date: new Date().toISOString().split('T')[0],
+    purpose: '',
+    collateral_description: '',
+    notes: '',
+  })
+
+  const preview = useMemo(() => {
+    const p = parseFloat(data.principal) || 0
+    const r = parseFloat(data.annual_rate) || 0
+    const t = parseInt(data.term_months) || 0
+    if (p <= 0 || t <= 0) return null
+    return calculateAmortization(p, r, t, new Date(data.start_date), data.loan_type)
+  }, [data.principal, data.annual_rate, data.term_months, data.loan_type, data.start_date])
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    post('/loans')
+  }
+
+  return (
+    <AppLayout>
+      <div className="max-w-6xl mx-auto">
+        <h1 className="text-2xl font-bold text-gray-900 mb-8">Create New Loan</h1>
+
+        <div className="grid lg:grid-cols-[1fr_340px] gap-8">
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
+              <h2 className="text-lg font-semibold text-gray-900">Borrower & Terms</h2>
+
+              <Field label="Borrower Name" error={errors.borrower_name} required>
+                <input
+                  type="text"
+                  value={data.borrower_name}
+                  onChange={(e) => setData('borrower_name', e.target.value)}
+                  placeholder="e.g. Marcus Williams"
+                  className={inputClass(errors.borrower_name)}
+                />
+              </Field>
+
+              <div className="grid sm:grid-cols-2 gap-5">
+                <Field label="Principal Amount" error={errors.principal} required>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={data.principal}
+                      onChange={(e) => setData('principal', e.target.value)}
+                      placeholder="100,000"
+                      className={`${inputClass(errors.principal)} pl-7`}
+                    />
+                  </div>
+                </Field>
+
+                <Field label="Annual Rate" error={errors.annual_rate} required>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      step="0.25"
+                      value={data.annual_rate}
+                      onChange={(e) => setData('annual_rate', e.target.value)}
+                      placeholder="12"
+                      className={`${inputClass(errors.annual_rate)} pr-8`}
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">%</span>
+                  </div>
+                </Field>
+
+                <Field label="Term (Months)" error={errors.term_months} required>
+                  <input
+                    type="number"
+                    value={data.term_months}
+                    onChange={(e) => setData('term_months', e.target.value)}
+                    placeholder="12"
+                    className={inputClass(errors.term_months)}
+                  />
+                </Field>
+
+                <Field label="Loan Type" error={errors.loan_type} required>
+                  <select
+                    value={data.loan_type}
+                    onChange={(e) => setData('loan_type', e.target.value as LoanType)}
+                    className={inputClass(errors.loan_type)}
+                  >
+                    <option value="standard">Standard (Fully Amortizing)</option>
+                    <option value="interest_only">Interest Only</option>
+                    <option value="balloon">Balloon</option>
+                  </select>
+                </Field>
+              </div>
+
+              <Field label="Start Date" error={errors.start_date} required>
+                <input
+                  type="date"
+                  value={data.start_date}
+                  onChange={(e) => setData('start_date', e.target.value)}
+                  className={inputClass(errors.start_date)}
+                />
+              </Field>
+            </div>
+
+            <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
+              <h2 className="text-lg font-semibold text-gray-900">Details</h2>
+
+              <Field label="Purpose" error={errors.purpose}>
+                <input
+                  type="text"
+                  value={data.purpose}
+                  onChange={(e) => setData('purpose', e.target.value)}
+                  placeholder="e.g. Fix-and-flip, Bridge loan, Rental rehab"
+                  className={inputClass(errors.purpose)}
+                />
+              </Field>
+
+              <Field label="Collateral Description" error={errors.collateral_description}>
+                <textarea
+                  value={data.collateral_description}
+                  onChange={(e) => setData('collateral_description', e.target.value)}
+                  placeholder="Property address, asset description, lien position..."
+                  rows={3}
+                  className={inputClass(errors.collateral_description)}
+                />
+              </Field>
+
+              <Field label="Notes" error={errors.notes}>
+                <textarea
+                  value={data.notes}
+                  onChange={(e) => setData('notes', e.target.value)}
+                  placeholder="Any additional notes about this loan..."
+                  rows={3}
+                  className={inputClass(errors.notes)}
+                />
+              </Field>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button
+                type="submit"
+                disabled={processing}
+                className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-lg transition-colors disabled:opacity-50"
+              >
+                {processing ? 'Creating...' : 'Create Loan'}
+              </button>
+              <a href="/loans" className="px-6 py-2.5 text-sm text-gray-600 hover:text-gray-800">
+                Cancel
+              </a>
+            </div>
+          </form>
+
+          {/* Live Preview Panel */}
+          <div className="lg:sticky lg:top-6 h-fit">
+            <div className="bg-white rounded-xl border border-gray-200 p-6">
+              <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">
+                Live Preview
+              </h3>
+
+              {preview ? (
+                <div className="space-y-4">
+                  <PreviewMetric label="Monthly Payment" value={preview.monthlyPayment} prefix="$" large />
+                  <PreviewMetric label="Total Interest" value={preview.totalInterest} prefix="$" />
+                  <PreviewMetric label="Total Repayment" value={preview.totalCost} prefix="$" />
+
+                  <div className="pt-3 border-t border-gray-100">
+                    <div className="flex justify-between text-xs text-gray-400 mb-1">
+                      <span>Schedule Preview</span>
+                      <span>{preview.schedule.length} payments</span>
+                    </div>
+                    <div className="space-y-0.5 max-h-48 overflow-y-auto">
+                      {preview.schedule.slice(0, 6).map((row) => (
+                        <div key={row.month} className="flex justify-between text-xs py-1">
+                          <span className="text-gray-500">Mo {row.month}</span>
+                          <span className="text-gray-900 font-mono">
+                            ${row.payment.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                          </span>
+                        </div>
+                      ))}
+                      {preview.schedule.length > 6 && (
+                        <div className="text-xs text-gray-400 text-center pt-1">
+                          +{preview.schedule.length - 6} more payments
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-sm text-gray-400">
+                  Enter loan details to see a live preview of the payment schedule.
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </AppLayout>
+  )
+}
+
+function PreviewMetric({ label, value, prefix = '', large }: { label: string; value: number; prefix?: string; large?: boolean }) {
+  return (
+    <div>
+      <p className="text-xs text-gray-500 mb-0.5">{label}</p>
+      <AnimatedNumber
+        value={value}
+        prefix={prefix}
+        className={`font-bold text-gray-900 ${large ? 'text-2xl' : 'text-lg'}`}
+      />
+    </div>
+  )
+}
+
+function Field({ label, error, required, children }: { label: string; error?: string; required?: boolean; children: React.ReactNode }) {
+  return (
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+        {label}{required && <span className="text-red-400 ml-0.5">*</span>}
+      </label>
+      {children}
+      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+    </div>
+  )
+}
+
+function inputClass(error?: string) {
+  return `w-full py-2.5 px-3 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 ${
+    error ? 'border-red-300 bg-red-50' : 'border-gray-300'
+  }`
+}

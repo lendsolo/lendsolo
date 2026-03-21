@@ -9,7 +9,12 @@ Rails.application.routes.draw do
   root "pages#landing"
 
   get "dashboard", to: "dashboard#index"
-  resources :loans, only: %i[index show]
+  resources :loans do
+    member do
+      patch :mark_paid_off
+      patch :mark_defaulted
+    end
+  end
   resources :payments, only: %i[index]
   resources :expenses, only: %i[index]
   get "calculators", to: "calculators#index"
