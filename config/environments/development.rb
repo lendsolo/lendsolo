@@ -28,14 +28,26 @@ Rails.application.configure do
   # Change to :null_store to avoid any caching.
   config.cache_store = :memory_store
 
-  # Don't care if the mailer can't send.
-  config.action_mailer.raise_delivery_errors = false
+  # Raise delivery errors so we see failures in development.
+  config.action_mailer.raise_delivery_errors = true
 
   # Make template changes take effect immediately.
   config.action_mailer.perform_caching = false
 
   # Set localhost to be used by links generated in mailer templates.
   config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
+
+  # Use Resend for email delivery (set RESEND_API_KEY in .env)
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    address: "smtp.resend.com",
+    port: 465,
+    user_name: "resend",
+    password: ENV.fetch("RESEND_API_KEY", ""),
+    authentication: :plain,
+    enable_starttls_auto: true,
+    ssl: true
+  }
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log

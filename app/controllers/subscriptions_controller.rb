@@ -48,7 +48,18 @@ class SubscriptionsController < ApplicationController
       metadata: { lendsolo_user_id: current_user.id, plan: plan }
     )
 
-    redirect_to session.url, allow_other_host: true
+    render inertia: "Billing/Show", props: {
+      redirect_url: session.url,
+      plan: current_user.effective_plan,
+      subscription_plan: current_user.subscription_plan,
+      subscription_status: current_user.subscription_status,
+      on_trial: current_user.on_trial?,
+      trial_days_remaining: current_user.trial_days_remaining,
+      trial_expired: current_user.trial_expired?,
+      active_loan_count: current_user.active_loan_count,
+      loan_limit: current_user.effective_loan_limit.infinite? ? nil : current_user.effective_loan_limit.to_i,
+      plans: PLAN_DETAILS
+    }
   end
 
   def portal
@@ -59,6 +70,17 @@ class SubscriptionsController < ApplicationController
       return_url: "#{request.base_url}/billing"
     )
 
-    redirect_to session.url, allow_other_host: true
+    render inertia: "Billing/Show", props: {
+      redirect_url: session.url,
+      plan: current_user.effective_plan,
+      subscription_plan: current_user.subscription_plan,
+      subscription_status: current_user.subscription_status,
+      on_trial: current_user.on_trial?,
+      trial_days_remaining: current_user.trial_days_remaining,
+      trial_expired: current_user.trial_expired?,
+      active_loan_count: current_user.active_loan_count,
+      loan_limit: current_user.effective_loan_limit.infinite? ? nil : current_user.effective_loan_limit.to_i,
+      plans: PLAN_DETAILS
+    }
   end
 end

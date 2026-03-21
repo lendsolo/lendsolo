@@ -13,7 +13,8 @@ class LoansController < ApplicationController
   def show
     render inertia: "Loans/Show", props: {
       loan: @loan.as_inertia_props(total_capital: current_user.total_capital),
-      total_capital: current_user.total_capital.to_f
+      total_capital: current_user.total_capital.to_f,
+      can_generate_reports: %w[pro fund].include?(current_user.effective_plan)
     }
   end
 

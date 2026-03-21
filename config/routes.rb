@@ -22,11 +22,25 @@ Rails.application.routes.draw do
     end
     resources :payments, only: %i[create]
   end
-  resources :payments, only: %i[index]
-  resources :expenses, only: %i[index create destroy]
+  resources :payments, only: %i[index] do
+    collection do
+      get :export_csv
+    end
+  end
+  resources :expenses, only: %i[index create destroy] do
+    collection do
+      get :export_csv
+    end
+  end
   get "import", to: "imports#new", as: :new_import
   post "import", to: "imports#create", as: :imports
   post "import/process", to: "imports#process_import", as: :process_import
+  # Reports (PDF generation)
+  get "reports", to: "reports#index"
+  get "loans/:id/statement.pdf", to: "reports#loan_statement", as: :loan_statement_pdf
+  get "loans/:id/amortization.pdf", to: "reports#amortization_schedule", as: :loan_amortization_pdf
+  get "reports/year_end/:year.pdf", to: "reports#year_end", as: :year_end_report_pdf
+
   # Exports
   get "exports", to: "exports#index"
   get "exports/year_end_summary.pdf", to: "exports#year_end_summary_pdf", as: :export_pdf
@@ -37,6 +51,7 @@ Rails.application.routes.draw do
   get "calculators", to: "calculators#index"
   get "settings", to: "settings#index"
   patch "settings", to: "settings#update"
+  post "settings/send_test_email", to: "settings#send_test_email"
   delete "settings/reset_data", to: "settings#reset_data"
 
   # Billing & Subscriptions

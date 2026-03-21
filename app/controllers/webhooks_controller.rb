@@ -18,6 +18,8 @@ class WebhooksController < ApplicationController
       return
     end
 
+    Rails.logger.info("[Stripe] Received webhook event: #{event.type}")
+
     case event.type
     when "checkout.session.completed"
       handle_checkout_completed(event.data.object)
@@ -27,6 +29,8 @@ class WebhooksController < ApplicationController
       handle_subscription_deleted(event.data.object)
     when "invoice.payment_failed"
       handle_payment_failed(event.data.object)
+    else
+      Rails.logger.info("[Stripe] Unhandled event type: #{event.type}")
     end
 
     head :ok
@@ -35,8 +39,18 @@ class WebhooksController < ApplicationController
   private
 
   def handle_checkout_completed(session)
+    Rails.logger.info("[Stripe] Checkout session metadata: #{session.metadata.to_h}")
+    Rails.logger.info("[Stripe] Checkout session customer: #{session.customer}")
+
     user = find_user_from_metadata(session.metadata)
-    return unless user
+
+    # Fallback: find user by stripe_customer_id if metadata lookup fails
+    user ||= User.find_by(stripe_customer_id: session.customer)
+
+    unless user
+      Rails.logger.error("[Stripe] Could not find user for checkout session #{session.id}")
+      return
+    end
 
     subscription = Stripe::Subscription.retrieve(session.subscription)
     plan = session.metadata["plan"] || determine_plan(subscription)

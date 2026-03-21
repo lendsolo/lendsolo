@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { router, usePage } from '@inertiajs/react'
 import AppLayout from '@/layouts/AppLayout'
 
@@ -18,6 +19,7 @@ interface Props {
   active_loan_count: number
   loan_limit: number | null
   plans: Record<string, PlanDetail>
+  redirect_url?: string
 }
 
 const PLAN_ORDER = ['free', 'solo', 'pro', 'fund'] as const
@@ -38,7 +40,17 @@ export default function BillingShow({
   active_loan_count,
   loan_limit,
   plans,
+  redirect_url,
 }: Props) {
+  // Handle external redirects (Stripe Checkout / Portal)
+  // Inertia intercepts all server redirects as XHR, so external URLs
+  // must be redirected client-side via window.location.href
+  useEffect(() => {
+    if (redirect_url) {
+      window.location.href = redirect_url
+    }
+  }, [redirect_url])
+
   const { flash } = usePage<{ flash: { notice?: string; alert?: string } }>().props
   const utilizationPercent = loan_limit ? Math.min((active_loan_count / loan_limit) * 100, 100) : 0
   const nearLimit = loan_limit ? active_loan_count >= loan_limit - 1 && active_loan_count < loan_limit : false

@@ -1,0 +1,135 @@
+<h2 style="font-size: 18px; font-weight: 600; color: #111827; margin: 0 0 8px 0;">
+  Monthly Portfolio Summary
+</h2>
+<p style="font-size: 14px; color: #6b7280; margin: 0 0 24px 0; line-height: 1.6;">
+  Here's your lending activity for <strong><%= @month_name %></strong>.
+</p>
+
+<!-- Key Metrics -->
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 24px;">
+  <tr>
+    <td width="50%" style="padding: 0 8px 16px 0;" class="stack-column">
+      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+        <tr>
+          <td style="background-color: #ecfdf5; border-radius: 8px; padding: 16px; text-align: center;">
+            <p style="font-size: 11px; font-weight: 600; color: #059669; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 4px 0;">
+              Payments Received
+            </p>
+            <p style="font-size: 24px; font-weight: 700; color: #065f46; margin: 0;">
+              $<%= number_with_precision(@payments_received_total, precision: 2, delimiter: ",") %>
+            </p>
+            <p style="font-size: 12px; color: #6b7280; margin: 4px 0 0 0;">
+              <%= @payments_received_count %> payment<%= 's' if @payments_received_count != 1 %>
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td>
+    <td width="50%" style="padding: 0 0 16px 8px;" class="stack-column">
+      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+        <tr>
+          <td style="background-color: #f0fdf4; border-radius: 8px; padding: 16px; text-align: center;">
+            <p style="font-size: 11px; font-weight: 600; color: #059669; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 4px 0;">
+              Interest Earned
+            </p>
+            <p style="font-size: 24px; font-weight: 700; color: #065f46; margin: 0;">
+              $<%= number_with_precision(@interest_earned, precision: 2, delimiter: ",") %>
+            </p>
+            <p style="font-size: 12px; color: #6b7280; margin: 4px 0 0 0;">
+              $<%= number_with_precision(@principal_returned, precision: 2, delimiter: ",") %> principal returned
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+
+<!-- Portfolio Status -->
+<h3 style="font-size: 14px; font-weight: 600; color: #111827; margin: 0 0 12px 0;">
+  Portfolio Status
+</h3>
+
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 24px;">
+  <tr>
+    <td style="padding: 12px 0; border-bottom: 1px solid #f3f4f6;">
+      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+        <tr>
+          <td style="font-size: 13px; color: #6b7280;">Active Loans</td>
+          <td align="right" style="font-size: 13px; color: #111827; font-weight: 500;"><%= @active_loans.count %></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td style="padding: 12px 0; border-bottom: 1px solid #f3f4f6;">
+      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+        <tr>
+          <td style="font-size: 13px; color: #6b7280;">Total Deployed</td>
+          <td align="right" style="font-size: 13px; color: #111827; font-weight: 500;">$<%= number_with_precision(@total_deployed, precision: 2, delimiter: ",") %></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td style="padding: 12px 0;">
+      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+        <tr>
+          <td style="font-size: 13px; color: #6b7280;">Outstanding Balance</td>
+          <td align="right" style="font-size: 13px; color: #111827; font-weight: 500;">$<%= number_with_precision(@total_outstanding, precision: 2, delimiter: ",") %></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+
+<!-- Overdue Loans -->
+<% if @overdue_loans.any? %>
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 24px;">
+  <tr>
+    <td style="background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 16px;">
+      <p style="font-size: 13px; font-weight: 600; color: #dc2626; margin: 0 0 8px 0;">
+        Overdue Loans (<%= @overdue_loans.count %>)
+      </p>
+      <% @overdue_loans.each do |loan| %>
+        <p style="font-size: 13px; color: #991b1b; margin: 4px 0;">
+          &bull; <strong><%= loan.borrower_name %></strong> &mdash;
+          <%= loan.days_overdue %> day<%= 's' if loan.days_overdue != 1 %> overdue
+          ($<%= number_with_precision(loan.monthly_payment, precision: 2, delimiter: ",") %>)
+        </p>
+      <% end %>
+    </td>
+  </tr>
+</table>
+<% end %>
+
+<!-- Upcoming Payments This Month -->
+<% if @upcoming_payments.any? %>
+<h3 style="font-size: 14px; font-weight: 600; color: #111827; margin: 0 0 12px 0;">
+  Upcoming Payments This Month
+</h3>
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 24px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+  <tr>
+    <td style="background-color: #f9fafb; padding: 10px 16px; font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #e5e7eb;">Borrower</td>
+    <td style="background-color: #f9fafb; padding: 10px 16px; font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #e5e7eb;" align="center">Due Date</td>
+    <td style="background-color: #f9fafb; padding: 10px 16px; font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #e5e7eb;" align="right">Amount</td>
+  </tr>
+  <% @upcoming_payments.each_with_index do |p, i| %>
+    <tr>
+      <td style="padding: 10px 16px; font-size: 13px; color: #111827; <%= 'border-bottom: 1px solid #f3f4f6;' unless i == @upcoming_payments.length - 1 %>">
+        <%= p[:loan].borrower_name %>
+      </td>
+      <td style="padding: 10px 16px; font-size: 13px; color: #6b7280; <%= 'border-bottom: 1px solid #f3f4f6;' unless i == @upcoming_payments.length - 1 %>" align="center">
+        <%= p[:due_date].strftime("%b %d") %>
+      </td>
+      <td style="padding: 10px 16px; font-size: 13px; color: #111827; font-weight: 500; font-family: ui-monospace, 'SF Mono', monospace; <%= 'border-bottom: 1px solid #f3f4f6;' unless i == @upcoming_payments.length - 1 %>" align="right">
+        $<%= number_with_precision(p[:amount], precision: 2, delimiter: ",") %>
+      </td>
+    </tr>
+  <% end %>
+</table>
+<% end %>
+
+<p style="font-size: 13px; color: #6b7280; line-height: 1.6; margin: 0;">
+  View your full dashboard for more details and to manage your portfolio.
+</p>

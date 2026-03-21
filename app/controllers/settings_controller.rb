@@ -4,7 +4,15 @@ class SettingsController < ApplicationController
       user: {
         business_name: current_user.business_name || "",
         total_capital: (current_user.total_capital || 0).to_f,
-        email: current_user.email
+        email: current_user.email,
+        # Email settings
+        email_reminders_enabled: current_user.email_reminders_enabled,
+        email_receipts_enabled: current_user.email_receipts_enabled,
+        email_late_notices_enabled: current_user.email_late_notices_enabled,
+        email_monthly_summary_enabled: current_user.email_monthly_summary_enabled,
+        reminder_days_before: current_user.reminder_days_before,
+        late_notice_days_after: current_user.late_notice_days_after,
+        borrower_notification_email: current_user.borrower_notification_email || ""
       }
     }
   end
@@ -17,7 +25,25 @@ class SettingsController < ApplicationController
     end
   end
 
+  def send_test_email
+    email_type = params[:email_type].to_s
+    valid_types = %w[payment_reminder late_payment_notice payment_receipt monthly_portfolio_summary]
+
+    unless valid_types.include?(email_type)
+      redirect_to settings_path, alert: "Invalid email type."
+      return
+    end
+
+    begin
+      LoanMailer.preview_email(current_user, email_type).deliver_now
+      redirect_to settings_path, notice: "Test email sent to #{current_user.email}."
+    rescue => e
+      redirect_to settings_path, alert: "Failed to send test email: #{e.message}"
+    end
+  end
+
   def reset_data
+    current_user.email_logs.delete_all
     current_user.expenses.delete_all
     current_user.loans.destroy_all  # cascades to payments via dependent: :destroy
     current_user.update!(total_capital: 0, business_name: nil)
@@ -27,6 +53,16 @@ class SettingsController < ApplicationController
   private
 
   def settings_params
-    params.require(:user).permit(:business_name, :total_capital)
+    params.require(:user).permit(
+      :business_name,
+      :total_capital,
+      :email_reminders_enabled,
+      :email_receipts_enabled,
+      :email_late_notices_enabled,
+      :email_monthly_summary_enabled,
+      :reminder_days_before,
+      :late_notice_days_after,
+      :borrower_notification_email
+    )
   end
 end

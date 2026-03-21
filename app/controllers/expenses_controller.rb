@@ -19,6 +19,17 @@ class ExpensesController < ApplicationController
     }
   end
 
+  def export_csv
+    expenses = current_user.expenses.order(date: :desc)
+
+    csv = generate_expenses_csv(expenses)
+
+    send_data csv,
+              filename: "lendsolo_expenses_#{Time.current.strftime('%Y%m%d%H%M%S')}.csv",
+              type: "text/csv",
+              disposition: "attachment"
+  end
+
   def create
     expense = current_user.expenses.build(expense_params)
 
@@ -42,6 +53,17 @@ class ExpensesController < ApplicationController
 
   def expense_params
     params.require(:expense).permit(:description, :amount, :date, :category)
+  end
+
+  def generate_expenses_csv(expenses)
+    require "csv"
+    CSV.generate do |csv|
+      csv << %w[date description category amount]
+
+      expenses.each do |e|
+        csv << [e.date.to_s, e.description, e.category, e.amount.to_f]
+      end
+    end
   end
 
   def serialize_expense(expense)

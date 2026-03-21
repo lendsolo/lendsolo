@@ -30,7 +30,11 @@ gem "stripe", "~> 13.0"
 gem "prawn", "~> 2.5"
 gem "prawn-table", "~> 0.2"
 
+# Transactional email via Resend
+gem "resend", "~> 0.17"
+
 group :development, :test do
+  gem "dotenv-rails"
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
   gem "brakeman", require: false
   gem "rubocop-rails-omakase", require: false

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_21_021547) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_21_111211) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -20,6 +20,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_21_021547) do
   create_enum "loan_status", ["active", "paid_off", "defaulted", "written_off"]
   create_enum "loan_type", ["standard", "interest_only", "balloon"]
   create_enum "subscription_plan", ["free", "solo", "pro", "fund"]
+
+  create_table "email_logs", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "loan_id"
+    t.string "email_type", null: false
+    t.string "recipient_email", null: false
+    t.integer "payment_number"
+    t.date "reference_date"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["loan_id", "email_type", "payment_number", "reference_date"], name: "idx_email_logs_unique_send", unique: true
+    t.index ["loan_id"], name: "index_email_logs_on_loan_id"
+    t.index ["user_id"], name: "index_email_logs_on_user_id"
+  end
 
   create_table "expenses", force: :cascade do |t|
     t.bigint "user_id", null: false
@@ -78,11 +92,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_21_021547) do
     t.enum "subscription_plan", default: "free", null: false, enum_type: "subscription_plan"
     t.string "subscription_status", default: "incomplete", null: false
     t.datetime "trial_ends_at"
+    t.boolean "email_reminders_enabled", default: true, null: false
+    t.boolean "email_receipts_enabled", default: true, null: false
+    t.boolean "email_late_notices_enabled", default: true, null: false
+    t.boolean "email_monthly_summary_enabled", default: true, null: false
+    t.integer "reminder_days_before", default: 5, null: false
+    t.integer "late_notice_days_after", default: 3, null: false
+    t.string "borrower_notification_email"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["stripe_customer_id"], name: "index_users_on_stripe_customer_id", unique: true
   end
 
+  add_foreign_key "email_logs", "loans"
+  add_foreign_key "email_logs", "users"
   add_foreign_key "expenses", "users"
   add_foreign_key "loans", "users"
   add_foreign_key "payments", "loans"

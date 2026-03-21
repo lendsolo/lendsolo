@@ -22,11 +22,29 @@ class PaymentsController < ApplicationController
     }
   end
 
+  def export_csv
+    payments = Payment.joins(:loan)
+                      .where(loans: { user_id: current_user.id })
+                      .includes(:loan)
+                      .order(date: :desc)
+
+    csv = generate_payments_csv(payments)
+
+    send_data csv,
+              filename: "lendsolo_payments_#{Time.current.strftime('%Y%m%d%H%M%S')}.csv",
+              type: "text/csv",
+              disposition: "attachment"
+  end
+
   def create
     loan = current_user.loans.find(params[:loan_id])
     payment = loan.payments.build(payment_params)
 
     if payment.save
+      # Send receipt email if enabled and recipient is configured
+      if current_user.email_receipts_enabled && current_user.borrower_notification_email.present?
+        LoanMailer.payment_receipt(payment).deliver_later
+      end
       redirect_back fallback_location: loan_path(loan), notice: "Payment recorded."
     else
       redirect_back fallback_location: loan_path(loan),
@@ -39,6 +57,26 @@ class PaymentsController < ApplicationController
 
   def payment_params
     params.require(:payment).permit(:amount, :date, :note, :late_fee)
+  end
+
+  def generate_payments_csv(payments)
+    require "csv"
+    CSV.generate do |csv|
+      csv << %w[date borrower loan_id amount principal interest late_fee note]
+
+      payments.each do |p|
+        csv << [
+          p.date.to_s,
+          p.loan.borrower_name,
+          p.loan_id,
+          p.amount.to_f,
+          p.principal_portion.to_f,
+          p.interest_portion.to_f,
+          p.late_fee.to_f,
+          p.note
+        ]
+      end
+    end
   end
 
   def serialize_payment(payment)
