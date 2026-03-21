@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react'
-import { Link, router } from '@inertiajs/react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
+import { Link, router, usePage } from '@inertiajs/react'
 import AppLayout from '@/layouts/AppLayout'
 import RecordPaymentModal from '@/components/RecordPaymentModal'
 import type { LoanProps, PaymentRecord } from '@/types/loan'
@@ -25,10 +25,20 @@ const LOAN_TYPE_LABELS: Record<string, string> = {
 }
 
 export default function LoansShow({ loan, total_capital, can_generate_reports }: Props) {
+  const { current_user } = usePage<{ current_user: { effective_plan: string } }>().props
+  const isPro = current_user?.effective_plan === 'pro' || current_user?.effective_plan === 'fund'
+
   const [actionsOpen, setActionsOpen] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState(false)
   const [detailsOpen, setDetailsOpen] = useState(false)
   const [paymentModalOpen, setPaymentModalOpen] = useState(false)
+
+  // AI states
+  const [memoModalOpen, setMemoModalOpen] = useState(false)
+  const [memoText, setMemoText] = useState<string | null>(null)
+  const [memoLoading, setMemoLoading] = useState(false)
+  const [riskNarrative, setRiskNarrative] = useState<string | null>(null)
+  const [riskLoading, setRiskLoading] = useState(false)
 
   const badge = STATUS_BADGES[loan.status] || STATUS_BADGES.active
 
@@ -65,6 +75,74 @@ export default function LoansShow({ loan, total_capital, can_generate_reports }:
 
     return alerts
   }, [loan])
+
+  // Fetch risk narrative on load (Pro only, async)
+  useEffect(() => {
+    if (!isPro) return
+
+    setRiskLoading(true)
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+
+    fetch('/api/ai/risk_narrative', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+      body: JSON.stringify({ loan_id: loan.id }),
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success && data.narrative) {
+          setRiskNarrative(data.narrative)
+        }
+      })
+      .catch(() => { /* fail silently */ })
+      .finally(() => setRiskLoading(false))
+  }, [loan.id, isPro])
+
+  const handleGenerateMemo = useCallback(() => {
+    setMemoModalOpen(true)
+    setMemoLoading(true)
+    setMemoText(null)
+
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+
+    fetch('/api/ai/deal_memo', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+      body: JSON.stringify({ loan_id: loan.id }),
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success) {
+          setMemoText(data.memo)
+        } else {
+          setMemoText(null)
+          setMemoModalOpen(false)
+        }
+      })
+      .catch(() => {
+        setMemoText(null)
+        setMemoModalOpen(false)
+      })
+      .finally(() => setMemoLoading(false))
+  }, [loan.id])
+
+  function handleCopyMemo() {
+    if (memoText) {
+      navigator.clipboard.writeText(memoText)
+    }
+  }
+
+  function handleDownloadMemoPdf() {
+    if (!memoText) return
+    // Create a simple text download (true PDF would require a backend endpoint)
+    const blob = new Blob([`DEAL MEMO\n${loan.borrower_name}\n${'='.repeat(40)}\n\n${memoText}`], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `deal_memo_${loan.borrower_name.replace(/\s+/g, '_').toLowerCase()}.txt`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
 
   function handleDelete() {
     router.delete(`/loans/${loan.id}`, { preserveScroll: true })
@@ -107,7 +185,31 @@ export default function LoansShow({ loan, total_capital, can_generate_reports }:
             </p>
           </div>
 
-          <div className="relative flex items-center gap-2">
+          <div className="relative flex items-center gap-2 flex-wrap">
+            {/* AI Deal Memo Button (Pro only) */}
+            {isPro ? (
+              <button
+                onClick={handleGenerateMemo}
+                className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100 transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 0 0-2.455 2.456Z" />
+                </svg>
+                Deal Memo
+              </button>
+            ) : (
+              <Link
+                href="/billing"
+                className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-gray-400 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors"
+                title="Upgrade to Pro for AI deal memos"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                </svg>
+                AI Memo (Pro)
+              </Link>
+            )}
+
             {/* PDF Downloads */}
             {can_generate_reports ? (
               <>
@@ -186,6 +288,35 @@ export default function LoansShow({ loan, total_capital, can_generate_reports }:
             </div>
           </div>
         </div>
+
+        {/* AI Risk Narrative (Pro only) */}
+        {isPro && (riskLoading || riskNarrative) && (
+          <div className="mb-6">
+            {riskLoading ? (
+              <div className="bg-indigo-50/50 rounded-xl border border-indigo-100 p-5 animate-pulse">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-4 h-4 bg-indigo-200 rounded" />
+                  <div className="h-4 w-32 bg-indigo-200 rounded" />
+                </div>
+                <div className="space-y-2">
+                  <div className="h-3 bg-indigo-100 rounded w-full" />
+                  <div className="h-3 bg-indigo-100 rounded w-5/6" />
+                  <div className="h-3 bg-indigo-100 rounded w-4/6" />
+                </div>
+              </div>
+            ) : riskNarrative ? (
+              <div className="bg-indigo-50/50 rounded-xl border border-indigo-100 p-5">
+                <div className="flex items-center gap-2 mb-2">
+                  <svg className="w-4 h-4 text-indigo-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 0 0-2.455 2.456Z" />
+                  </svg>
+                  <h3 className="text-sm font-semibold text-indigo-700">AI Risk Assessment</h3>
+                </div>
+                <p className="text-sm text-indigo-900/80 leading-relaxed">{riskNarrative}</p>
+              </div>
+            ) : null}
+          </div>
+        )}
 
         {/* Key Metrics Row */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -359,6 +490,76 @@ export default function LoansShow({ loan, total_capital, can_generate_reports }:
                   Delete Loan
                 </button>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Deal Memo Modal */}
+        {memoModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+            <div className="bg-white rounded-2xl p-6 max-w-2xl w-full mx-4 shadow-xl max-h-[80vh] overflow-y-auto">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <svg className="w-5 h-5 text-indigo-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 0 0-2.455 2.456Z" />
+                  </svg>
+                  <h3 className="text-lg font-bold text-gray-900">Deal Memo</h3>
+                </div>
+                <button
+                  onClick={() => setMemoModalOpen(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <p className="text-xs text-gray-400 mb-4">
+                {loan.borrower_name} &middot; ${loan.principal.toLocaleString()} &middot; {loan.annual_rate}% &middot; {loan.term_months}mo
+              </p>
+
+              {memoLoading ? (
+                <div className="space-y-3 animate-pulse">
+                  <div className="h-4 bg-gray-100 rounded w-full" />
+                  <div className="h-4 bg-gray-100 rounded w-11/12" />
+                  <div className="h-4 bg-gray-100 rounded w-full" />
+                  <div className="h-4 bg-gray-100 rounded w-10/12" />
+                  <div className="h-4 bg-gray-50 rounded w-full mt-4" />
+                  <div className="h-4 bg-gray-50 rounded w-11/12" />
+                  <div className="h-4 bg-gray-50 rounded w-9/12" />
+                  <div className="h-4 bg-gray-50 rounded w-full mt-4" />
+                  <div className="h-4 bg-gray-50 rounded w-10/12" />
+                  <div className="h-4 bg-gray-50 rounded w-7/12" />
+                  <p className="text-xs text-gray-400 text-center mt-4">Generating deal memo...</p>
+                </div>
+              ) : memoText ? (
+                <>
+                  <div className="prose prose-sm max-w-none text-gray-700 whitespace-pre-wrap leading-relaxed">
+                    {memoText}
+                  </div>
+                  <div className="flex gap-3 mt-6 pt-4 border-t border-gray-100">
+                    <button
+                      onClick={handleCopyMemo}
+                      className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75" />
+                      </svg>
+                      Copy
+                    </button>
+                    <button
+                      onClick={handleDownloadMemoPdf}
+                      className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                      </svg>
+                      Download
+                    </button>
+                  </div>
+                </>
+              ) : null}
             </div>
           </div>
         )}

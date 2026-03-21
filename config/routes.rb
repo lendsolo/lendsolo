@@ -62,6 +62,12 @@ Rails.application.routes.draw do
   # Stripe webhooks
   post "webhooks/stripe", to: "webhooks#stripe"
 
+  # AI features (Pro gate)
+  namespace :api do
+    post "ai/deal_memo", to: "ai#deal_memo"
+    post "ai/risk_narrative", to: "ai#risk_narrative"
+  end
+
   # Waitlist (public)
   post "waitlist", to: "waitlist#create"
 

@@ -32,6 +32,9 @@ gem "prawn-table", "~> 0.2"
 # Transactional email via Resend
 gem "resend", "~> 0.17"
 
+# Anthropic API for AI features
+gem "anthropic", "~> 0.3"
+
 group :development, :test do
   gem "dotenv-rails"
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"

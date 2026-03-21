@@ -43,3 +43,5 @@ services:
         sync: false
       - key: RESEND_FROM_DOMAIN
         sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
