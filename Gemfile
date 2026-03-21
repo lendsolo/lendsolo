@@ -26,6 +26,10 @@ gem "roo", "~> 2.10"
 # Stripe payments
 gem "stripe", "~> 13.0"
 
+# PDF generation
+gem "prawn", "~> 2.5"
+gem "prawn-table", "~> 0.2"
+
 group :development, :test do
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
   gem "brakeman", require: false

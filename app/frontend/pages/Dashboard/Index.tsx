@@ -286,6 +286,32 @@ export default function DashboardIndex({ stats, monthly_interest_data, upcoming_
                 </div>
               </div>
             </div>
+
+            {/* Tax Season CTA — show Oct through Apr */}
+            {(() => {
+              const month = new Date().getMonth() // 0-indexed
+              const isTaxSeason = month >= 9 || month <= 3 // Oct=9, Nov=10, Dec=11, Jan=0, Feb=1, Mar=2, Apr=3
+              if (!isTaxSeason || !stats.total_interest_earned) return null
+              return (
+                <Link
+                  href="/exports"
+                  className="mt-4 block p-4 rounded-xl bg-gradient-to-r from-indigo-50 to-emerald-50 border border-indigo-100 hover:border-indigo-200 transition-colors group"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="text-lg">📋</span>
+                      <div>
+                        <p className="text-sm font-semibold text-gray-900">Tax season coming up?</p>
+                        <p className="text-xs text-gray-500">Download your year-end summary for your accountant →</p>
+                      </div>
+                    </div>
+                    <svg className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                    </svg>
+                  </div>
+                </Link>
+              )
+            })()}
           </>
         )}
       </div>

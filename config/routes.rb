@@ -27,6 +27,13 @@ Rails.application.routes.draw do
   get "import", to: "imports#new", as: :new_import
   post "import", to: "imports#create", as: :imports
   post "import/process", to: "imports#process_import", as: :process_import
+  # Exports
+  get "exports", to: "exports#index"
+  get "exports/year_end_summary.pdf", to: "exports#year_end_summary_pdf", as: :export_pdf
+  get "exports/year_end_summary.csv", to: "exports#year_end_summary_csv", as: :export_csv
+  get "exports/quickbooks.qbo", to: "exports#quickbooks_qbo", as: :export_qbo
+  get "exports/expenses.csv", to: "exports#expenses_csv", as: :export_expenses_csv
+
   get "calculators", to: "calculators#index"
   get "settings", to: "settings#index"
   patch "settings", to: "settings#update"
