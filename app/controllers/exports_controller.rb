@@ -120,7 +120,8 @@ class ExportsController < ApplicationController
     expenses = current_user.expenses.where(date: year_start..year_end).order(:date)
     total_expenses = expenses.sum(:amount).to_f
 
-    expenses_by_category = expenses.group(:category).sum(:amount).transform_values(&:to_f)
+    expenses_by_category = current_user.expenses.where(date: year_start..year_end)
+                                       .group(:category).sum(:amount).transform_values(&:to_f)
 
     total_interest = loan_summaries.sum { |l| l[:interest_received] }
     total_principal = loan_summaries.sum { |l| l[:principal_received] }
