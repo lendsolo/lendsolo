@@ -12,8 +12,7 @@ services:
     buildCommand: |
       bundle install &&
       npm install &&
-      npx vite build &&
-      bundle exec rails db:migrate
+      npx vite build
     startCommand: bundle exec puma -C config/puma.rb
     envVars:
       - key: DATABASE_URL
