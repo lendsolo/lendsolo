@@ -18,6 +18,9 @@ Rails.application.routes.draw do
   end
   resources :payments, only: %i[index]
   resources :expenses, only: %i[index create destroy]
+  get "import", to: "imports#new", as: :new_import
+  post "import", to: "imports#create", as: :imports
+  post "import/process", to: "imports#process_import", as: :process_import
   get "calculators", to: "calculators#index"
   get "settings", to: "settings#index"
   patch "settings", to: "settings#update"

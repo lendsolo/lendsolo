@@ -20,6 +20,9 @@ gem "vite_rails"
 # Authentication
 gem "devise"
 
+# Spreadsheet parsing for imports
+gem "roo", "~> 2.10"
+
 group :development, :test do
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
   gem "brakeman", require: false
