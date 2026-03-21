@@ -23,12 +23,14 @@
   --color-danger-text: #B33D2F;
 }
 
-/* Base typography */
-body {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  color: #4D4D45;
-}
+/* Base typography — must be in @layer base so Tailwind utilities can override */
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: #4D4D45;
+  }
 
-h1, h2, h3, h4, h5, h6 {
-  color: #1C1C19;
+  h1, h2, h3, h4, h5, h6 {
+    color: #1C1C19;
+  }
 }
