@@ -1,5 +1,6 @@
 class ToolsController < ApplicationController
   skip_before_action :authenticate_user!
+  skip_before_action :redirect_to_onboarding
 
   def amortization_calculator
     render inertia: "Tools/AmortizationCalculator"

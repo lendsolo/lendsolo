@@ -1,5 +1,6 @@
 class ApplicationController < ActionController::Base
   before_action :authenticate_user!
+  before_action :redirect_to_onboarding
 
   inertia_share do
     {
@@ -9,5 +10,14 @@ class ApplicationController < ActionController::Base
         alert: flash[:alert]
       }
     }
+  end
+
+  private
+
+  def redirect_to_onboarding
+    return unless current_user
+    return if current_user.has_completed_onboarding
+
+    redirect_to onboarding_path unless request.path.start_with?("/onboarding")
   end
 end

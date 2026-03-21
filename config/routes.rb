@@ -8,6 +8,12 @@ Rails.application.routes.draw do
 
   root "pages#landing"
 
+  # Onboarding
+  get "onboarding", to: "onboarding#show"
+  post "onboarding/profile", to: "onboarding#update_profile"
+  post "onboarding/seed", to: "onboarding#seed_sample_data"
+  post "onboarding/complete", to: "onboarding#complete"
+
   get "dashboard", to: "dashboard#index"
   resources :loans do
     member do
