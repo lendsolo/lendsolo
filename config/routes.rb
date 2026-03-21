@@ -62,6 +62,9 @@ Rails.application.routes.draw do
   # Stripe webhooks
   post "webhooks/stripe", to: "webhooks#stripe"
 
+  # Waitlist (public)
+  post "waitlist", to: "waitlist#create"
+
   # Public calculator tools (no auth required)
   get "tools/loan-amortization-calculator", to: "tools#amortization_calculator"
   get "tools/roi-calculator", to: "tools#roi_calculator"
