@@ -11,7 +11,7 @@ const SCREENSHOTS = [
           {/* Sidebar mock */}
           <div className="hidden sm:flex flex-col gap-2 w-36 shrink-0">
             {['Dashboard', 'Loans', 'Payments', 'Expenses', 'Settings'].map((item, i) => (
-              <div key={item} className={`px-3 py-2 rounded-md text-xs ${i === 0 ? 'bg-white/10 text-[#34D399]' : 'text-white/40'}`}>
+              <div key={item} className={`px-3 py-2 rounded-md text-xs ${i === 0 ? 'bg-white/10 text-[#34D399]' : 'text-white/60'}`}>
                 {item}
               </div>
             ))}
@@ -26,7 +26,7 @@ const SCREENSHOTS = [
                 ['Active Loans', '4'],
               ].map(([label, value]) => (
                 <div key={label} className="bg-white/5 rounded-lg p-3">
-                  <div className="text-[10px] text-white/40">{label}</div>
+                  <div className="text-[10px] text-white/60">{label}</div>
                   <div className="text-sm font-bold text-white mt-1 font-mono">{value}</div>
                 </div>
               ))}
@@ -38,7 +38,7 @@ const SCREENSHOTS = [
             </div>
             <div className="space-y-1.5">
               {['Marcus W. — $3,987 due Mar 15', 'Sarah K. — $1,250 due Mar 18', 'Tom R. — $2,100 due Mar 22'].map((item) => (
-                <div key={item} className="bg-white/5 rounded-md px-3 py-2 text-xs text-white/50">{item}</div>
+                <div key={item} className="bg-white/5 rounded-md px-3 py-2 text-xs text-white/70">{item}</div>
               ))}
             </div>
           </div>

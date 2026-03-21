@@ -35,17 +35,17 @@ export default function Hero() {
           <h1 className="font-display text-4xl sm:text-5xl lg:text-7xl font-bold text-white leading-[1.1] tracking-tight">
             Stop managing your loans in{' '}
             <span className="relative inline-block">
-              <span className="text-white/30">spreadsheets.</span>
+              <span className="text-white/60">spreadsheets.</span>
               {/* Strikethrough line */}
               <span
-                className="absolute left-0 right-0 top-1/2 h-[3px] sm:h-[4px] bg-white/25 -rotate-1"
+                className="absolute left-0 right-0 top-1/2 h-[3px] sm:h-[4px] bg-white/50 -rotate-1"
                 aria-hidden="true"
               />
             </span>
           </h1>
 
           <div className="mt-8 sm:mt-10 max-w-2xl space-y-4">
-            <p className="text-lg sm:text-xl text-white/60 leading-relaxed font-body">
+            <p className="text-lg sm:text-xl text-white/75 leading-relaxed font-body">
               You've got real money out there — $40K to a house flipper, $25K to a friend's rental rehab,
               another $60K on a bridge loan closing next week. Your spreadsheet doesn't know any of that is late.
               It doesn't warn you when one borrower is 70% of your capital. It can't tell you what you earned

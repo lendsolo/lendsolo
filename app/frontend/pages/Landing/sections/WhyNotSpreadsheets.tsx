@@ -65,7 +65,7 @@ export default function WhyNotSpreadsheets() {
           <h2 className="mt-4 text-3xl sm:text-4xl font-bold text-white font-display leading-tight">
             Your spreadsheet doesn't know what it doesn't know.
           </h2>
-          <p className="mt-4 text-lg text-white/50 font-body leading-relaxed">
+          <p className="mt-4 text-lg text-white/70 font-body leading-relaxed">
             Most private lenders start in Excel. Here's where it breaks.
           </p>
         </div>
@@ -86,7 +86,7 @@ export default function WhyNotSpreadsheets() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="text-lg font-bold text-white font-display">{card.title}</h3>
-                  <p className="mt-3 text-sm text-white/50 leading-relaxed font-body">
+                  <p className="mt-3 text-sm text-white/70 leading-relaxed font-body">
                     {card.description}
                   </p>
                 </div>
@@ -97,7 +97,7 @@ export default function WhyNotSpreadsheets() {
 
         {/* Closing line */}
         <div className="mt-12 sm:mt-16 text-center">
-          <p className="text-lg sm:text-xl text-white/70 font-body max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg sm:text-xl text-white/80 font-body max-w-2xl mx-auto leading-relaxed">
             LendSolo doesn't replace your spreadsheet.{' '}
             <span className="font-semibold text-white">It makes the spreadsheet unnecessary.</span>
           </p>

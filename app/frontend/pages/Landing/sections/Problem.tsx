@@ -45,7 +45,7 @@ export default function Problem() {
           <h2 className="mt-4 text-3xl sm:text-4xl font-bold text-white font-display leading-tight">
             Most private lenders managing under 15 loans aren't using loan software.
           </h2>
-          <p className="mt-4 text-lg text-white/50 font-body leading-relaxed">
+          <p className="mt-4 text-lg text-white/70 font-body leading-relaxed">
             They're using one of four things — and each one breaks at a specific, predictable moment.
           </p>
         </div>
@@ -59,13 +59,13 @@ export default function Problem() {
             >
               <span className="text-4xl">{card.emoji}</span>
               <h3 className="mt-4 text-lg font-bold text-white font-display">{card.title}</h3>
-              <p className="mt-3 text-sm text-white/50 leading-relaxed font-body">
+              <p className="mt-3 text-sm text-white/70 leading-relaxed font-body">
                 {card.description}
               </p>
               <div className="mt-5 px-4 py-3 rounded-lg" style={{ backgroundColor: 'rgba(181, 133, 10, 0.1)' }}>
                 <p className="text-sm">
-                  <span className="font-semibold" style={{ color: '#B5850A' }}>Breaks when: </span>
-                  <span className="text-[#B5850A]/80">{card.breaksWhen}</span>
+                  <span className="font-semibold" style={{ color: '#E0A80D' }}>Breaks when: </span>
+                  <span style={{ color: '#D4A017' }}>{card.breaksWhen}</span>
                 </p>
               </div>
             </div>
@@ -74,7 +74,7 @@ export default function Problem() {
 
         {/* Transition line */}
         <div className="mt-12 sm:mt-16 text-center">
-          <p className="text-lg sm:text-xl text-white/70 font-body max-w-2xl mx-auto">
+          <p className="text-lg sm:text-xl text-white/80 font-body max-w-2xl mx-auto">
             LendSolo replaces all of it — without the learning curve of enterprise software built for mortgage companies.
           </p>
         </div>

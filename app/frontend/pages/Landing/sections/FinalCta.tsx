@@ -9,10 +9,10 @@ export default function FinalCta() {
       <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 text-center">
         <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white font-display leading-tight">
           Start with the free tools.{' '}
-          <span className="text-white/50">No account needed.</span>
+          <span className="text-white/70">No account needed.</span>
         </h2>
 
-        <p className="mt-6 text-lg text-white/60 font-body max-w-xl mx-auto leading-relaxed">
+        <p className="mt-6 text-lg text-white/75 font-body max-w-xl mx-auto leading-relaxed">
           The loan amortization calculator, ROI tool, and loan comparison calculator are free — no signup,
           no credit card, no commitment. Use them for your next deal. If LendSolo earns a place in your
           workflow, you'll know.
@@ -30,11 +30,11 @@ export default function FinalCta() {
           </Link>
         </div>
 
-        <p className="mt-6 text-sm text-white/40 font-body">
+        <p className="mt-6 text-sm text-white/60 font-body">
           Or start a 14-day free trial with a full account. No credit card required.
         </p>
 
-        <p className="mt-3 text-xs text-white/25 font-body">
+        <p className="mt-3 text-xs text-white/50 font-body">
           Solo plan is $19/month after trial. Cancel anytime. Your data is always exportable.
         </p>
       </div>

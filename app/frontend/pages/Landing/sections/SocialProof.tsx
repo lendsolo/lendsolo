@@ -34,7 +34,7 @@ export default function SocialProof() {
           <h2 className="mt-4 text-3xl sm:text-4xl font-bold text-white font-display">
             We're in private beta with a small group of real private lenders.
           </h2>
-          <p className="mt-4 text-lg text-white/50 font-body">Here's what they've told us.</p>
+          <p className="mt-4 text-lg text-white/70 font-body">Here's what they've told us.</p>
         </div>
 
         {/* Testimonial cards */}
@@ -47,13 +47,13 @@ export default function SocialProof() {
               {/* Avatar placeholder */}
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
-                  <svg className="w-6 h-6 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-6 h-6 text-white/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                   </svg>
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-white">{t.name}</p>
-                  <p className="text-xs text-white/40">
+                  <p className="text-xs text-white/60">
                     {t.role} — {t.location}
                   </p>
                 </div>
@@ -63,7 +63,7 @@ export default function SocialProof() {
               <p className="mt-3 text-xs font-medium text-[#34D399]/80 font-mono">{t.stats}</p>
 
               {/* Quote */}
-              <p className="mt-4 text-sm text-white/60 italic leading-relaxed font-body">
+              <p className="mt-4 text-sm text-white/70 italic leading-relaxed font-body">
                 "{t.quote}"
               </p>
             </div>
