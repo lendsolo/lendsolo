@@ -32,6 +32,14 @@ Rails.application.routes.draw do
   patch "settings", to: "settings#update"
   delete "settings/reset_data", to: "settings#reset_data"
 
+  # Billing & Subscriptions
+  get "billing", to: "subscriptions#show"
+  post "billing/subscribe", to: "subscriptions#create"
+  post "billing/portal", to: "subscriptions#portal"
+
+  # Stripe webhooks
+  post "webhooks/stripe", to: "webhooks#stripe"
+
   # Public calculator tools (no auth required)
   get "tools/loan-amortization-calculator", to: "tools#amortization_calculator"
   get "tools/roi-calculator", to: "tools#roi_calculator"

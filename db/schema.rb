@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_20_214402) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_21_021547) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -19,6 +19,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_20_214402) do
   create_enum "expense_category", ["legal", "filing", "software", "marketing", "insurance", "travel", "office", "other"]
   create_enum "loan_status", ["active", "paid_off", "defaulted", "written_off"]
   create_enum "loan_type", ["standard", "interest_only", "balloon"]
+  create_enum "subscription_plan", ["free", "solo", "pro", "fund"]
 
   create_table "expenses", force: :cascade do |t|
     t.bigint "user_id", null: false
@@ -72,8 +73,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_20_214402) do
     t.boolean "has_completed_onboarding", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "stripe_customer_id"
+    t.string "stripe_subscription_id"
+    t.enum "subscription_plan", default: "free", null: false, enum_type: "subscription_plan"
+    t.string "subscription_status", default: "incomplete", null: false
+    t.datetime "trial_ends_at"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+    t.index ["stripe_customer_id"], name: "index_users_on_stripe_customer_id", unique: true
   end
 
   add_foreign_key "expenses", "users"

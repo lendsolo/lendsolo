@@ -5,6 +5,13 @@ interface User {
   id: number
   email: string
   business_name: string | null
+  subscription_plan: string
+  effective_plan: string
+  on_trial: boolean
+  trial_days_remaining: number
+  trial_expired: boolean
+  active_loan_count: number
+  loan_limit: number | null
 }
 
 interface PageProps {
@@ -19,6 +26,7 @@ const navItems = [
   { name: 'Expenses', href: '/expenses', icon: ReceiptIcon },
   { name: 'Import', href: '/import', icon: ArrowUpTrayIcon },
   { name: 'Calculators', href: '/calculators', icon: CalculatorIcon },
+  { name: 'Billing', href: '/billing', icon: SparklesIcon },
   { name: 'Settings', href: '/settings', icon: CogIcon },
 ]
 
@@ -70,6 +78,14 @@ function CalculatorIcon() {
   )
 }
 
+function SparklesIcon() {
+  return (
+    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 0 0-2.455 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z" />
+    </svg>
+  )
+}
+
 function CogIcon() {
   return (
     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -79,17 +95,31 @@ function CogIcon() {
   )
 }
 
+const PLAN_BADGES: Record<string, { label: string; bg: string; text: string }> = {
+  free: { label: 'Free', bg: 'bg-gray-600', text: 'text-gray-300' },
+  solo: { label: 'Solo', bg: 'bg-emerald-900', text: 'text-emerald-400' },
+  pro: { label: 'Pro', bg: 'bg-indigo-900', text: 'text-indigo-400' },
+  fund: { label: 'Fund', bg: 'bg-amber-900', text: 'text-amber-400' },
+}
+
 export default function AppLayout({ children }: { children: ReactNode }) {
   const { current_user } = usePage<PageProps>().props
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const currentPath = window.location.pathname
+
+  const planBadge = PLAN_BADGES[current_user?.effective_plan || 'free'] || PLAN_BADGES.free
 
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
       <aside className="w-64 flex-shrink-0 flex flex-col" style={{ backgroundColor: '#0F1419' }}>
         <div className="p-6">
-          <h1 className="text-xl font-bold text-white tracking-tight">LendSolo</h1>
+          <div className="flex items-center justify-between">
+            <h1 className="text-xl font-bold text-white tracking-tight">LendSolo</h1>
+            <span className={`px-1.5 py-0.5 text-[9px] font-bold rounded ${planBadge.bg} ${planBadge.text}`}>
+              {planBadge.label}
+            </span>
+          </div>
           <p className="text-xs text-gray-500 mt-1">Loan Management</p>
         </div>
 
@@ -114,6 +144,43 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             )
           })}
         </nav>
+
+        {/* Trial / Plan info */}
+        <div className="px-3 pb-2">
+          {current_user?.on_trial && (
+            <Link
+              href="/billing"
+              className="block p-3 rounded-lg bg-gradient-to-r from-emerald-900/50 to-indigo-900/50 border border-emerald-800/30 mb-2"
+            >
+              <p className="text-[10px] font-semibold text-emerald-400 uppercase tracking-wider">Free Trial</p>
+              <p className="text-xs text-gray-300 mt-0.5">
+                {current_user.trial_days_remaining} day{current_user.trial_days_remaining !== 1 ? 's' : ''} remaining
+              </p>
+              <div className="h-1 bg-gray-700 rounded-full mt-2 overflow-hidden">
+                <div
+                  className="h-full bg-emerald-500 rounded-full"
+                  style={{ width: `${Math.max(5, ((14 - current_user.trial_days_remaining) / 14) * 100)}%` }}
+                />
+              </div>
+            </Link>
+          )}
+          {current_user?.trial_expired && (
+            <Link
+              href="/billing"
+              className="block p-3 rounded-lg bg-red-950/50 border border-red-800/30 mb-2"
+            >
+              <p className="text-[10px] font-semibold text-red-400">Trial expired</p>
+              <p className="text-xs text-gray-400 mt-0.5">Upgrade to keep creating loans</p>
+            </Link>
+          )}
+          {current_user?.loan_limit && (
+            <div className="px-3 py-2">
+              <p className="text-[10px] text-gray-500">
+                {current_user.active_loan_count} / {current_user.loan_limit} active loans
+              </p>
+            </div>
+          )}
+        </div>
 
         <div className="p-4 border-t border-gray-800">
           <p className="text-xs text-gray-500">v1.0.0</p>
@@ -146,6 +213,12 @@ export default function AppLayout({ children }: { children: ReactNode }) {
 
             {userMenuOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+                <Link
+                  href="/billing"
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                >
+                  Billing
+                </Link>
                 <Link
                   href="/settings"
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"

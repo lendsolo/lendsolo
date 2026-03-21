@@ -1,5 +1,6 @@
 class LoansController < ApplicationController
   before_action :set_loan, only: %i[show edit update destroy mark_paid_off mark_defaulted]
+  before_action :enforce_loan_limit!, only: %i[create]
 
   def index
     loans = current_user.loans.includes(:payments).order(created_at: :desc)
@@ -24,6 +25,10 @@ class LoansController < ApplicationController
     loan = current_user.loans.build(loan_params)
 
     if loan.save
+      # Start 14-day trial on first real loan (not sample data)
+      if current_user.trial_ends_at.nil? && !current_user.active_subscription? && !loan.notes&.start_with?("Sample data")
+        current_user.start_trial!
+      end
       redirect_to loan_path(loan), notice: "Loan created successfully."
     else
       redirect_to new_loan_path, inertia: { errors: loan.errors.to_hash(true) }

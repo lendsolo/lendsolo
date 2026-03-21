@@ -23,6 +23,9 @@ gem "devise"
 # Spreadsheet parsing for imports
 gem "roo", "~> 2.10"
 
+# Stripe payments
+gem "stripe", "~> 13.0"
+
 group :development, :test do
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
   gem "brakeman", require: false
