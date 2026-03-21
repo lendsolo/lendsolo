@@ -5,7 +5,6 @@ gem "propshaft"
 gem "pg", "~> 1.1"
 gem "puma", ">= 5.0"
 gem "tzinfo-data", platforms: %i[ windows jruby ]
-gem "solid_cache"
 gem "solid_queue"
 gem "bootsnap", require: false
 gem "kamal", require: false

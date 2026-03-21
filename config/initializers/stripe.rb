@@ -1,1 +1,1 @@
-Stripe.api_key = ENV.fetch("STRIPE_SECRET_KEY", "sk_test_placeholder")
+Stripe.api_key = ENV["STRIPE_SECRET_KEY"] if ENV["STRIPE_SECRET_KEY"].present?

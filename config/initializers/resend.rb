@@ -1,1 +1,1 @@
-Resend.api_key = ENV.fetch("RESEND_API_KEY", "re_placeholder")
+Resend.api_key = ENV["RESEND_API_KEY"] if ENV["RESEND_API_KEY"].present?
