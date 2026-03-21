@@ -46,3 +46,7 @@ end
 group :development do
   gem "web-console"
 end
+
+gem "front_matter_parser", "~> 1.0"
+gem "redcarpet", "~> 3.6"
+gem "rouge", "~> 4.7"

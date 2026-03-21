@@ -22,6 +22,12 @@ export default function PublicLayout({ children, title, description }: Props) {
 
           <nav className="flex items-center gap-3">
             <Link
+              href="/blog"
+              className="hidden sm:inline-block text-sm text-gray-600 hover:text-gray-900 px-3 py-2"
+            >
+              Blog
+            </Link>
+            <Link
               href="/tools/loan-amortization-calculator"
               className="hidden sm:inline-block text-sm text-gray-600 hover:text-gray-900 px-3 py-2"
             >
@@ -66,7 +72,8 @@ export default function PublicLayout({ children, title, description }: Props) {
               </div>
               <span className="text-sm text-gray-500">LendSolo — Loan management for private lenders</span>
             </div>
-            <nav className="flex gap-6 text-sm text-gray-500">
+            <nav className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-gray-500">
+              <Link href="/blog" className="hover:text-gray-700">Blog</Link>
               <Link href="/tools/loan-amortization-calculator" className="hover:text-gray-700">Amortization</Link>
               <Link href="/tools/roi-calculator" className="hover:text-gray-700">ROI Calculator</Link>
               <Link href="/tools/loan-comparison" className="hover:text-gray-700">Loan Comparison</Link>

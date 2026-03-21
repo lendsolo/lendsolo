@@ -76,4 +76,12 @@ Rails.application.routes.draw do
   get "tools/roi-calculator", to: "tools#roi_calculator"
   get "tools/loan-comparison", to: "tools#loan_comparison"
   get "tools/interest-only-calculator", to: "tools#interest_only_calculator"
+
+  # Blog
+  get "blog", to: "blog#index", as: :blog
+  get "blog/feed.xml", to: "blog#feed", as: :blog_feed, defaults: { format: :xml }
+  get "blog/:slug", to: "blog#show", as: :blog_post
+
+  # SEO
+  get "sitemap.xml", to: "sitemap#show", as: :sitemap, defaults: { format: :xml }
 end
