@@ -40,9 +40,16 @@ export default function AmortizationCalculatorPage() {
       description="Calculate monthly payments, total interest, and view full amortization schedules for standard, interest-only, and balloon loans."
     >
       <SeoHead
-        title="Free Loan Amortization Calculator"
-        description="Calculate monthly payments, total interest, and view full amortization schedules for private lending. Supports standard, interest-only, and balloon loan structures."
-        canonicalPath="/tools/loan-amortization-calculator"
+        title="Free Loan Amortization Calculator | LendSolo"
+        description="Generate amortization schedules for standard, interest-only, and balloon loans. See monthly payments, total interest, and principal breakdown instantly."
+        canonicalUrl="https://lendsolo.com/tools/loan-amortization-calculator"
+        schema={{
+          '@type': 'FinancialProduct',
+          name: 'Loan Amortization Calculator',
+          description: 'Generate amortization schedules for standard, interest-only, and balloon loans. See monthly payments, total interest, and principal breakdown instantly.',
+          url: 'https://lendsolo.com/tools/loan-amortization-calculator',
+          provider: { '@type': 'Organization', name: 'LendSolo' },
+        }}
       />
 
       <div className="grid lg:grid-cols-[400px_1fr] gap-8">
