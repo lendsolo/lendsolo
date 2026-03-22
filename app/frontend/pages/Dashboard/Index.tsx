@@ -27,7 +27,16 @@ interface MonthlyData {
   principal: number
 }
 
+interface CapitalTransaction {
+  id: number
+  transaction_type: 'infusion' | 'withdrawal' | 'adjustment'
+  amount: number
+  date: string
+  source: string | null
+}
+
 interface Props {
+  recent_capital_transactions: CapitalTransaction[]
   stats: {
     active_loans: number
     total_deployed: number
@@ -52,7 +61,7 @@ const ALLOCATION_COLORS = [
   '#ca8a04', '#4f46e5', '#dc2626', '#16a34a', '#9333ea',
 ]
 
-export default function DashboardIndex({ stats, monthly_interest_data, upcoming_payments, portfolio_allocation }: Props) {
+export default function DashboardIndex({ stats, monthly_interest_data, upcoming_payments, portfolio_allocation, recent_capital_transactions }: Props) {
   const hasLoans = stats.total_loans > 0
   const utilizationPercent = stats.total_capital > 0
     ? Math.min((stats.total_deployed / stats.total_capital) * 100, 100)
@@ -303,6 +312,61 @@ export default function DashboardIndex({ stats, monthly_interest_data, upcoming_
                   />
                 </div>
               </div>
+            </div>
+
+            {/* Recent Capital Activity */}
+            <div className="bg-white rounded-xl border border-gray-200 p-5 mt-4">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-semibold text-gray-900">Recent Capital Activity</h3>
+                {recent_capital_transactions.length > 0 && (
+                  <Link href="/capital_transactions" className="text-xs text-emerald-600 hover:text-emerald-700 font-medium">
+                    View all &rarr;
+                  </Link>
+                )}
+              </div>
+              {recent_capital_transactions.length === 0 ? (
+                <div className="text-center py-4">
+                  <p className="text-sm text-gray-400 mb-2">Track your capital</p>
+                  <Link
+                    href="/capital_transactions"
+                    className="text-xs text-emerald-600 hover:text-emerald-700 font-medium"
+                  >
+                    Log your first infusion &rarr;
+                  </Link>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {recent_capital_transactions.map((txn) => {
+                    const isWithdrawal = txn.transaction_type === 'withdrawal'
+                    const typeColors: Record<string, string> = {
+                      infusion: 'text-emerald-600',
+                      withdrawal: 'text-red-600',
+                      adjustment: 'text-gray-600',
+                    }
+                    const typeIcons: Record<string, string> = {
+                      infusion: '+',
+                      withdrawal: '-',
+                      adjustment: '~',
+                    }
+                    return (
+                      <div key={txn.id} className="flex items-center justify-between py-1.5">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className={`text-sm font-bold ${typeColors[txn.transaction_type]} w-4 text-center`}>
+                            {typeIcons[txn.transaction_type]}
+                          </span>
+                          <div className="min-w-0">
+                            <span className="text-sm text-gray-600 truncate block">{txn.source || txn.transaction_type}</span>
+                            <span className="text-[10px] text-gray-400">{txn.date}</span>
+                          </div>
+                        </div>
+                        <span className={`text-sm font-semibold font-mono shrink-0 ${typeColors[txn.transaction_type]}`}>
+                          {isWithdrawal ? '-' : '+'}${txn.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                        </span>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
             </div>
 
             {/* Tax Season CTA — show Oct through Apr */}

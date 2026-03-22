@@ -6,9 +6,31 @@ class User < ApplicationRecord
   has_many :borrowers, dependent: :destroy
   has_many :expenses, dependent: :destroy
   has_many :email_logs, dependent: :destroy
+  has_many :capital_transactions, dependent: :destroy
 
   attribute :subscription_plan, :string, default: "free"
   enum :subscription_plan, { free: "free", solo: "solo", pro: "pro", fund: "fund" }
+
+  # ── Capital helpers ────────────────────────────────────────────────────────
+
+  def computed_total_capital
+    infusions = capital_transactions.infusions.sum(:amount)
+    adjustments = capital_transactions.adjustments.sum(:amount)
+    withdrawals = capital_transactions.withdrawals.sum(:amount)
+    (infusions + adjustments - withdrawals).to_f
+  end
+
+  def capital_balance_on(date)
+    txns = capital_transactions.where("date <= ?", date)
+    infusions = txns.infusions.sum(:amount)
+    adjustments = txns.adjustments.sum(:amount)
+    withdrawals = txns.withdrawals.sum(:amount)
+    (infusions + adjustments - withdrawals).to_f
+  end
+
+  def sync_total_capital!
+    update!(total_capital: computed_total_capital)
+  end
 
   # ── Subscription helpers ────────────────────────────────────────────────────
 

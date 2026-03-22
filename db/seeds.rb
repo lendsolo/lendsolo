@@ -20,3 +20,30 @@ demo_user.expenses.find_or_create_by!(description: "LendSolo Pro Subscription") 
 end
 
 puts "Sample recurring expense created: LendSolo Pro Subscription ($39/mo)"
+
+# Sample capital transactions
+demo_user.capital_transactions.delete_all
+demo_user.capital_transactions.create!(
+  transaction_type: "infusion",
+  amount: 60_000,
+  date: 3.months.ago.to_date,
+  source: "Personal savings",
+  note: "Initial capital to start lending business"
+)
+demo_user.capital_transactions.create!(
+  transaction_type: "infusion",
+  amount: 20_000,
+  date: 1.month.ago.to_date,
+  source: "Sold index fund position",
+  note: "Liquidated VTSAX position to increase lending capital"
+)
+demo_user.capital_transactions.create!(
+  transaction_type: "withdrawal",
+  amount: 5_000,
+  date: 2.weeks.ago.to_date,
+  source: "Owner draw",
+  note: "Monthly owner draw"
+)
+demo_user.sync_total_capital!
+
+puts "Sample capital transactions created: $60k + $20k - $5k = $75k total capital"

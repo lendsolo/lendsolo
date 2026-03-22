@@ -35,6 +35,7 @@ Rails.application.routes.draw do
       get :export_csv
     end
   end
+  resources :capital_transactions, only: %i[index create destroy]
   resources :expenses, only: %i[index create destroy] do
     member do
       patch :stop_recurring

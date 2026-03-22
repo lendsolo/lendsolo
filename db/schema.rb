@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_22_195454) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_22_211000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -38,6 +38,19 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_22_195454) do
     t.datetime "updated_at", null: false
     t.index ["user_id", "name"], name: "index_borrowers_on_user_id_and_name"
     t.index ["user_id"], name: "index_borrowers_on_user_id"
+  end
+
+  create_table "capital_transactions", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "transaction_type", null: false
+    t.decimal "amount", precision: 12, scale: 2, null: false
+    t.date "date", null: false
+    t.string "source"
+    t.text "note"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "date"], name: "index_capital_transactions_on_user_id_and_date"
+    t.index ["user_id"], name: "index_capital_transactions_on_user_id"
   end
 
   create_table "email_logs", force: :cascade do |t|
@@ -263,6 +276,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_22_195454) do
   end
 
   add_foreign_key "borrowers", "users"
+  add_foreign_key "capital_transactions", "users"
   add_foreign_key "email_logs", "loans"
   add_foreign_key "email_logs", "users"
   add_foreign_key "expenses", "expenses", column: "recurring_parent_id"
