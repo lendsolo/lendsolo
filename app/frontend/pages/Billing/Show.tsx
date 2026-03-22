@@ -1,10 +1,11 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { router, usePage } from '@inertiajs/react'
 import AppLayout from '@/layouts/AppLayout'
 
 interface PlanDetail {
   name: string
   price: number
+  annual_price?: number
   loan_limit: number | null
   features: string[]
 }
@@ -30,6 +31,12 @@ const PLAN_COLORS: Record<string, { ring: string; bg: string; badge: string; but
   fund: { ring: 'ring-amber-200', bg: 'bg-white', badge: 'bg-amber-100 text-amber-700', button: 'bg-amber-600 hover:bg-amber-700 text-white' },
 }
 
+const ANNUAL_SAVINGS: Record<string, number> = {
+  solo: 29 * 12 - 290,
+  pro: 49 * 12 - 490,
+  fund: 99 * 12 - 990,
+}
+
 export default function BillingShow({
   plan,
   subscription_plan,
@@ -42,6 +49,8 @@ export default function BillingShow({
   plans,
   redirect_url,
 }: Props) {
+  const [billingInterval, setBillingInterval] = useState<'monthly' | 'annual'>('monthly')
+
   // Handle external redirects (Stripe Checkout / Portal)
   // Inertia intercepts all server redirects as XHR, so external URLs
   // must be redirected client-side via window.location.href
@@ -57,7 +66,7 @@ export default function BillingShow({
   const atLimit = loan_limit ? active_loan_count >= loan_limit : false
 
   function handleSubscribe(planKey: string) {
-    router.post('/billing/subscribe', { plan: planKey })
+    router.post('/billing/subscribe', { plan: planKey, interval: billingInterval })
   }
 
   function handlePortal() {
@@ -205,7 +214,37 @@ export default function BillingShow({
         </div>
 
         {/* Plan Comparison Grid */}
-        <h3 className="text-lg font-bold text-gray-900 mb-4">Plans</h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-bold text-gray-900">Plans</h3>
+
+          {/* Billing interval toggle */}
+          <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-0.5">
+            <button
+              onClick={() => setBillingInterval('monthly')}
+              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${
+                billingInterval === 'monthly'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Monthly
+            </button>
+            <button
+              onClick={() => setBillingInterval('annual')}
+              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-1.5 ${
+                billingInterval === 'annual'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Annual
+              <span className="px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-emerald-100 text-emerald-700">
+                Save 2 months
+              </span>
+            </button>
+          </div>
+        </div>
+
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {PLAN_ORDER.map((planKey) => {
             const p = plans[planKey]
@@ -214,6 +253,11 @@ export default function BillingShow({
             const isCurrent = plan === planKey
             const isDowngrade = PLAN_ORDER.indexOf(planKey) < PLAN_ORDER.indexOf(plan as typeof PLAN_ORDER[number])
             const isUpgrade = PLAN_ORDER.indexOf(planKey) > PLAN_ORDER.indexOf(plan as typeof PLAN_ORDER[number])
+
+            const showAnnual = billingInterval === 'annual' && planKey !== 'free'
+            const displayPrice = showAnnual && p.annual_price ? p.annual_price : p.price
+            const perLabel = showAnnual ? '/yr' : '/mo'
+            const savings = ANNUAL_SAVINGS[planKey]
 
             return (
               <div
@@ -232,9 +276,17 @@ export default function BillingShow({
                 </div>
 
                 <div className="flex items-baseline gap-0.5 mb-1">
-                  <span className="text-2xl font-bold text-gray-900">${p.price}</span>
-                  <span className="text-xs text-gray-400">/mo</span>
+                  <span className="text-2xl font-bold text-gray-900">${displayPrice}</span>
+                  <span className="text-xs text-gray-400">{perLabel}</span>
                 </div>
+
+                {showAnnual && savings ? (
+                  <p className="text-[11px] font-semibold text-emerald-600 mb-1">
+                    Save ${savings}/yr
+                  </p>
+                ) : (
+                  <p className="mb-1">&nbsp;</p>
+                )}
 
                 <p className="text-xs text-gray-500 mb-4">
                   {p.loan_limit ? `Up to ${p.loan_limit} active loans` : 'Unlimited active loans'}
