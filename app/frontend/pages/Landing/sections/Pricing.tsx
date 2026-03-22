@@ -4,7 +4,9 @@ import { useState } from 'react'
 const TIERS = [
   {
     name: 'Solo',
-    price: 29,
+    monthlyPrice: 29,
+    annualPrice: 290,
+    annualSavings: 58,
     description: 'For lenders just getting started',
     features: [
       'Up to 5 active loans',
@@ -18,7 +20,9 @@ const TIERS = [
   },
   {
     name: 'Pro',
-    price: 49,
+    monthlyPrice: 49,
+    annualPrice: 490,
+    annualSavings: 98,
     description: 'For active lenders running a real portfolio',
     badge: 'Best Value',
     features: [
@@ -33,7 +37,7 @@ const TIERS = [
   },
 ]
 
-function FundWaitlistCard() {
+function FundWaitlistCard({ isAnnual }: { isAnnual: boolean }) {
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
   const [message, setMessage] = useState('')
@@ -81,9 +85,14 @@ function FundWaitlistCard() {
       </div>
 
       <div className="mt-6 flex items-baseline gap-1">
-        <span className="text-4xl font-bold text-[#8A8A7E] font-mono line-through decoration-[#C4C4BC]">$99</span>
-        <span className="text-sm text-[#8A8A7E] font-body">/mo</span>
+        <span className="text-4xl font-bold text-[#8A8A7E] font-mono line-through decoration-[#C4C4BC]">
+          ${isAnnual ? 990 : 99}
+        </span>
+        <span className="text-sm text-[#8A8A7E] font-body">{isAnnual ? '/yr' : '/mo'}</span>
       </div>
+      {isAnnual && (
+        <p className="mt-1 text-xs font-semibold text-[#1A7A50] font-body">Save $198/yr</p>
+      )}
 
       <div className="mt-6 flex-1">
         <p className="text-sm text-[#4D4D45] font-body leading-relaxed">
@@ -131,6 +140,8 @@ function FundWaitlistCard() {
 }
 
 export default function Pricing() {
+  const [isAnnual, setIsAnnual] = useState(false)
+
   return (
     <section id="pricing" className="py-20 sm:py-28" style={{ backgroundColor: '#F6F5F0' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -144,8 +155,41 @@ export default function Pricing() {
           </h2>
         </div>
 
+        {/* Billing toggle */}
+        <div className="mt-10 flex justify-center">
+          <div className="inline-flex items-center gap-1 rounded-full bg-white border border-[#E4E3DB] p-1 shadow-sm">
+            <button
+              onClick={() => setIsAnnual(false)}
+              className={`px-5 py-2 rounded-full text-sm font-semibold transition-colors font-body ${
+                !isAnnual
+                  ? 'bg-[#1C1C19] text-white'
+                  : 'text-[#8A8A7E] hover:text-[#4D4D45]'
+              }`}
+            >
+              Monthly
+            </button>
+            <button
+              onClick={() => setIsAnnual(true)}
+              className={`px-5 py-2 rounded-full text-sm font-semibold transition-colors font-body flex items-center gap-2 ${
+                isAnnual
+                  ? 'bg-[#1C1C19] text-white'
+                  : 'text-[#8A8A7E] hover:text-[#4D4D45]'
+              }`}
+            >
+              Annual
+              <span className={`px-2 py-0.5 text-[10px] font-bold rounded-full ${
+                isAnnual
+                  ? 'bg-[#34D399] text-[#081C12]'
+                  : 'bg-[#ECFDF5] text-[#1A7A50]'
+              }`}>
+                2 months free
+              </span>
+            </button>
+          </div>
+        </div>
+
         {/* Cards - On mobile, Pro shows first */}
-        <div className="mt-12 sm:mt-16 grid sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6">
+        <div className="mt-10 sm:mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6">
           {/* Mobile reorder: Pro first */}
           {[TIERS[1], TIERS[0]].map((tier) => (
             <div
@@ -170,9 +214,16 @@ export default function Pricing() {
               </div>
 
               <div className="mt-6 flex items-baseline gap-1">
-                <span className="text-4xl font-bold text-[#1A7A50] font-mono">${tier.price}</span>
-                <span className="text-sm text-[#8A8A7E] font-body">/mo</span>
+                <span className="text-4xl font-bold text-[#1A7A50] font-mono">
+                  ${isAnnual ? tier.annualPrice : tier.monthlyPrice}
+                </span>
+                <span className="text-sm text-[#8A8A7E] font-body">{isAnnual ? '/yr' : '/mo'}</span>
               </div>
+              {isAnnual && (
+                <p className="mt-1 text-xs font-semibold text-[#1A7A50] font-body">
+                  Save ${tier.annualSavings}/yr
+                </p>
+              )}
 
               <ul className="mt-6 space-y-3 flex-1">
                 {tier.features.map((f) => (
@@ -199,7 +250,7 @@ export default function Pricing() {
           ))}
 
           {/* Fund - Coming Soon Waitlist */}
-          <FundWaitlistCard />
+          <FundWaitlistCard isAnnual={isAnnual} />
         </div>
 
         {/* Free tier callout */}
