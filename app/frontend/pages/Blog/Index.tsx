@@ -44,9 +44,16 @@ export default function BlogIndex({ posts, categories, activeCategory }: Props) 
       description="Guides, strategies, and insights for private lenders managing their loan portfolios."
     >
       <SeoHead
-        title="Private Lending Blog"
-        description="Practical guides on loan structuring, tax compliance, risk management, and portfolio strategy for private and hard money lenders."
-        canonicalPath="/blog"
+        title="Private Lending Guides & Resources | LendSolo Blog"
+        description="Practical guides for private lenders: tax strategies, rate setting, legal requirements, deal analysis, and portfolio management. Written by a lender, for lenders."
+        canonicalUrl="https://lendsolo.com/blog"
+        schema={{
+          '@type': 'Blog',
+          name: 'LendSolo Blog',
+          description: 'Practical guides for private lenders: tax strategies, rate setting, legal requirements, deal analysis, and portfolio management. Written by a lender, for lenders.',
+          url: 'https://lendsolo.com/blog',
+          publisher: { '@type': 'Organization', name: 'LendSolo' },
+        }}
       />
 
       {/* Category filters */}
