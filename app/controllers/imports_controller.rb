@@ -57,7 +57,7 @@ class ImportsController < ApplicationController
   end
 
   def process_import
-    loans_data = params.require(:loans).map { |l| l.permit! }
+    loans_data = params.require(:loans).map { |l| l.permit(:borrower_name, :principal, :annual_rate, :term_months, :loan_type, :start_date, :status, :purpose, :collateral, :notes) }
 
     created = 0
     skipped = 0

@@ -137,6 +137,49 @@ RSpec.describe "Borrowers", type: :request do
     end
   end
 
+  describe "TIN masking" do
+    it "returns masked TIN in detail view" do
+      borrower = user.borrowers.create!(name: "Alice", tin: "123456789")
+      get borrower_path(borrower), headers: { "Accept" => "application/json" }
+      body = JSON.parse(response.body)
+      expect(body["tin"]).to eq("***-**-6789")
+    end
+
+    it "returns nil TIN when borrower has no TIN" do
+      borrower = user.borrowers.create!(name: "Alice")
+      get borrower_path(borrower), headers: { "Accept" => "application/json" }
+      body = JSON.parse(response.body)
+      expect(body["tin"]).to be_nil
+    end
+
+    it "does not include TIN in list view" do
+      user.borrowers.create!(name: "Alice", tin: "123456789")
+      get borrowers_path, headers: { "Accept" => "application/json" }
+      body = JSON.parse(response.body)
+      expect(body.first).not_to have_key("tin")
+    end
+  end
+
+  describe "POST /borrowers/:id/reveal_tin" do
+    it "returns the full unmasked TIN" do
+      borrower = user.borrowers.create!(name: "Alice", tin: "123456789")
+      post reveal_tin_borrower_path(borrower), headers: { "Accept" => "application/json" }
+      expect(response).to have_http_status(:ok)
+      body = JSON.parse(response.body)
+      expect(body["tin"]).to eq("123456789")
+    end
+
+    it "cannot reveal another user's borrower TIN" do
+      borrower = other_user.borrowers.create!(name: "Eve", tin: "987654321")
+      begin
+        post reveal_tin_borrower_path(borrower), headers: { "Accept" => "application/json" }
+        expect(response.status).to be_in([302, 404])
+      rescue ActiveRecord::RecordNotFound
+        # Expected behavior
+      end
+    end
+  end
+
   describe "PATCH /borrowers/:id/update_notes" do
     it "updates a borrower's notes via JSON" do
       borrower = user.borrowers.create!(name: "Alice")

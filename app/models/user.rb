@@ -2,6 +2,8 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
 
+  validates :borrower_notification_email, format: { with: URI::MailTo::EMAIL_REGEXP, message: "must be a valid email address" }, allow_blank: true
+
   has_many :loans, dependent: :destroy
   has_many :borrowers, dependent: :destroy
   has_many :expenses, dependent: :destroy

@@ -42,6 +42,7 @@ export default function SettingsIndex({ user }: Props) {
 
   function handleReset() {
     router.delete('/settings/reset_data', {
+      data: { confirmation: resetConfirmText },
       onSuccess: () => {
         setShowResetConfirm(false)
         setResetConfirmText('')
