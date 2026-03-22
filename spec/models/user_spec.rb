@@ -290,4 +290,27 @@ RSpec.describe User, type: :model do
       expect(user.reload.total_capital.to_f).to eq(65_000.0)
     end
   end
+
+  describe "total_capital validation" do
+    it "allows positive values" do
+      user = build(:user, total_capital: 10_000)
+      expect(user).to be_valid
+    end
+
+    it "allows zero" do
+      user = build(:user, total_capital: 0)
+      expect(user).to be_valid
+    end
+
+    it "allows nil" do
+      user = build(:user, total_capital: nil)
+      expect(user).to be_valid
+    end
+
+    it "rejects negative values" do
+      user = build(:user, total_capital: -100)
+      expect(user).not_to be_valid
+      expect(user.errors[:total_capital]).to include("must be greater than or equal to 0")
+    end
+  end
 end

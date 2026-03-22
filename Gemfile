@@ -7,7 +7,6 @@ gem "puma", ">= 5.0"
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 gem "solid_queue"
 gem "bootsnap", require: false
-gem "kamal", require: false
 gem "thruster", require: false
 
 # Inertia.js adapter

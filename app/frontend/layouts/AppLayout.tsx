@@ -29,7 +29,7 @@ const navItems = [
   { name: 'Import', href: '/import', icon: ArrowUpTrayIcon, gate: 'solo' as const },
   { name: 'Reports', href: '/reports', icon: DocumentChartIcon, gate: null },
   { name: 'Exports', href: '/exports', icon: ArrowDownTrayIcon, gate: 'pro' as const },
-  { name: 'Calculators', href: '/calculators', icon: CalculatorIcon, gate: null },
+  { name: 'Calculators', href: '/tools/loan-amortization-calculator', icon: CalculatorIcon, gate: null },
   { name: 'Billing', href: '/billing', icon: SparklesIcon, gate: null },
   { name: 'Settings', href: '/settings', icon: CogIcon, gate: null },
 ]
