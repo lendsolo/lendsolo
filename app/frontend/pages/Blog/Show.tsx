@@ -81,7 +81,7 @@ export default function BlogShow({ post, relatedPosts }: Props) {
         title={post.meta_title}
         description={post.meta_description}
         canonicalPath={`/blog/${post.slug}`}
-        type="article"
+        ogType="article"
       />
 
       <div className="max-w-4xl mx-auto">
