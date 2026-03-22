@@ -32,8 +32,14 @@ class OnboardingController < ApplicationController
 
   def seed_sample_data
     ActiveRecord::Base.transaction do
+      # Create borrower records
+      maria = current_user.borrowers.find_or_create_by!(name: "Maria Rodriguez")
+      james = current_user.borrowers.find_or_create_by!(name: "James Chen")
+      priya = current_user.borrowers.find_or_create_by!(name: "Priya Sharma")
+
       # Loan 1: Standard 12-month, $25K at 10%, 4 payments made
       loan1 = current_user.loans.create!(
+        borrower: maria,
         borrower_name: "Maria Rodriguez",
         principal: 25_000,
         annual_rate: 10.0,
@@ -57,6 +63,7 @@ class OnboardingController < ApplicationController
 
       # Loan 2: Interest-only, $15K at 12%, 2 payments made
       loan2 = current_user.loans.create!(
+        borrower: james,
         borrower_name: "James Chen",
         principal: 15_000,
         annual_rate: 12.0,
@@ -79,6 +86,7 @@ class OnboardingController < ApplicationController
 
       # Loan 3: New standard loan, $20K at 11%, 0 payments (triggers guardrails)
       current_user.loans.create!(
+        borrower: priya,
         borrower_name: "Priya Sharma",
         principal: 20_000,
         annual_rate: 11.0,

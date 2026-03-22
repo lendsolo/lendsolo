@@ -65,8 +65,12 @@ class ImportsController < ApplicationController
 
     ActiveRecord::Base.transaction do
       loans_data.each_with_index do |loan_data, index|
+        borrower_name = loan_data[:borrower_name].presence&.strip || "Unknown Borrower"
+        borrower = current_user.borrowers.find_or_create_by!(name: borrower_name)
+
         loan = current_user.loans.build(
-          borrower_name: loan_data[:borrower_name].presence,
+          borrower: borrower,
+          borrower_name: borrower_name,
           principal: parse_currency(loan_data[:principal]),
           annual_rate: parse_number(loan_data[:annual_rate]),
           term_months: parse_number(loan_data[:term_months])&.to_i,

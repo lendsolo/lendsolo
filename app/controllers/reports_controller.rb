@@ -6,7 +6,7 @@ class ReportsController < ApplicationController
     pdf = Pdf::LoanStatementPdf.new(loan, current_user).render
 
     send_data pdf.render,
-              filename: "lendsolo_statement_#{loan.borrower_name.parameterize}_#{Time.current.strftime('%Y%m%d')}.pdf",
+              filename: "lendsolo_statement_#{loan.display_borrower_name.parameterize}_#{Time.current.strftime('%Y%m%d')}.pdf",
               type: "application/pdf",
               disposition: "attachment"
   end
@@ -16,7 +16,7 @@ class ReportsController < ApplicationController
     pdf = Pdf::AmortizationSchedulePdf.new(loan, current_user).render
 
     send_data pdf.render,
-              filename: "lendsolo_amortization_#{loan.borrower_name.parameterize}_#{Time.current.strftime('%Y%m%d')}.pdf",
+              filename: "lendsolo_amortization_#{loan.display_borrower_name.parameterize}_#{Time.current.strftime('%Y%m%d')}.pdf",
               type: "application/pdf",
               disposition: "attachment"
   end
@@ -41,7 +41,7 @@ class ReportsController < ApplicationController
     loans = current_user.loans.order(:borrower_name).map do |loan|
       {
         id: loan.id,
-        borrower_name: loan.borrower_name,
+        borrower_name: loan.display_borrower_name,
         status: loan.status,
         principal: loan.principal.to_f,
         start_date: loan.start_date.to_s

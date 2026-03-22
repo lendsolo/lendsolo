@@ -7,7 +7,7 @@ module Pdf
 
     def render
       pdf = setup_document
-      render_header(pdf, "Amortization Schedule", subtitle: @loan.borrower_name, business_name: @user.business_name)
+      render_header(pdf, "Amortization Schedule", subtitle: @loan.display_borrower_name, business_name: @user.business_name)
 
       render_loan_terms(pdf)
       pdf.move_down 16
@@ -28,7 +28,7 @@ module Pdf
       total_cost = @loan.total_cost
 
       info_box(pdf, [
-        ["Borrower", @loan.borrower_name],
+        ["Borrower", @loan.display_borrower_name],
         ["Loan Type", @loan.loan_type.titleize],
         ["Principal", fmt(@loan.principal.to_f)],
         ["Annual Rate", "#{@loan.annual_rate}%"],

@@ -46,7 +46,7 @@ module Pdf
         remaining = [loan.principal.to_f - total_principal_paid_by_eoy, 0].max
 
         {
-          borrower_name: loan.borrower_name,
+          borrower_name: loan.display_borrower_name,
           start_date: loan.start_date,
           principal: loan.principal.to_f,
           annual_rate: loan.annual_rate.to_f,

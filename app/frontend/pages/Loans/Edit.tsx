@@ -2,15 +2,23 @@ import { useForm } from '@inertiajs/react'
 import { useMemo } from 'react'
 import AppLayout from '@/layouts/AppLayout'
 import AnimatedNumber from '@/components/AnimatedNumber'
+import BorrowerSelector from '@/components/BorrowerSelector'
 import { calculateAmortization, type LoanType } from '@/lib/calculations'
 import type { LoanProps } from '@/types/loan'
 
-interface Props {
-  loan: LoanProps
+interface BorrowerOption {
+  id: number
+  name: string
 }
 
-export default function EditLoan({ loan }: Props) {
+interface Props {
+  loan: LoanProps
+  borrowers?: BorrowerOption[]
+}
+
+export default function EditLoan({ loan, borrowers = [] }: Props) {
   const { data, setData, patch, processing, errors } = useForm({
+    borrower_id: loan.borrower_id || ('' as string | number),
     borrower_name: loan.borrower_name,
     principal: String(loan.principal),
     annual_rate: String(loan.annual_rate),
@@ -52,14 +60,15 @@ export default function EditLoan({ loan }: Props) {
             <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
               <h2 className="text-lg font-semibold text-gray-900">Borrower & Terms</h2>
 
-              <Field label="Borrower Name" error={errors.borrower_name} required>
-                <input
-                  type="text"
-                  value={data.borrower_name}
-                  onChange={(e) => setData('borrower_name', e.target.value)}
-                  className={inputClass(errors.borrower_name)}
-                />
-              </Field>
+              <BorrowerSelector
+                borrowers={borrowers}
+                selectedId={data.borrower_id ? Number(data.borrower_id) : null}
+                selectedName={data.borrower_name}
+                onSelect={(id, name) => {
+                  setData(prev => ({ ...prev, borrower_id: id || '', borrower_name: name }))
+                }}
+                error={errors.borrower_name || errors.borrower_id}
+              />
 
               <div className="grid sm:grid-cols-2 gap-5">
                 <Field label="Principal Amount" error={errors.principal} required>

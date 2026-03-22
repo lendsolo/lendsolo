@@ -97,7 +97,7 @@ class ExportsController < ApplicationController
       remaining = [loan.principal.to_f - total_principal_paid_by_eoy, 0].max
 
       {
-        borrower_name: loan.borrower_name,
+        borrower_name: loan.display_borrower_name,
         start_date: loan.start_date.to_s,
         principal: loan.principal.to_f,
         annual_rate: loan.annual_rate.to_f,
@@ -340,8 +340,8 @@ class ExportsController < ApplicationController
           <DTPOSTED>#{payment.date.strftime('%Y%m%d')}120000</DTPOSTED>
           <TRNAMT>#{payment.interest_portion.to_f.round(2)}</TRNAMT>
           <FITID>#{fitid}</FITID>
-          <NAME>#{escape_xml(payment.loan.borrower_name)}</NAME>
-          <MEMO>Loan interest - #{escape_xml(payment.loan.borrower_name)} - Payment ##{payment_num}</MEMO>
+          <NAME>#{escape_xml(payment.loan.display_borrower_name)}</NAME>
+          <MEMO>Loan interest - #{escape_xml(payment.loan.display_borrower_name)} - Payment ##{payment_num}</MEMO>
         </STMTTRN>
       XML
     end.join

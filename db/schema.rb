@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_21_195518) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_22_165109) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -20,6 +20,25 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_21_195518) do
   create_enum "loan_status", ["active", "paid_off", "defaulted", "written_off"]
   create_enum "loan_type", ["standard", "interest_only", "balloon"]
   create_enum "subscription_plan", ["free", "solo", "pro", "fund"]
+
+  create_table "borrowers", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "name", null: false
+    t.string "email"
+    t.string "phone"
+    t.string "address_line1"
+    t.string "address_line2"
+    t.string "city"
+    t.string "state"
+    t.string "zip"
+    t.text "notes"
+    t.string "tin"
+    t.boolean "archived", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "name"], name: "index_borrowers_on_user_id_and_name"
+    t.index ["user_id"], name: "index_borrowers_on_user_id"
+  end
 
   create_table "email_logs", force: :cascade do |t|
     t.bigint "user_id", null: false
@@ -60,6 +79,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_21_195518) do
     t.text "notes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "borrower_id"
+    t.index ["borrower_id"], name: "index_loans_on_borrower_id"
     t.index ["user_id"], name: "index_loans_on_user_id"
   end
 
@@ -234,9 +255,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_21_195518) do
     t.index ["email", "tier"], name: "index_waitlist_entries_on_email_and_tier", unique: true
   end
 
+  add_foreign_key "borrowers", "users"
   add_foreign_key "email_logs", "loans"
   add_foreign_key "email_logs", "users"
   add_foreign_key "expenses", "users"
+  add_foreign_key "loans", "borrowers"
   add_foreign_key "loans", "users"
   add_foreign_key "payments", "loans"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade

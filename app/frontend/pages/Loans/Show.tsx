@@ -174,7 +174,13 @@ export default function LoansShow({ loan, total_capital, can_generate_reports }:
               <span className="text-gray-300">/</span>
             </div>
             <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold text-gray-900">{loan.borrower_name}</h1>
+              <h1 className="text-2xl font-bold text-gray-900">
+                {loan.borrower_id ? (
+                  <Link href={`/borrowers/${loan.borrower_id}`} className="hover:text-emerald-700 transition-colors">
+                    {loan.borrower_name}
+                  </Link>
+                ) : loan.borrower_name}
+              </h1>
               <span className={`px-2.5 py-0.5 text-xs font-medium rounded-full border ${badge.bg} ${badge.text}`}>
                 {badge.label}
               </span>

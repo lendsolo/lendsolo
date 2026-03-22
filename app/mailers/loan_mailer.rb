@@ -15,7 +15,7 @@ class LoanMailer < ApplicationMailer
     @remaining_balance = loan.remaining_balance
     @amount_due = @expected ? @expected[:payment].to_f : loan.monthly_payment
 
-    recipient = @user.borrower_notification_email.presence || @loan.borrower_name
+    recipient = @user.borrower_notification_email.presence || @loan.display_borrower_name
     from_name = @business_name.presence || "LendSolo"
 
     mail(
@@ -40,7 +40,7 @@ class LoanMailer < ApplicationMailer
     @amount_due = @expected ? @expected[:payment].to_f : loan.monthly_payment
     @remaining_balance = loan.remaining_balance
 
-    recipient = @user.borrower_notification_email.presence || @loan.borrower_name
+    recipient = @user.borrower_notification_email.presence || @loan.display_borrower_name
     from_name = @business_name.presence || "LendSolo"
 
     mail(
@@ -60,13 +60,13 @@ class LoanMailer < ApplicationMailer
     @remaining_balance = @loan.remaining_balance
     @next_due = @loan.next_payment_due_date
 
-    recipient = @user.borrower_notification_email.presence || @loan.borrower_name
+    recipient = @user.borrower_notification_email.presence || @loan.display_borrower_name
     from_name = @business_name.presence || "LendSolo"
 
     mail(
       to: recipient,
       from: "#{from_name} <#{default_from_address}>",
-      subject: "Payment Received — $#{format_currency(@payment.amount)} for loan to #{@loan.borrower_name}"
+      subject: "Payment Received — $#{format_currency(@payment.amount)} for loan to #{@loan.display_borrower_name}"
     )
   end
 

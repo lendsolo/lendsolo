@@ -2,10 +2,21 @@ import { useForm } from '@inertiajs/react'
 import { useMemo } from 'react'
 import AppLayout from '@/layouts/AppLayout'
 import AnimatedNumber from '@/components/AnimatedNumber'
+import BorrowerSelector from '@/components/BorrowerSelector'
 import { calculateAmortization, type LoanType } from '@/lib/calculations'
 
-export default function NewLoan() {
+interface BorrowerOption {
+  id: number
+  name: string
+}
+
+interface Props {
+  borrowers?: BorrowerOption[]
+}
+
+export default function NewLoan({ borrowers = [] }: Props) {
   const { data, setData, post, processing, errors } = useForm({
+    borrower_id: '' as string | number,
     borrower_name: '',
     principal: '',
     annual_rate: '',
@@ -41,15 +52,15 @@ export default function NewLoan() {
             <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
               <h2 className="text-lg font-semibold text-gray-900">Borrower & Terms</h2>
 
-              <Field label="Borrower Name" error={errors.borrower_name} required>
-                <input
-                  type="text"
-                  value={data.borrower_name}
-                  onChange={(e) => setData('borrower_name', e.target.value)}
-                  placeholder="e.g. Marcus Williams"
-                  className={inputClass(errors.borrower_name)}
-                />
-              </Field>
+              <BorrowerSelector
+                borrowers={borrowers}
+                selectedId={data.borrower_id ? Number(data.borrower_id) : null}
+                selectedName={data.borrower_name}
+                onSelect={(id, name) => {
+                  setData(prev => ({ ...prev, borrower_id: id || '', borrower_name: name }))
+                }}
+                error={errors.borrower_name || errors.borrower_id}
+              />
 
               <div className="grid sm:grid-cols-2 gap-5">
                 <Field label="Principal Amount" error={errors.principal} required>

@@ -16,6 +16,12 @@ Rails.application.routes.draw do
 
   get "admin", to: "admin#index"
   get "dashboard", to: "dashboard#index"
+  resources :borrowers, except: [:destroy] do
+    member do
+      patch :archive
+      patch :unarchive
+    end
+  end
   resources :loans do
     member do
       patch :mark_paid_off

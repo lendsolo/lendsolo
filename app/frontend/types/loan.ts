@@ -10,6 +10,7 @@ export interface PaymentRecord {
 
 export interface LoanProps {
   id: number
+  borrower_id: number | null
   borrower_name: string
   principal: number
   annual_rate: number

@@ -1,5 +1,6 @@
 class Loan < ApplicationRecord
   belongs_to :user
+  belongs_to :borrower, optional: true
   has_many :payments, dependent: :destroy
 
   enum :loan_type, { standard: "standard", interest_only: "interest_only", balloon: "balloon" }
@@ -9,6 +10,12 @@ class Loan < ApplicationRecord
   validates :principal, numericality: { greater_than: 0 }
   validates :annual_rate, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 100 }
   validates :term_months, numericality: { greater_than: 0, less_than_or_equal_to: 360, only_integer: true }
+
+  # ── Borrower helpers ──────────────────────────────────────────────────────
+
+  def display_borrower_name
+    borrower&.name || borrower_name
+  end
 
   # ── Computed fields ────────────────────────────────────────────────────────
 
@@ -119,7 +126,8 @@ class Loan < ApplicationRecord
   def as_inertia_props(total_capital: nil)
     {
       id: id,
-      borrower_name: borrower_name,
+      borrower_id: borrower_id,
+      borrower_name: display_borrower_name,
       principal: principal.to_f,
       annual_rate: annual_rate.to_f,
       term_months: term_months,

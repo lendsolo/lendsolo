@@ -14,7 +14,7 @@ class PaymentsController < ApplicationController
     render inertia: "Payments/Index", props: {
       payments: all_payments.map { |p| serialize_payment(p) },
       loans: current_user.loans.order(:borrower_name).map { |l|
-        { id: l.id, borrower_name: l.borrower_name }
+        { id: l.id, borrower_name: l.display_borrower_name }
       },
       stats: {
         total_collected_month: month_payments.sum(:amount).to_f,
@@ -70,7 +70,7 @@ class PaymentsController < ApplicationController
       payments.each do |p|
         csv << [
           p.date.to_s,
-          p.loan.borrower_name,
+          p.loan.display_borrower_name,
           p.loan_id,
           p.amount.to_f,
           p.principal_portion.to_f,
@@ -92,7 +92,7 @@ class PaymentsController < ApplicationController
       late_fee: payment.late_fee.to_f,
       note: payment.note,
       loan_id: payment.loan_id,
-      borrower_name: payment.loan.borrower_name
+      borrower_name: payment.loan.display_borrower_name
     }
   end
 end

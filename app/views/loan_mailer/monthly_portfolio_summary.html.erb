@@ -93,7 +93,7 @@
       </p>
       <% @overdue_loans.each do |loan| %>
         <p style="font-size: 13px; color: #991b1b; margin: 4px 0;">
-          &bull; <strong><%= loan.borrower_name %></strong> &mdash;
+          &bull; <strong><%= loan.display_borrower_name %></strong> &mdash;
           <%= loan.days_overdue %> day<%= 's' if loan.days_overdue != 1 %> overdue
           ($<%= number_with_precision(loan.monthly_payment, precision: 2, delimiter: ",") %>)
         </p>
@@ -117,7 +117,7 @@
   <% @upcoming_payments.each_with_index do |p, i| %>
     <tr>
       <td style="padding: 10px 16px; font-size: 13px; color: #111827; <%= 'border-bottom: 1px solid #f3f4f6;' unless i == @upcoming_payments.length - 1 %>">
-        <%= p[:loan].borrower_name %>
+        <%= p[:loan].display_borrower_name %>
       </td>
       <td style="padding: 10px 16px; font-size: 13px; color: #6b7280; <%= 'border-bottom: 1px solid #f3f4f6;' unless i == @upcoming_payments.length - 1 %>" align="center">
         <%= p[:due_date].strftime("%b %d") %>

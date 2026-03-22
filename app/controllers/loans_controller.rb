@@ -19,11 +19,14 @@ class LoansController < ApplicationController
   end
 
   def new
-    render inertia: "Loans/New"
+    render inertia: "Loans/New", props: {
+      borrowers: current_user.borrowers.active.order(:name).map { |b| { id: b.id, name: b.name } }
+    }
   end
 
   def create
     loan = current_user.loans.build(loan_params)
+    resolve_borrower(loan)
 
     if loan.save
       # Start 14-day trial on first real loan (not sample data)
@@ -38,11 +41,13 @@ class LoansController < ApplicationController
 
   def edit
     render inertia: "Loans/Edit", props: {
-      loan: @loan.as_inertia_props(total_capital: current_user.total_capital)
+      loan: @loan.as_inertia_props(total_capital: current_user.total_capital),
+      borrowers: current_user.borrowers.active.order(:name).map { |b| { id: b.id, name: b.name } }
     }
   end
 
   def update
+    resolve_borrower(@loan)
     if @loan.update(loan_params)
       redirect_to loan_path(@loan), notice: "Loan updated successfully."
     else
@@ -73,8 +78,24 @@ class LoansController < ApplicationController
 
   def loan_params
     params.require(:loan).permit(
-      :borrower_name, :principal, :annual_rate, :term_months,
+      :borrower_id, :borrower_name, :principal, :annual_rate, :term_months,
       :loan_type, :start_date, :purpose, :collateral_description, :notes
     )
+  end
+
+  def resolve_borrower(loan, attrs = nil)
+    attrs ||= loan_params
+    borrower_id = attrs[:borrower_id]
+    borrower_name = attrs[:borrower_name]
+
+    if borrower_id.present?
+      borrower = current_user.borrowers.find(borrower_id)
+      loan.borrower = borrower
+      loan.borrower_name = borrower.name
+    elsif borrower_name.present?
+      borrower = current_user.borrowers.find_or_create_by!(name: borrower_name.strip)
+      loan.borrower = borrower
+      loan.borrower_name = borrower_name.strip
+    end
   end
 end

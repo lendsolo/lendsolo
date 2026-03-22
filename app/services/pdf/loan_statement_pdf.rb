@@ -27,7 +27,7 @@ module Pdf
       section_heading(pdf, "Loan Summary")
 
       info_box(pdf, [
-        ["Borrower", @loan.borrower_name],
+        ["Borrower", @loan.display_borrower_name],
         ["Loan Type", @loan.loan_type.titleize],
         ["Original Principal", fmt(@loan.principal.to_f)],
         ["Annual Interest Rate", "#{@loan.annual_rate}%"],

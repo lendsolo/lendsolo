@@ -3,6 +3,7 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable
 
   has_many :loans, dependent: :destroy
+  has_many :borrowers, dependent: :destroy
   has_many :expenses, dependent: :destroy
   has_many :email_logs, dependent: :destroy
 
