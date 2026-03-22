@@ -35,7 +35,7 @@ export default function FinalCta() {
         </p>
 
         <p className="mt-3 text-xs text-white/50 font-body">
-          Solo plan is $19/month after trial. Cancel anytime. Your data is always exportable.
+          Solo plan is $29/month after trial. Cancel anytime. Your data is always exportable.
         </p>
       </div>
     </section>

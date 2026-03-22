@@ -1,17 +1,23 @@
 class SubscriptionsController < ApplicationController
+  # NOTE: After creating new prices in Stripe dashboard, update these env vars in production:
+  # STRIPE_SOLO_PRICE_ID, STRIPE_PRO_PRICE_ID, STRIPE_FUND_PRICE_ID (monthly)
+  # STRIPE_SOLO_ANNUAL_PRICE_ID, STRIPE_PRO_ANNUAL_PRICE_ID, STRIPE_FUND_ANNUAL_PRICE_ID (annual)
   def self.plan_prices
     {
       "solo" => ENV.fetch("STRIPE_SOLO_PRICE_ID", ""),
       "pro" => ENV.fetch("STRIPE_PRO_PRICE_ID", ""),
-      "fund" => ENV.fetch("STRIPE_FUND_PRICE_ID", "")
+      "fund" => ENV.fetch("STRIPE_FUND_PRICE_ID", ""),
+      "solo_annual" => ENV.fetch("STRIPE_SOLO_ANNUAL_PRICE_ID", ""),
+      "pro_annual" => ENV.fetch("STRIPE_PRO_ANNUAL_PRICE_ID", ""),
+      "fund_annual" => ENV.fetch("STRIPE_FUND_ANNUAL_PRICE_ID", "")
     }
   end
 
   PLAN_DETAILS = {
     "free" => { name: "Free", price: 0, loan_limit: 2, features: ["2 active loans", "Basic amortization", "Payment tracking"] },
-    "solo" => { name: "Solo", price: 19, loan_limit: 5, features: ["5 active loans", "Full amortization schedules", "Payment tracking", "Expense tracking", "Spreadsheet import (CSV & Excel)", "Smart guardrails"] },
-    "pro" => { name: "Pro", price: 39, loan_limit: 25, features: ["25 active loans", "Everything in Solo", "CSV exports (payments & expenses)", "Tax reporting exports (PDF, QBO)", "Priority support", "Portfolio analytics"] },
-    "fund" => { name: "Fund", price: 99, loan_limit: nil, features: ["Unlimited loans", "Everything in Pro", "Multi-user access (coming soon)", "API access (coming soon)", "Dedicated support"] }
+    "solo" => { name: "Solo", price: 29, annual_price: 290, loan_limit: 5, features: ["5 active loans", "Full amortization schedules", "Payment tracking", "Expense tracking", "Spreadsheet import (CSV & Excel)", "Smart guardrails"] },
+    "pro" => { name: "Pro", price: 49, annual_price: 490, loan_limit: 25, features: ["25 active loans", "Everything in Solo", "CSV exports (payments & expenses)", "Tax reporting exports (PDF, QBO)", "Priority support", "Portfolio analytics"] },
+    "fund" => { name: "Fund", price: 99, annual_price: 990, loan_limit: nil, features: ["Unlimited loans", "Everything in Pro", "Multi-user access (coming soon)", "API access (coming soon)", "Dedicated support"] }
   }.freeze
 
   def show

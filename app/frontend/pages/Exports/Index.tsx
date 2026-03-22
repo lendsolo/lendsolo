@@ -49,7 +49,7 @@ export default function ExportsIndex({ year, available_years, preview, can_expor
               <div>
                 <p className="text-sm font-semibold text-amber-800">Pro Feature</p>
                 <p className="text-xs text-amber-700">
-                  Accountant exports are available on the Pro plan ($39/mo). Upgrade to download your year-end summaries.
+                  Accountant exports are available on the Pro plan ($49/mo). Upgrade to download your year-end summaries.
                 </p>
               </div>
             </div>

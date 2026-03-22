@@ -4,7 +4,7 @@ import { useState } from 'react'
 const TIERS = [
   {
     name: 'Solo',
-    price: 19,
+    price: 29,
     description: 'For lenders just getting started',
     features: [
       'Up to 5 active loans',
@@ -18,7 +18,7 @@ const TIERS = [
   },
   {
     name: 'Pro',
-    price: 39,
+    price: 49,
     description: 'For active lenders running a real portfolio',
     badge: 'Best Value',
     features: [

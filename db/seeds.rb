@@ -11,7 +11,7 @@ puts "Seed user created: demo@lendsolo.com / password123"
 # Sample recurring expense
 demo_user = User.find_by!(email: "demo@lendsolo.com")
 demo_user.expenses.find_or_create_by!(description: "LendSolo Pro Subscription") do |expense|
-  expense.amount = 39
+  expense.amount = 49
   expense.category = "software"
   expense.date = Date.current.beginning_of_month
   expense.recurring = true
@@ -19,7 +19,7 @@ demo_user.expenses.find_or_create_by!(description: "LendSolo Pro Subscription") 
   expense.next_occurrence_date = Date.current.beginning_of_month + 1.month
 end
 
-puts "Sample recurring expense created: LendSolo Pro Subscription ($39/mo)"
+puts "Sample recurring expense created: LendSolo Pro Subscription ($49/mo)"
 
 # Sample capital transactions
 demo_user.capital_transactions.delete_all
