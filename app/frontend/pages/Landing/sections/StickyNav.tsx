@@ -38,6 +38,9 @@ export default function StickyNav() {
             <a href="#pricing" className="text-sm text-white/70 hover:text-white transition-colors">
               Pricing
             </a>
+            <Link href="/blog" className="text-sm text-white/70 hover:text-white transition-colors">
+              Blog
+            </Link>
           </div>
 
           {/* Desktop CTAs */}
@@ -88,6 +91,9 @@ export default function StickyNav() {
             <a href="#pricing" onClick={() => setMobileOpen(false)} className="block px-4 py-3 text-white/80 hover:text-white rounded-lg hover:bg-white/5">
               Pricing
             </a>
+            <Link href="/blog" onClick={() => setMobileOpen(false)} className="block px-4 py-3 text-white/80 hover:text-white rounded-lg hover:bg-white/5">
+              Blog
+            </Link>
             <div className="pt-2 border-t border-white/10 flex flex-col gap-2">
               <Link href="/users/sign_in" className="block text-center px-4 py-3 text-white/80 border border-white/20 rounded-lg">
                 Sign In
