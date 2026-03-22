@@ -7,6 +7,13 @@ xml.urlset xmlns: "http://www.sitemaps.org/schemas/sitemap/0.9" do
     xml.priority "1.0"
   end
 
+  # Calculators index
+  xml.url do
+    xml.loc calculators_url
+    xml.changefreq "monthly"
+    xml.priority "0.9"
+  end
+
   # Calculator tools
   %w[
     tools/loan-amortization-calculator
@@ -17,7 +24,7 @@ xml.urlset xmlns: "http://www.sitemaps.org/schemas/sitemap/0.9" do
     xml.url do
       xml.loc "#{root_url}#{path}"
       xml.changefreq "monthly"
-      xml.priority "0.8"
+      xml.priority "0.9"
     end
   end
 

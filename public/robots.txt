@@ -1,4 +1,23 @@
 User-agent: *
 Allow: /
 
+Disallow: /users/
+Disallow: /dashboard
+Disallow: /loans
+Disallow: /payments
+Disallow: /expenses
+Disallow: /settings
+Disallow: /billing
+Disallow: /onboarding
+Disallow: /imports
+Disallow: /import
+Disallow: /admin
+Disallow: /waitlist
+Disallow: /borrowers
+Disallow: /capital_transactions
+Disallow: /reports
+Disallow: /exports
+Disallow: /webhooks
+Disallow: /api
+
 Sitemap: https://lendsolo.com/sitemap.xml
