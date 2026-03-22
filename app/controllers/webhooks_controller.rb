@@ -112,7 +112,7 @@ class WebhooksController < ApplicationController
 
   def determine_plan(subscription)
     price_id = subscription.items.data.first&.price&.id
-    plan_prices = SubscriptionsController::PLAN_PRICES
+    plan_prices = SubscriptionsController.plan_prices
     plan_prices.key(price_id) || "solo"
   end
 end

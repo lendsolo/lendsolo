@@ -3,10 +3,11 @@ class LoansController < ApplicationController
   before_action :enforce_loan_limit!, only: %i[create]
 
   def index
-    loans = current_user.loans.includes(:payments).order(created_at: :desc)
+    loans = current_user.loans.order(created_at: :desc)
+    preloaded = Loan.preload_payment_stats(loans)
 
     render inertia: "Loans/Index", props: {
-      loans: loans.map { |l| l.as_inertia_props(total_capital: current_user.total_capital) }
+      loans: loans.map { |l| l.as_inertia_props(total_capital: current_user.total_capital, preloaded: preloaded) }
     }
   end
 

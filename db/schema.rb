@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_22_211000) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_22_214201) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -100,6 +100,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_22_211000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "borrower_id"
+    t.date "cached_next_payment_date"
+    t.decimal "cached_next_payment_amount", precision: 12, scale: 2
     t.index ["borrower_id"], name: "index_loans_on_borrower_id"
     t.index ["user_id"], name: "index_loans_on_user_id"
   end
