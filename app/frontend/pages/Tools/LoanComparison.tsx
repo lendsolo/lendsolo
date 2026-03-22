@@ -55,9 +55,16 @@ export default function LoanComparisonPage() {
       description="Compare up to 3 loan structures side by side. See which option has the lowest monthly payment, least total interest, and best overall cost."
     >
       <SeoHead
-        title="Free Loan Comparison Calculator"
-        description="Compare up to 3 private loan structures side by side. Find the lowest monthly payment, least total interest, and best total cost instantly."
-        canonicalPath="/tools/loan-comparison"
+        title="Loan Comparison Tool — Compare Up to 3 Loans | LendSolo"
+        description="Compare up to 3 loan structures side by side. See which has the lowest payment, least interest, and lowest total cost. Free for private lenders."
+        canonicalUrl="https://lendsolo.com/tools/loan-comparison"
+        schema={{
+          '@type': 'FinancialProduct',
+          name: 'Loan Comparison Tool',
+          description: 'Compare up to 3 loan structures side by side. See which has the lowest payment, least interest, and lowest total cost. Free for private lenders.',
+          url: 'https://lendsolo.com/tools/loan-comparison',
+          provider: { '@type': 'Organization', name: 'LendSolo' },
+        }}
       />
 
       {/* Loan count toggle */}
