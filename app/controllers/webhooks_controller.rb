@@ -113,6 +113,8 @@ class WebhooksController < ApplicationController
   def determine_plan(subscription)
     price_id = subscription.items.data.first&.price&.id
     plan_prices = SubscriptionsController.plan_prices
-    plan_prices.key(price_id) || "solo"
+    price_key = plan_prices.key(price_id) || "solo"
+    # Strip _annual suffix — subscription_plan stores the base plan (solo/pro/fund)
+    price_key.sub(/_annual$/, "")
   end
 end

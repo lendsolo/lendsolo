@@ -36,16 +36,19 @@ class SubscriptionsController < ApplicationController
 
   def create
     plan = params[:plan]
+    interval = params[:interval] == "annual" ? "annual" : "monthly"
 
-    prices = self.class.plan_prices
-    unless prices.key?(plan)
+    base_plans = %w[solo pro fund]
+    unless base_plans.include?(plan)
       redirect_to billing_path, alert: "Invalid plan selected."
       return
     end
 
-    price_id = prices[plan]
+    price_key = interval == "annual" ? "#{plan}_annual" : plan
+    prices = self.class.plan_prices
+    price_id = prices[price_key]
     if price_id.blank?
-      Rails.logger.error("[Stripe] Missing price ID for plan: #{plan}")
+      Rails.logger.error("[Stripe] Missing price ID for plan: #{plan}, interval: #{interval}")
       redirect_to billing_path, alert: "Billing is not configured for this plan. Please contact support."
       return
     end
