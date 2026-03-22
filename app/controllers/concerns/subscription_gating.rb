@@ -20,7 +20,7 @@ module SubscriptionGating
 
     unless %w[solo pro fund].include?(current_user.effective_plan)
       redirect_to billing_path,
-        alert: "This feature requires the Solo plan ($19/mo) or above. Upgrade to access it."
+        alert: "This feature requires the Solo plan ($29/mo) or above. Upgrade to access it."
     end
   end
 
@@ -30,7 +30,7 @@ module SubscriptionGating
 
     unless %w[pro fund].include?(current_user.effective_plan)
       redirect_to billing_path,
-        alert: "This feature requires the Pro plan ($39/mo) or above. Upgrade to access it."
+        alert: "This feature requires the Pro plan ($49/mo) or above. Upgrade to access it."
     end
   end
 

@@ -203,7 +203,7 @@ export default function ImportsNew({ parsed_data, auto_mappings, import_result, 
               <div>
                 <p className="text-sm font-semibold text-amber-800">Solo Feature</p>
                 <p className="text-xs text-amber-700">
-                  Spreadsheet import is available on the Solo plan ($19/mo) and above. Upgrade to bulk-import your loans.
+                  Spreadsheet import is available on the Solo plan ($29/mo) and above. Upgrade to bulk-import your loans.
                 </p>
               </div>
             </div>

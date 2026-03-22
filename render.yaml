@@ -39,6 +39,13 @@ services:
         sync: false
       - key: STRIPE_FUND_PRICE_ID
         sync: false
+      # Annual price IDs — create new prices in Stripe dashboard and set these
+      - key: STRIPE_SOLO_ANNUAL_PRICE_ID
+        sync: false
+      - key: STRIPE_PRO_ANNUAL_PRICE_ID
+        sync: false
+      - key: STRIPE_FUND_ANNUAL_PRICE_ID
+        sync: false
       - key: RESEND_API_KEY
         sync: false
       - key: RESEND_FROM_DOMAIN
