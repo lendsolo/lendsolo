@@ -19,6 +19,42 @@ RSpec.describe "Borrowers", type: :request do
       expect(names).to contain_exactly("Alice", "Bob")
       expect(names).not_to include("Eve")
     end
+
+    it "includes status and active_loan_count in summary" do
+      borrower = user.borrowers.create!(name: "Alice")
+      user.loans.create!(
+        borrower: borrower, borrower_name: "Alice",
+        principal: 10000, annual_rate: 10, term_months: 12, start_date: Date.current
+      )
+
+      get borrowers_path, headers: { "Accept" => "application/json" }
+      body = JSON.parse(response.body)
+      alice = body.find { |b| b["name"] == "Alice" }
+      expect(alice["status"]).to eq("active")
+      expect(alice["active_loan_count"]).to eq(1)
+      expect(alice["total_principal"]).to eq(10000.0)
+    end
+
+    it "excludes archived borrowers by default" do
+      user.borrowers.create!(name: "Active")
+      user.borrowers.create!(name: "Hidden", archived: true)
+
+      get borrowers_path, headers: { "Accept" => "application/json" }
+      body = JSON.parse(response.body)
+      names = body.map { |b| b["name"] }
+      expect(names).to include("Active")
+      expect(names).not_to include("Hidden")
+    end
+
+    it "includes archived borrowers with show_archived filter" do
+      user.borrowers.create!(name: "Active")
+      user.borrowers.create!(name: "Hidden", archived: true)
+
+      get borrowers_path(show_archived: "true"), headers: { "Accept" => "application/json" }
+      body = JSON.parse(response.body)
+      names = body.map { |b| b["name"] }
+      expect(names).to include("Active", "Hidden")
+    end
   end
 
   describe "GET /borrowers/:id" do
@@ -32,7 +68,6 @@ RSpec.describe "Borrowers", type: :request do
 
     it "rejects access to another user's borrower" do
       borrower = other_user.borrowers.create!(name: "Eve")
-      # Devise redirects or raises RecordNotFound
       begin
         get borrower_path(borrower)
         expect(response.status).to be_in([302, 404])
@@ -99,6 +134,19 @@ RSpec.describe "Borrowers", type: :request do
       borrower = user.borrowers.create!(name: "Alice", archived: true)
       patch unarchive_borrower_path(borrower)
       expect(borrower.reload.archived).to be false
+    end
+  end
+
+  describe "PATCH /borrowers/:id/update_notes" do
+    it "updates a borrower's notes via JSON" do
+      borrower = user.borrowers.create!(name: "Alice")
+      patch update_notes_borrower_path(borrower),
+            params: { notes: "Reliable payer" },
+            headers: { "Accept" => "application/json" }
+      expect(response).to have_http_status(:ok)
+      body = JSON.parse(response.body)
+      expect(body["notes"]).to eq("Reliable payer")
+      expect(borrower.reload.notes).to eq("Reliable payer")
     end
   end
 end

@@ -5,6 +5,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 
 interface UpcomingPayment {
   loan_id: number
+  borrower_id: number | null
   borrower_name: string
   amount: number
   due_date: string
@@ -14,6 +15,7 @@ interface UpcomingPayment {
 
 interface AllocationItem {
   id: number
+  borrower_id: number | null
   borrower_name: string
   principal: number
   percentage: number
@@ -158,9 +160,19 @@ export default function DashboardIndex({ stats, monthly_interest_data, upcoming_
                         className="block p-3 rounded-lg hover:bg-gray-50 transition-colors"
                       >
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm font-medium text-gray-900 truncate mr-2">
-                            {p.borrower_name}
-                          </span>
+                          {p.borrower_id ? (
+                            <Link
+                              href={`/borrowers/${p.borrower_id}`}
+                              className="text-sm font-medium text-emerald-600 hover:text-emerald-700 truncate mr-2"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              {p.borrower_name}
+                            </Link>
+                          ) : (
+                            <span className="text-sm font-medium text-gray-900 truncate mr-2">
+                              {p.borrower_name}
+                            </span>
+                          )}
                           <span className="text-sm font-semibold font-mono text-gray-900 shrink-0">
                             ${p.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                           </span>
@@ -256,7 +268,13 @@ export default function DashboardIndex({ stats, monthly_interest_data, upcoming_
                               className="w-2.5 h-2.5 rounded-full shrink-0"
                               style={{ backgroundColor: ALLOCATION_COLORS[i % ALLOCATION_COLORS.length] }}
                             />
-                            <span className="text-gray-700 truncate">{item.borrower_name}</span>
+                            {item.borrower_id ? (
+                              <Link href={`/borrowers/${item.borrower_id}`} className="text-gray-700 truncate hover:text-emerald-600 transition-colors">
+                                {item.borrower_name}
+                              </Link>
+                            ) : (
+                              <span className="text-gray-700 truncate">{item.borrower_name}</span>
+                            )}
                           </div>
                           <span className="text-gray-400 shrink-0 ml-2">{item.percentage}%</span>
                         </div>

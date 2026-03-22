@@ -20,6 +20,7 @@ Rails.application.routes.draw do
     member do
       patch :archive
       patch :unarchive
+      patch :update_notes
     end
   end
   resources :loans do

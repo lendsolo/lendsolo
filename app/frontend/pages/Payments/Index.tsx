@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { router } from '@inertiajs/react'
+import { Link, router } from '@inertiajs/react'
 import AppLayout from '@/layouts/AppLayout'
 import RecordPaymentModal from '@/components/RecordPaymentModal'
 
@@ -12,6 +12,7 @@ interface PaymentItem {
   late_fee: number
   note: string | null
   loan_id: number
+  borrower_id: number | null
   borrower_name: string
 }
 
@@ -180,12 +181,12 @@ export default function PaymentsIndex({ payments, loans, stats, can_export_csv =
                   {filtered.map((p) => (
                     <tr key={p.id} className="border-b border-gray-50 hover:bg-gray-50/50">
                       <td className="py-2.5 px-4">
-                        <button
-                          onClick={() => router.visit(`/loans/${p.loan_id}`)}
+                        <Link
+                          href={p.borrower_id ? `/borrowers/${p.borrower_id}` : `/loans/${p.loan_id}`}
                           className="text-sm font-medium text-emerald-600 hover:text-emerald-700"
                         >
                           {p.borrower_name}
-                        </button>
+                        </Link>
                       </td>
                       <td className="py-2.5 px-4 text-gray-600">{p.date}</td>
                       <td className="py-2.5 px-4 text-right font-mono font-semibold text-gray-900">

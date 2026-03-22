@@ -38,6 +38,7 @@ class DashboardController < ApplicationController
 
       {
         loan_id: loan.id,
+        borrower_id: loan.borrower_id,
         borrower_name: loan.display_borrower_name,
         amount: next_payment[:amount],
         due_date: next_payment[:due_date],
@@ -50,6 +51,7 @@ class DashboardController < ApplicationController
     portfolio_allocation = active_loans.order(principal: :desc).map do |loan|
       {
         id: loan.id,
+        borrower_id: loan.borrower_id,
         borrower_name: loan.display_borrower_name,
         principal: loan.principal.to_f,
         percentage: total_deployed > 0 ? ((loan.principal.to_f / total_deployed) * 100).round(1) : 0

@@ -92,6 +92,7 @@ class PaymentsController < ApplicationController
       late_fee: payment.late_fee.to_f,
       note: payment.note,
       loan_id: payment.loan_id,
+      borrower_id: payment.loan.borrower_id,
       borrower_name: payment.loan.display_borrower_name
     }
   end

@@ -127,7 +127,17 @@ function LoanCard({ loan }: { loan: LoanProps }) {
       <div className="flex items-start justify-between mb-3">
         <div className="min-w-0">
           <h3 className="text-sm font-semibold text-gray-900 truncate group-hover:text-emerald-700 transition-colors">
-            {loan.borrower_name}
+            {loan.borrower_id ? (
+              <Link
+                href={`/borrowers/${loan.borrower_id}`}
+                className="hover:text-emerald-600 transition-colors"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {loan.borrower_name}
+              </Link>
+            ) : (
+              loan.borrower_name
+            )}
           </h3>
           <p className="text-xs text-gray-400 mt-0.5">{LOAN_TYPE_LABELS[loan.loan_type]}</p>
         </div>

@@ -1,5 +1,5 @@
 class BorrowersController < ApplicationController
-  before_action :set_borrower, only: %i[show edit update archive unarchive]
+  before_action :set_borrower, only: %i[show edit update archive unarchive update_notes]
 
   def index
     scope = params[:show_archived] == "true" ? current_user.borrowers : current_user.borrowers.active
@@ -20,12 +20,30 @@ class BorrowersController < ApplicationController
     loans = @borrower.loans.includes(:payments).order(created_at: :desc)
     total_capital = current_user.total_capital
 
+    # Combined payment history across all loans
+    all_payments = Payment.joins(:loan)
+                          .where(loan_id: loans.select(:id))
+                          .includes(:loan)
+                          .order(date: :desc)
+
+    # Weighted average rate
+    total_principal = loans.sum(:principal).to_f
+    weighted_sum = loans.sum("principal * annual_rate").to_f
+    avg_rate = total_principal > 0 ? (weighted_sum / total_principal).round(2) : 0.0
+
     respond_to do |format|
       format.json { render json: serialize_borrower_detail(@borrower) }
       format.any do
         render inertia: "Borrowers/Show", props: {
           borrower: serialize_borrower_detail(@borrower),
-          loans: loans.map { |l| l.as_inertia_props(total_capital: total_capital) }
+          loans: loans.map { |l| l.as_inertia_props(total_capital: total_capital) },
+          payments: all_payments.map { |p| serialize_borrower_payment(p) },
+          stats: {
+            active_loans: loans.where(status: :active).count,
+            total_principal: total_principal,
+            interest_earned: all_payments.sum(:interest_portion).to_f,
+            avg_rate: avg_rate
+          }
         }
       end
     end
@@ -79,6 +97,14 @@ class BorrowersController < ApplicationController
     redirect_to borrower_path(@borrower), notice: "#{@borrower.name} restored."
   end
 
+  def update_notes
+    if @borrower.update(notes: params[:notes])
+      render json: { notes: @borrower.notes }, status: :ok
+    else
+      render json: { error: "Could not update notes" }, status: :unprocessable_entity
+    end
+  end
+
   private
 
   def set_borrower
@@ -96,6 +122,21 @@ class BorrowersController < ApplicationController
   def serialize_borrower_summary(borrower)
     loans = borrower.loans
     payments = Payment.where(loan_id: loans.select(:id))
+    active_count = loans.where(status: :active).count
+    last_payment = payments.maximum(:date)
+    last_loan_start = loans.maximum(:start_date)
+    last_activity = [last_payment, last_loan_start].compact.max&.to_s
+
+    # Status: Active if has active loans, Paid Off if all paid off, Archived if archived
+    status = if borrower.archived
+               "archived"
+             elsif active_count > 0
+               "active"
+             elsif loans.any?
+               "paid_off"
+             else
+               "none"
+             end
 
     {
       id: borrower.id,
@@ -103,10 +144,28 @@ class BorrowersController < ApplicationController
       email: borrower.email,
       phone: borrower.phone,
       archived: borrower.archived,
+      status: status,
       loan_count: loans.count,
+      active_loan_count: active_count,
       total_principal: loans.sum(:principal).to_f,
       total_interest_received: payments.sum(:interest_portion).to_f,
-      last_payment_date: payments.maximum(:date)&.to_s
+      last_payment_date: last_payment&.to_s,
+      last_activity: last_activity
+    }
+  end
+
+  def serialize_borrower_payment(payment)
+    loan = payment.loan
+    {
+      id: payment.id,
+      date: payment.date.to_s,
+      amount: payment.amount.to_f,
+      principal_portion: payment.principal_portion.to_f,
+      interest_portion: payment.interest_portion.to_f,
+      late_fee: payment.late_fee.to_f,
+      note: payment.note,
+      loan_id: loan.id,
+      loan_label: "$#{ActiveSupport::NumberHelper.number_to_delimited(loan.principal.to_i)} at #{loan.annual_rate}%"
     }
   end
 

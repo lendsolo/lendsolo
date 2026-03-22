@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { router } from '@inertiajs/react'
 
 interface BorrowerOption {
   id: number
@@ -19,6 +18,8 @@ export default function BorrowerSelector({ borrowers, selectedId, selectedName, 
   const [search, setSearch] = useState('')
   const [showNewForm, setShowNewForm] = useState(false)
   const [newName, setNewName] = useState('')
+  const [newEmail, setNewEmail] = useState('')
+  const [newPhone, setNewPhone] = useState('')
   const [creating, setCreating] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -49,6 +50,10 @@ export default function BorrowerSelector({ borrowers, selectedId, selectedName, 
     if (!newName.trim()) return
     setCreating(true)
 
+    const body: Record<string, string> = { name: newName.trim() }
+    if (newEmail.trim()) body.email = newEmail.trim()
+    if (newPhone.trim()) body.phone = newPhone.trim()
+
     fetch('/borrowers', {
       method: 'POST',
       headers: {
@@ -56,25 +61,30 @@ export default function BorrowerSelector({ borrowers, selectedId, selectedName, 
         'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
         'Accept': 'application/json',
       },
-      body: JSON.stringify({ borrower: { name: newName.trim() } }),
+      body: JSON.stringify({ borrower: body }),
     })
       .then((res) => res.json())
       .then((data) => {
         if (data.id) {
           onSelect(data.id, data.name || newName.trim())
-          setShowNewForm(false)
-          setNewName('')
+          resetNewForm()
           setOpen(false)
         }
       })
       .catch(() => {
         // Fallback: just set the name without a borrower_id, the controller will handle find-or-create
         onSelect(null, newName.trim())
-        setShowNewForm(false)
-        setNewName('')
+        resetNewForm()
         setOpen(false)
       })
       .finally(() => setCreating(false))
+  }
+
+  function resetNewForm() {
+    setShowNewForm(false)
+    setNewName('')
+    setNewEmail('')
+    setNewPhone('')
   }
 
   const displayValue = selectedId
@@ -103,7 +113,7 @@ export default function BorrowerSelector({ borrowers, selectedId, selectedName, 
         </button>
 
         {open && (
-          <div className="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-64 overflow-hidden">
+          <div className="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-80 overflow-hidden">
             {/* Search input */}
             <div className="p-2 border-b border-gray-100">
               <input
@@ -143,24 +153,49 @@ export default function BorrowerSelector({ borrowers, selectedId, selectedName, 
             {/* Create new */}
             <div className="border-t border-gray-100">
               {showNewForm ? (
-                <div className="p-2 flex gap-2">
+                <div className="p-3 space-y-2">
                   <input
                     type="text"
                     value={newName}
                     onChange={(e) => setNewName(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleCreateNew())}
-                    placeholder="Borrower name"
-                    className="flex-1 px-2 py-1.5 text-sm border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                    placeholder="Name *"
+                    className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-emerald-500"
                     autoFocus
                   />
-                  <button
-                    type="button"
-                    onClick={handleCreateNew}
-                    disabled={creating || !newName.trim()}
-                    className="px-3 py-1.5 bg-emerald-600 text-white text-xs font-medium rounded hover:bg-emerald-700 disabled:opacity-50"
-                  >
-                    {creating ? '...' : 'Add'}
-                  </button>
+                  <div className="grid grid-cols-2 gap-2">
+                    <input
+                      type="email"
+                      value={newEmail}
+                      onChange={(e) => setNewEmail(e.target.value)}
+                      placeholder="Email (optional)"
+                      className="px-2 py-1.5 text-sm border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                    />
+                    <input
+                      type="tel"
+                      value={newPhone}
+                      onChange={(e) => setNewPhone(e.target.value)}
+                      placeholder="Phone (optional)"
+                      className="px-2 py-1.5 text-sm border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                    />
+                  </div>
+                  <div className="flex justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={resetNewForm}
+                      className="px-3 py-1.5 text-xs text-gray-500 hover:text-gray-700"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleCreateNew}
+                      disabled={creating || !newName.trim()}
+                      className="px-3 py-1.5 bg-emerald-600 text-white text-xs font-medium rounded hover:bg-emerald-700 disabled:opacity-50"
+                    >
+                      {creating ? 'Creating...' : 'Create & Select'}
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <button
