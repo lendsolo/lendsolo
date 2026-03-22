@@ -20,6 +20,26 @@ RSpec.describe "Expenses", type: :request do
       expect(response).to redirect_to(expenses_path)
     end
 
+    it "creates a recurring expense" do
+      expect {
+        post expenses_path, params: {
+          expense: {
+            description: "Software sub",
+            amount: 39,
+            date: Date.current.to_s,
+            category: "software",
+            recurring: "true",
+            frequency: "monthly"
+          }
+        }
+      }.to change(Expense, :count).by(1)
+
+      expense = Expense.last
+      expect(expense.recurring).to be true
+      expect(expense.frequency).to eq("monthly")
+      expect(expense.next_occurrence_date).to eq(Date.current + 1.month)
+    end
+
     it "rejects invalid params" do
       post expenses_path, params: { expense: { description: "", amount: 0, date: "" } }
       expect(response).to redirect_to(expenses_path)
@@ -36,6 +56,28 @@ RSpec.describe "Expenses", type: :request do
       other_expense = create(:expense, user: create(:user))
       delete expense_path(other_expense)
       expect(response).to have_http_status(:not_found)
+    end
+  end
+
+  describe "PATCH /expenses/:id/stop_recurring" do
+    it "stops an active recurring expense" do
+      expense = create(:expense, :recurring, user: user)
+      patch stop_recurring_expense_path(expense)
+      expect(response).to redirect_to(expenses_path)
+      expense.reload
+      expect(expense.active).to be false
+      expect(expense.next_occurrence_date).to be_nil
+    end
+  end
+
+  describe "PATCH /expenses/:id/resume_recurring" do
+    it "resumes a stopped recurring expense" do
+      expense = create(:expense, :stopped, user: user, frequency: "monthly")
+      patch resume_recurring_expense_path(expense)
+      expect(response).to redirect_to(expenses_path)
+      expense.reload
+      expect(expense.active).to be true
+      expect(expense.next_occurrence_date).to eq(Date.current + 1.month)
     end
   end
 

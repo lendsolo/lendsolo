@@ -36,6 +36,10 @@ Rails.application.routes.draw do
     end
   end
   resources :expenses, only: %i[index create destroy] do
+    member do
+      patch :stop_recurring
+      patch :resume_recurring
+    end
     collection do
       get :export_csv
     end

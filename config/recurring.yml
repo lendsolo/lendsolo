@@ -21,6 +21,12 @@ production:
     schedule: "0 8 1 * * America/New_York"
     description: "Sends portfolio summary email on the 1st of each month (8am ET)"
 
+  recurring_expense_generation:
+    class: RecurringExpenseJob
+    queue: default
+    schedule: "0 6 * * * America/Chicago"
+    description: "Generates recurring expense entries daily at 6am CT"
+
   clear_solid_queue_finished_jobs:
     command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
     schedule: "12 * * * *"
@@ -41,3 +47,8 @@ development:
     class: MonthlySummaryJob
     queue: default
     schedule: "0 8 1 * * America/New_York"
+
+  recurring_expense_generation:
+    class: RecurringExpenseJob
+    queue: default
+    schedule: "0 6 * * * America/Chicago"

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_22_165109) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_22_195454) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -62,6 +62,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_22_165109) do
     t.date "date", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "recurring", default: false, null: false
+    t.string "frequency"
+    t.date "next_occurrence_date"
+    t.bigint "recurring_parent_id"
+    t.boolean "active", default: true, null: false
+    t.index ["recurring", "active", "next_occurrence_date"], name: "index_expenses_on_recurring_active_next_date"
+    t.index ["recurring_parent_id"], name: "index_expenses_on_recurring_parent_id"
     t.index ["user_id"], name: "index_expenses_on_user_id"
   end
 
@@ -258,6 +265,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_22_165109) do
   add_foreign_key "borrowers", "users"
   add_foreign_key "email_logs", "loans"
   add_foreign_key "email_logs", "users"
+  add_foreign_key "expenses", "expenses", column: "recurring_parent_id"
   add_foreign_key "expenses", "users"
   add_foreign_key "loans", "borrowers"
   add_foreign_key "loans", "users"
