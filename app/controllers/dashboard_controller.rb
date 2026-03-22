@@ -31,21 +31,34 @@ class DashboardController < ApplicationController
       }
     end.reverse
 
-    # Upcoming payments — next 5 expected from active loans
+    # Upcoming payments — next 5 expected from active loans (uses cached fields)
     upcoming_payments = active_loans.filter_map do |loan|
-      next_payment = loan.expected_next_payment
-      next unless next_payment
+      if loan.cached_next_payment_date.present?
+        due_date = loan.cached_next_payment_date
+        amount = loan.cached_next_payment_amount.to_f
+      else
+        # Fallback for loans without cached values; populate the cache
+        next_payment = loan.expected_next_payment
+        next unless next_payment
+        loan.refresh_payment_cache!
+        due_date = Date.parse(next_payment[:due_date])
+        amount = next_payment[:amount]
+      end
 
+      is_overdue = Date.current > due_date
       {
         loan_id: loan.id,
         borrower_id: loan.borrower_id,
         borrower_name: loan.display_borrower_name,
-        amount: next_payment[:amount],
-        due_date: next_payment[:due_date],
-        overdue: loan.overdue?,
-        days_overdue: loan.days_overdue
+        amount: amount,
+        due_date: due_date.to_s,
+        overdue: is_overdue,
+        days_overdue: is_overdue ? (Date.current - due_date).to_i : 0
       }
     end.sort_by { |p| p[:due_date] }.first(5)
+
+    # Preload payment stats for portfolio allocation serialization
+    preloaded = Loan.preload_payment_stats(active_loans)
 
     # Portfolio allocation — each active loan's share
     portfolio_allocation = active_loans.order(principal: :desc).map do |loan|

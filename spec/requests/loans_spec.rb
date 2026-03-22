@@ -19,6 +19,27 @@ RSpec.describe "Loans", type: :request do
       get loans_path
       expect(response).to have_http_status(:ok)
     end
+
+    it "handles 10 loans with payments without N+1 queries" do
+      10.times do |i|
+        loan = create(:loan, user: user, borrower_name: "Borrower #{i}")
+        3.times do |j|
+          create(:payment, loan: loan, date: loan.start_date + (j + 1).months)
+        end
+      end
+
+      query_count = 0
+      counter = lambda { |_name, _start, _finish, _id, payload|
+        query_count += 1 unless payload[:name] == "SCHEMA" || payload[:sql]&.start_with?("SAVEPOINT", "RELEASE")
+      }
+
+      ActiveSupport::Notifications.subscribed(counter, "sql.active_record") do
+        get loans_path
+      end
+
+      expect(response).to have_http_status(:ok)
+      expect(query_count).to be <= 20
+    end
   end
 
   describe "GET /loans/:id" do

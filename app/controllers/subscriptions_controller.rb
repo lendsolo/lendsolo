@@ -1,9 +1,11 @@
 class SubscriptionsController < ApplicationController
-  PLAN_PRICES = {
-    "solo" => ENV.fetch("STRIPE_SOLO_PRICE_ID", "price_solo_placeholder"),
-    "pro" => ENV.fetch("STRIPE_PRO_PRICE_ID", "price_pro_placeholder"),
-    "fund" => ENV.fetch("STRIPE_FUND_PRICE_ID", "price_fund_placeholder")
-  }.freeze
+  def self.plan_prices
+    {
+      "solo" => ENV.fetch("STRIPE_SOLO_PRICE_ID", ""),
+      "pro" => ENV.fetch("STRIPE_PRO_PRICE_ID", ""),
+      "fund" => ENV.fetch("STRIPE_FUND_PRICE_ID", "")
+    }
+  end
 
   PLAN_DETAILS = {
     "free" => { name: "Free", price: 0, loan_limit: 2, features: ["2 active loans", "Basic amortization", "Payment tracking"] },
@@ -29,8 +31,16 @@ class SubscriptionsController < ApplicationController
   def create
     plan = params[:plan]
 
-    unless PLAN_PRICES.key?(plan)
+    prices = self.class.plan_prices
+    unless prices.key?(plan)
       redirect_to billing_path, alert: "Invalid plan selected."
+      return
+    end
+
+    price_id = prices[plan]
+    if price_id.blank?
+      Rails.logger.error("[Stripe] Missing price ID for plan: #{plan}")
+      redirect_to billing_path, alert: "Billing is not configured for this plan. Please contact support."
       return
     end
 
@@ -39,7 +49,7 @@ class SubscriptionsController < ApplicationController
     session = Stripe::Checkout::Session.create(
       customer: customer_id,
       mode: "subscription",
-      line_items: [{ price: PLAN_PRICES[plan], quantity: 1 }],
+      line_items: [{ price: price_id, quantity: 1 }],
       success_url: "#{request.base_url}/billing?session_id={CHECKOUT_SESSION_ID}",
       cancel_url: "#{request.base_url}/billing",
       subscription_data: {

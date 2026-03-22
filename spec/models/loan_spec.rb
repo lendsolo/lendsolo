@@ -146,6 +146,31 @@ RSpec.describe Loan, type: :model do
     end
   end
 
+  describe "#refresh_payment_cache!" do
+    let(:loan) { create(:loan, principal: 100_000, annual_rate: 12, term_months: 12) }
+
+    it "populates cached fields on creation" do
+      expect(loan.cached_next_payment_date).not_to be_nil
+      expect(loan.cached_next_payment_amount).not_to be_nil
+    end
+
+    it "updates cached fields after a payment" do
+      original_date = loan.cached_next_payment_date
+      create(:payment, loan: loan, amount: loan.monthly_payment, date: loan.start_date + 1.month)
+      loan.reload
+      expect(loan.cached_next_payment_date).to be > original_date
+    end
+
+    it "sets cached fields to nil when loan is fully paid off" do
+      loan.term_months.times do |i|
+        create(:payment, loan: loan, amount: loan.monthly_payment, date: loan.start_date + (i + 1).months)
+      end
+      loan.reload
+      expect(loan.cached_next_payment_date).to be_nil
+      expect(loan.cached_next_payment_amount).to be_nil
+    end
+  end
+
   describe "#as_inertia_props" do
     it "returns a hash with all expected keys" do
       loan = create(:loan)

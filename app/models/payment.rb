@@ -9,6 +9,7 @@ class Payment < ApplicationRecord
   before_validation :calculate_split, on: :create
 
   after_create :check_loan_payoff
+  after_commit :refresh_loan_payment_cache
 
   private
 
@@ -53,6 +54,11 @@ class Payment < ApplicationRecord
     if loan.payments.count >= loan.term_months && loan.active?
       loan.update!(status: :paid_off)
     end
+  end
+
+  def refresh_loan_payment_cache
+    return if loan.destroyed?
+    loan.refresh_payment_cache!
   end
 
   def loan_amortization_schedule

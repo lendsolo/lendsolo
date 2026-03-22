@@ -24,8 +24,8 @@ production:
   recurring_expense_generation:
     class: RecurringExpenseJob
     queue: default
-    schedule: "0 6 * * * America/Chicago"
-    description: "Generates recurring expense entries daily at 6am CT"
+    schedule: "0 7 * * * America/New_York"
+    description: "Generates recurring expense entries daily at 7am ET"
 
   clear_solid_queue_finished_jobs:
     command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
@@ -51,4 +51,4 @@ development:
   recurring_expense_generation:
     class: RecurringExpenseJob
     queue: default
-    schedule: "0 6 * * * America/Chicago"
+    schedule: "0 7 * * * America/New_York"
