@@ -69,6 +69,12 @@ export default function BlogShow({ post, relatedPosts }: Props) {
     [post.headings]
   )
 
+  // Strip the leading H1 from body_html to avoid duplicating the title shown in the hero
+  const bodyHtml = useMemo(
+    () => post.body_html.replace(/^\s*<h1[^>]*>.*?<\/h1>\s*/i, ''),
+    [post.body_html]
+  )
+
   return (
     <PublicLayout title={post.title} description={post.excerpt}>
       <SeoHead
@@ -146,7 +152,7 @@ export default function BlogShow({ post, relatedPosts }: Props) {
                 prose-code:bg-gray-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:font-mono
                 prose-pre:bg-gray-900 prose-pre:text-gray-100
                 prose-blockquote:border-emerald-500 prose-blockquote:text-gray-600"
-              dangerouslySetInnerHTML={{ __html: post.body_html }}
+              dangerouslySetInnerHTML={{ __html: bodyHtml }}
             />
 
             {/* CTA card */}
