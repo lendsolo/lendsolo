@@ -25,6 +25,7 @@ const navItems = [
   { name: 'Borrowers', href: '/borrowers', icon: UserIcon, gate: null },
   { name: 'Payments', href: '/payments', icon: CreditCardIcon, gate: null },
   { name: 'Expenses', href: '/expenses', icon: ReceiptIcon, gate: null },
+  { name: 'Capital', href: '/capital_transactions', icon: WalletIcon, gate: null },
   { name: 'Import', href: '/import', icon: ArrowUpTrayIcon, gate: 'solo' as const },
   { name: 'Reports', href: '/reports', icon: DocumentChartIcon, gate: null },
   { name: 'Exports', href: '/exports', icon: ArrowDownTrayIcon, gate: 'pro' as const },
@@ -84,6 +85,14 @@ function ReceiptIcon() {
   return (
     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" d="M9 14.25l6-6m4.5-3.493V21.75l-3.75-1.5-3.75 1.5-3.75-1.5-3.75 1.5V4.757c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0c1.1.128 1.907 1.077 1.907 2.185ZM9.75 9h.008v.008H9.75V9Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm4.125 4.5h.008v.008h-.008V13.5Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+    </svg>
+  )
+}
+
+function WalletIcon() {
+  return (
+    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75Z" />
     </svg>
   )
 }

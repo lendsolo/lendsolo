@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useForm, router, usePage } from '@inertiajs/react'
+import { useForm, router, usePage, Link } from '@inertiajs/react'
 import AppLayout from '@/layouts/AppLayout'
 
 interface Props {
@@ -25,7 +25,6 @@ export default function SettingsIndex({ user }: Props) {
 
   const form = useForm({
     business_name: user.business_name,
-    total_capital: user.total_capital.toString(),
     email_reminders_enabled: user.email_reminders_enabled,
     email_receipts_enabled: user.email_receipts_enabled,
     email_late_notices_enabled: user.email_late_notices_enabled,
@@ -138,24 +137,33 @@ export default function SettingsIndex({ user }: Props) {
               </div>
 
               <div>
-                <label htmlFor="total_capital" className="block text-xs font-medium text-gray-500 mb-1.5">
-                  Total Available Capital
+                <label className="block text-xs font-medium text-gray-500 mb-1.5">
+                  Total Capital
                 </label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">$</span>
-                  <input
-                    id="total_capital"
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    value={form.data.total_capital}
-                    onChange={(e) => form.setData('total_capital', e.target.value)}
-                    placeholder="0.00"
-                    className="w-full text-sm pl-7 pr-3 py-2.5 border border-gray-200 rounded-lg bg-white text-gray-900 placeholder-gray-400 font-mono focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                  />
+                <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg bg-gray-50">
+                  <span className="text-lg font-bold font-mono text-gray-900">
+                    ${user.total_capital.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                  </span>
+                  <div className="flex items-center gap-3">
+                    <Link
+                      href="/capital_transactions"
+                      className="text-xs text-emerald-600 hover:text-emerald-700 font-medium"
+                    >
+                      View capital history &rarr;
+                    </Link>
+                    <Link
+                      href="/capital_transactions"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg transition-colors"
+                    >
+                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                      Add Capital
+                    </Link>
+                  </div>
                 </div>
                 <p className="text-[10px] text-gray-400 mt-1">
-                  Total funds you have available for lending. Used to calculate capital utilization and concentration alerts.
+                  Computed from your capital transaction history. Add or withdraw capital from the capital ledger.
                 </p>
               </div>
             </div>

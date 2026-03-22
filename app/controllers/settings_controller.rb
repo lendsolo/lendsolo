@@ -50,6 +50,7 @@ class SettingsController < ApplicationController
 
     current_user.email_logs.delete_all
     current_user.expenses.delete_all
+    current_user.capital_transactions.delete_all
     current_user.loans.destroy_all  # cascades to payments via dependent: :destroy
     current_user.update!(total_capital: 0, business_name: nil)
     redirect_to settings_path, notice: "All data has been reset."

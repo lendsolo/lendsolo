@@ -6,7 +6,7 @@ class DashboardController < ApplicationController
     all_expenses = current_user.expenses
 
     total_deployed = active_loans.sum(:principal).to_f
-    total_capital = (current_user.total_capital || 0).to_f
+    total_capital = current_user.computed_total_capital
     available_capital = [total_capital - total_deployed, 0].max
     total_interest_earned = all_payments.sum(:interest_portion).to_f
     total_expenses_amount = all_expenses.sum(:amount).to_f
@@ -58,7 +58,19 @@ class DashboardController < ApplicationController
       }
     end
 
+    recent_capital_transactions = current_user.capital_transactions
+      .reverse_chronological.limit(3).map do |t|
+      {
+        id: t.id,
+        transaction_type: t.transaction_type,
+        amount: t.amount.to_f,
+        date: t.date.to_s,
+        source: t.source
+      }
+    end
+
     render inertia: "Dashboard/Index", props: {
+      recent_capital_transactions: recent_capital_transactions,
       stats: {
         active_loans: active_loans.count,
         total_deployed: total_deployed,

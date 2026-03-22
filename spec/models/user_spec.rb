@@ -5,6 +5,7 @@ RSpec.describe User, type: :model do
     it { expect(build(:user)).to respond_to(:loans) }
     it { expect(build(:user)).to respond_to(:expenses) }
     it { expect(build(:user)).to respond_to(:email_logs) }
+    it { expect(build(:user)).to respond_to(:capital_transactions) }
 
     it "destroys associated loans" do
       user = create(:user)
@@ -22,6 +23,12 @@ RSpec.describe User, type: :model do
       user = create(:user)
       create(:email_log, user: user)
       expect { user.destroy }.to change(EmailLog, :count).by(-1)
+    end
+
+    it "destroys associated capital_transactions" do
+      user = create(:user)
+      create(:capital_transaction, user: user)
+      expect { user.destroy }.to change(CapitalTransaction, :count).by(-1)
     end
   end
 
@@ -234,6 +241,53 @@ RSpec.describe User, type: :model do
       user = create(:user, :free) # free = 2 loan limit
       2.times { create(:loan, user: user, status: :active) }
       expect(user.can_create_loan_with_plan?).to be false
+    end
+  end
+
+  describe "#computed_total_capital" do
+    let(:user) { create(:user, total_capital: 0) }
+
+    it "returns 0 with no transactions" do
+      expect(user.computed_total_capital).to eq(0.0)
+    end
+
+    it "sums infusions and subtracts withdrawals" do
+      create(:capital_transaction, :infusion, user: user, amount: 50_000)
+      create(:capital_transaction, :infusion, user: user, amount: 20_000)
+      create(:capital_transaction, :withdrawal, user: user, amount: 5_000)
+      expect(user.computed_total_capital).to eq(65_000.0)
+    end
+
+    it "includes adjustments as additions" do
+      create(:capital_transaction, :infusion, user: user, amount: 50_000)
+      create(:capital_transaction, :adjustment, user: user, amount: 3_000)
+      create(:capital_transaction, :withdrawal, user: user, amount: 10_000)
+      expect(user.computed_total_capital).to eq(43_000.0)
+    end
+  end
+
+  describe "#capital_balance_on" do
+    let(:user) { create(:user, total_capital: 0) }
+
+    it "returns balance up to a given date" do
+      create(:capital_transaction, :infusion, user: user, amount: 50_000, date: Date.new(2026, 1, 1))
+      create(:capital_transaction, :infusion, user: user, amount: 20_000, date: Date.new(2026, 2, 1))
+      create(:capital_transaction, :withdrawal, user: user, amount: 5_000, date: Date.new(2026, 3, 1))
+
+      expect(user.capital_balance_on(Date.new(2026, 1, 15))).to eq(50_000.0)
+      expect(user.capital_balance_on(Date.new(2026, 2, 15))).to eq(70_000.0)
+      expect(user.capital_balance_on(Date.new(2026, 3, 15))).to eq(65_000.0)
+    end
+  end
+
+  describe "#sync_total_capital!" do
+    it "updates the cached total_capital column" do
+      user = create(:user, total_capital: 0)
+      create(:capital_transaction, :infusion, user: user, amount: 75_000)
+      create(:capital_transaction, :withdrawal, user: user, amount: 10_000)
+
+      user.sync_total_capital!
+      expect(user.reload.total_capital.to_f).to eq(65_000.0)
     end
   end
 end
