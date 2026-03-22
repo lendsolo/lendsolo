@@ -1,38 +1,43 @@
 # Solid Queue recurring tasks
-# These run automatically on the specified schedule
+# Schedules use cron syntax with America/New_York timezone
+# Format: minute hour day month weekday timezone
 
 production:
-  clear_solid_queue_finished_jobs:
-    command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
-    schedule: every hour at minute 12
-
   payment_reminders:
     class: PaymentReminderJob
     queue: default
-    schedule: every day at 8am
+    schedule: "0 9 * * 1-5 America/New_York"
+    description: "Sends reminders for payments due in the next few days (weekdays 9am ET)"
 
   late_payment_notices:
     class: LatePaymentNoticeJob
     queue: default
-    schedule: every day at 9am
+    schedule: "0 10 * * 1-5 America/New_York"
+    description: "Sends notices for overdue payments (weekdays 10am ET)"
 
   monthly_portfolio_summary:
     class: MonthlySummaryJob
     queue: default
-    schedule: on the 1st of every month at 7am
+    schedule: "0 8 1 * * America/New_York"
+    description: "Sends portfolio summary email on the 1st of each month (8am ET)"
+
+  clear_solid_queue_finished_jobs:
+    command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
+    schedule: "12 * * * *"
+    description: "Housekeeping: clears finished jobs every hour at :12"
 
 development:
   payment_reminders:
     class: PaymentReminderJob
     queue: default
-    schedule: every day at 8am
+    schedule: "0 9 * * 1-5 America/New_York"
 
   late_payment_notices:
     class: LatePaymentNoticeJob
     queue: default
-    schedule: every day at 9am
+    schedule: "0 10 * * 1-5 America/New_York"
 
   monthly_portfolio_summary:
     class: MonthlySummaryJob
     queue: default
-    schedule: on the 1st of every month at 7am
+    schedule: "0 8 1 * * America/New_York"
