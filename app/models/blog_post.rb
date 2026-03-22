@@ -34,6 +34,10 @@ class BlogPost
   # ------------------------------------------------------------------
 
   def self.all
+    all_including_scheduled.select { |p| p.date <= Date.current }
+  end
+
+  def self.all_including_scheduled
     cache_key = "blog_posts:all:#{dir_fingerprint}"
     cached = Rails.cache.read(cache_key)
     return cached if cached
