@@ -45,9 +45,16 @@ export default function RoiCalculatorPage() {
       description="Analyze the return on investment for your private lending deals. Calculate net profit, ROI, annualized returns, and cash-on-cash yield."
     >
       <SeoHead
-        title="Free ROI Calculator for Private Lenders"
-        description="Calculate net profit, ROI%, annualized ROI, and cash-on-cash return for real estate and private lending deals."
-        canonicalPath="/tools/roi-calculator"
+        title="Private Lending ROI Calculator — Free | LendSolo"
+        description="Calculate net profit, ROI, and cash-on-cash return for private lending deals. Input purchase price, rehab, and loan terms to see your projected return."
+        canonicalUrl="https://lendsolo.com/tools/roi-calculator"
+        schema={{
+          '@type': 'FinancialProduct',
+          name: 'Private Lending ROI Calculator',
+          description: 'Calculate net profit, ROI, and cash-on-cash return for private lending deals. Input purchase price, rehab, and loan terms to see your projected return.',
+          url: 'https://lendsolo.com/tools/roi-calculator',
+          provider: { '@type': 'Organization', name: 'LendSolo' },
+        }}
       />
 
       <div className="grid lg:grid-cols-[400px_1fr] gap-8">
