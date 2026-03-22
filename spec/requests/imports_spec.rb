@@ -53,4 +53,30 @@ RSpec.describe "Imports", type: :request do
       expect(response).to redirect_to(new_import_path)
     end
   end
+
+  describe "POST /import/process" do
+    it "ignores injected fields like user_id" do
+      user.update!(subscription_plan: "solo", subscription_status: "active")
+      other_user = create(:user)
+
+      post process_import_path, params: {
+        loans: [
+          {
+            borrower_name: "Alice",
+            principal: "50000",
+            annual_rate: "10",
+            term_months: "12",
+            start_date: "2025-01-01",
+            user_id: other_user.id
+          }
+        ]
+      }
+
+      expect(response).to have_http_status(:ok)
+      loan = user.loans.last
+      expect(loan).to be_present
+      expect(loan.user_id).to eq(user.id)
+      expect(loan.user_id).not_to eq(other_user.id)
+    end
+  end
 end

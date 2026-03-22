@@ -43,6 +43,11 @@ class SettingsController < ApplicationController
   end
 
   def reset_data
+    unless params[:confirmation] == "DELETE"
+      redirect_to settings_path, alert: "Please type DELETE to confirm data reset."
+      return
+    end
+
     current_user.email_logs.delete_all
     current_user.expenses.delete_all
     current_user.loans.destroy_all  # cascades to payments via dependent: :destroy

@@ -1,6 +1,5 @@
 module Api
   class AiController < ApplicationController
-    skip_before_action :verify_authenticity_token
     before_action :require_pro_plan!
 
     # POST /api/ai/deal_memo

@@ -21,6 +21,7 @@ Rails.application.routes.draw do
       patch :archive
       patch :unarchive
       patch :update_notes
+      post :reveal_tin
     end
   end
   resources :loans do

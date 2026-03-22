@@ -41,6 +41,34 @@ RSpec.describe User, type: :model do
       user = build(:user, password: "")
       expect(user).not_to be_valid
     end
+
+    describe "borrower_notification_email" do
+      it "accepts a valid email" do
+        user = build(:user, borrower_notification_email: "valid@example.com")
+        expect(user).to be_valid
+      end
+
+      it "accepts a blank email" do
+        user = build(:user, borrower_notification_email: "")
+        expect(user).to be_valid
+      end
+
+      it "rejects 'notanemail'" do
+        user = build(:user, borrower_notification_email: "notanemail")
+        expect(user).not_to be_valid
+        expect(user.errors[:borrower_notification_email]).to include("must be a valid email address")
+      end
+
+      it "rejects 'missing@'" do
+        user = build(:user, borrower_notification_email: "missing@")
+        expect(user).not_to be_valid
+      end
+
+      it "rejects '@nodomain'" do
+        user = build(:user, borrower_notification_email: "@nodomain")
+        expect(user).not_to be_valid
+      end
+    end
   end
 
   describe "enums" do

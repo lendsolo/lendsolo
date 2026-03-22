@@ -1,5 +1,5 @@
 class BorrowersController < ApplicationController
-  before_action :set_borrower, only: %i[show edit update archive unarchive update_notes]
+  before_action :set_borrower, only: %i[show edit update archive unarchive update_notes reveal_tin]
 
   def index
     scope = params[:show_archived] == "true" ? current_user.borrowers : current_user.borrowers.active
@@ -105,10 +105,19 @@ class BorrowersController < ApplicationController
     end
   end
 
+  def reveal_tin
+    render json: { tin: @borrower.tin }
+  end
+
   private
 
   def set_borrower
     @borrower = current_user.borrowers.find(params[:id])
+  end
+
+  def mask_tin(tin)
+    return nil if tin.blank?
+    "***-**-#{tin.last(4)}"
   end
 
   def borrower_params
@@ -181,7 +190,7 @@ class BorrowersController < ApplicationController
       state: borrower.state,
       zip: borrower.zip,
       notes: borrower.notes,
-      tin: borrower.tin,
+      tin: mask_tin(borrower.tin),
       archived: borrower.archived,
       created_at: borrower.created_at.iso8601
     }
