@@ -1,5 +1,6 @@
 class ExpensesController < ApplicationController
   before_action :set_expense, only: %i[destroy]
+  before_action :enforce_pro_gate!, only: :export_csv
 
   def index
     expenses = current_user.expenses.order(date: :desc)
@@ -15,7 +16,8 @@ class ExpensesController < ApplicationController
         total_this_month: month_expenses.sum(:amount).to_f,
         count_this_month: month_expenses.count
       },
-      categories: Expense.categories.keys
+      categories: Expense.categories.keys,
+      can_export_csv: pro_or_above?
     }
   end
 

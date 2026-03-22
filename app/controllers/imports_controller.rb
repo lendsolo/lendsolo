@@ -1,6 +1,10 @@
 class ImportsController < ApplicationController
+  before_action :enforce_solo_gate!, only: %i[create process_import]
+
   def new
-    render inertia: "Imports/New"
+    render inertia: "Imports/New", props: {
+      can_import: solo_or_above?
+    }
   end
 
   def create

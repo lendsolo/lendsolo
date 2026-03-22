@@ -20,17 +20,32 @@ interface PageProps {
 }
 
 const navItems = [
-  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Loans', href: '/loans', icon: BanknotesIcon },
-  { name: 'Payments', href: '/payments', icon: CreditCardIcon },
-  { name: 'Expenses', href: '/expenses', icon: ReceiptIcon },
-  { name: 'Import', href: '/import', icon: ArrowUpTrayIcon },
-  { name: 'Reports', href: '/reports', icon: DocumentChartIcon },
-  { name: 'Exports', href: '/exports', icon: ArrowDownTrayIcon },
-  { name: 'Calculators', href: '/calculators', icon: CalculatorIcon },
-  { name: 'Billing', href: '/billing', icon: SparklesIcon },
-  { name: 'Settings', href: '/settings', icon: CogIcon },
+  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon, gate: null },
+  { name: 'Loans', href: '/loans', icon: BanknotesIcon, gate: null },
+  { name: 'Payments', href: '/payments', icon: CreditCardIcon, gate: null },
+  { name: 'Expenses', href: '/expenses', icon: ReceiptIcon, gate: null },
+  { name: 'Import', href: '/import', icon: ArrowUpTrayIcon, gate: 'solo' as const },
+  { name: 'Reports', href: '/reports', icon: DocumentChartIcon, gate: null },
+  { name: 'Exports', href: '/exports', icon: ArrowDownTrayIcon, gate: 'pro' as const },
+  { name: 'Calculators', href: '/calculators', icon: CalculatorIcon, gate: null },
+  { name: 'Billing', href: '/billing', icon: SparklesIcon, gate: null },
+  { name: 'Settings', href: '/settings', icon: CogIcon, gate: null },
 ]
+
+function LockIcon() {
+  return (
+    <svg className="w-3 h-3 text-gray-500 opacity-60" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+    </svg>
+  )
+}
+
+const PLAN_RANK: Record<string, number> = { free: 0, solo: 1, pro: 2, fund: 3 }
+
+function isGated(gate: string | null, userPlan: string): boolean {
+  if (!gate) return false
+  return (PLAN_RANK[userPlan] || 0) < (PLAN_RANK[gate] || 0)
+}
 
 function HomeIcon() {
   return (
@@ -220,6 +235,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         {navItems.map((item) => {
           const isActive = currentPath.startsWith(item.href)
           const Icon = item.icon
+          const locked = isGated(item.gate, current_user?.effective_plan || 'free')
           return (
             <Link
               key={item.name}
@@ -233,6 +249,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             >
               <Icon />
               {item.name}
+              {locked && <LockIcon />}
             </Link>
           )
         })}

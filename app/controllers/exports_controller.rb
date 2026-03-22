@@ -71,13 +71,7 @@ class ExportsController < ApplicationController
   end
 
   def can_export?
-    %w[pro fund].include?(current_user.effective_plan)
-  end
-
-  def enforce_pro_gate!
-    unless can_export?
-      redirect_to exports_path, alert: "Accountant exports require the Pro plan. Upgrade to download."
-    end
+    pro_or_above?
   end
 
   def available_years

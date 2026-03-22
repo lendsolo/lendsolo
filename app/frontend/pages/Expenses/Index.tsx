@@ -19,6 +19,7 @@ interface Props {
     count_this_month: number
   }
   categories: string[]
+  can_export_csv?: boolean
 }
 
 const CATEGORY_BADGES: Record<string, { label: string; bg: string; text: string }> = {
@@ -32,7 +33,7 @@ const CATEGORY_BADGES: Record<string, { label: string; bg: string; text: string 
   other: { label: 'Other', bg: 'bg-gray-100', text: 'text-gray-600' },
 }
 
-export default function ExpensesIndex({ expenses, stats, categories }: Props) {
+export default function ExpensesIndex({ expenses, stats, categories, can_export_csv = false }: Props) {
   const [deleteId, setDeleteId] = useState<number | null>(null)
   const [showForm, setShowForm] = useState(false)
 
@@ -70,15 +71,28 @@ export default function ExpensesIndex({ expenses, stats, categories }: Props) {
           </div>
           <div className="flex items-center gap-3">
             {expenses.length > 0 && (
-              <a
-                href="/expenses/export_csv"
-                className="inline-flex items-center gap-2 px-4 py-2.5 border border-gray-200 text-gray-600 hover:bg-gray-50 text-sm font-medium rounded-lg transition-colors"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                </svg>
-                Export CSV
-              </a>
+              can_export_csv ? (
+                <a
+                  href="/expenses/export_csv"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 border border-gray-200 text-gray-600 hover:bg-gray-50 text-sm font-medium rounded-lg transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                  </svg>
+                  Export CSV
+                </a>
+              ) : (
+                <button
+                  disabled
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-gray-100 text-gray-400 text-sm font-medium rounded-lg cursor-not-allowed"
+                  title="CSV export requires the Pro plan"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                  </svg>
+                  Pro Feature
+                </button>
+              )
             )}
             <button
               onClick={() => setShowForm(!showForm)}

@@ -7,8 +7,8 @@ class SubscriptionsController < ApplicationController
 
   PLAN_DETAILS = {
     "free" => { name: "Free", price: 0, loan_limit: 2, features: ["2 active loans", "Basic amortization", "Payment tracking"] },
-    "solo" => { name: "Solo", price: 19, loan_limit: 5, features: ["5 active loans", "Full amortization schedules", "Payment tracking", "Expense tracking", "Spreadsheet import", "Smart guardrails"] },
-    "pro" => { name: "Pro", price: 39, loan_limit: 25, features: ["25 active loans", "Everything in Solo", "Accountant exports (PDF, CSV, QBO)", "Priority support", "Portfolio analytics"] },
+    "solo" => { name: "Solo", price: 19, loan_limit: 5, features: ["5 active loans", "Full amortization schedules", "Payment tracking", "Expense tracking", "Spreadsheet import (CSV & Excel)", "Smart guardrails"] },
+    "pro" => { name: "Pro", price: 39, loan_limit: 25, features: ["25 active loans", "Everything in Solo", "CSV exports (payments & expenses)", "Tax reporting exports (PDF, QBO)", "Priority support", "Portfolio analytics"] },
     "fund" => { name: "Fund", price: 99, loan_limit: nil, features: ["Unlimited loans", "Everything in Pro", "Multi-user access (coming soon)", "API access (coming soon)", "Dedicated support"] }
   }.freeze
 

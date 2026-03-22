@@ -1,4 +1,6 @@
 class PaymentsController < ApplicationController
+  before_action :enforce_pro_gate!, only: :export_csv
+
   def index
     all_payments = Payment.joins(:loan)
                          .where(loans: { user_id: current_user.id })
@@ -18,7 +20,8 @@ class PaymentsController < ApplicationController
         total_collected_month: month_payments.sum(:amount).to_f,
         interest_earned_month: month_payments.sum(:interest_portion).to_f,
         principal_returned_month: month_payments.sum(:principal_portion).to_f
-      }
+      },
+      can_export_csv: pro_or_above?
     }
   end
 

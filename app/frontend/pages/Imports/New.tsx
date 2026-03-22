@@ -22,6 +22,7 @@ interface Props {
   parsed_data?: ParsedData
   auto_mappings?: Record<string, number>
   import_result?: ImportResult
+  can_import?: boolean
 }
 
 interface MappedLoan {
@@ -57,7 +58,7 @@ type FieldKey = typeof LOAN_FIELDS[number]['key']
 
 // ── Main Component ───────────────────────────────────────────────────────────
 
-export default function ImportsNew({ parsed_data, auto_mappings, import_result }: Props) {
+export default function ImportsNew({ parsed_data, auto_mappings, import_result, can_import = true }: Props) {
   // Determine which step to show based on props
   const initialStep = import_result ? 4 : parsed_data ? 2 : 1
   const [step, setStep] = useState(initialStep)
@@ -190,12 +191,37 @@ export default function ImportsNew({ parsed_data, auto_mappings, import_result }
           <p className="text-sm text-gray-500 mt-1">Upload a spreadsheet to bulk-create loans.</p>
         </div>
 
+        {/* Solo gate banner */}
+        {!can_import && (
+          <div className="mb-6 px-5 py-4 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
+                <svg className="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-amber-800">Solo Feature</p>
+                <p className="text-xs text-amber-700">
+                  Spreadsheet import is available on the Solo plan ($19/mo) and above. Upgrade to bulk-import your loans.
+                </p>
+              </div>
+            </div>
+            <Link
+              href="/billing"
+              className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-lg transition-colors shrink-0 ml-4"
+            >
+              Upgrade to Solo
+            </Link>
+          </div>
+        )}
+
         {/* Stepper */}
-        <StepIndicator current={step} />
+        {can_import && <StepIndicator current={step} />}
 
         {/* Steps */}
-        {step === 1 && <UploadStep />}
-        {step === 2 && parsed_data && (
+        {can_import && step === 1 && <UploadStep />}
+        {can_import && step === 2 && parsed_data && (
           <MappingStep
             parsedData={parsed_data}
             mappings={mappings}
@@ -204,7 +230,7 @@ export default function ImportsNew({ parsed_data, auto_mappings, import_result }
             onBack={() => setStep(1)}
           />
         )}
-        {step === 3 && (
+        {can_import && step === 3 && (
           <ReviewStep
             loans={loans}
             editingRow={editingRow}
@@ -218,7 +244,7 @@ export default function ImportsNew({ parsed_data, auto_mappings, import_result }
             importing={importing}
           />
         )}
-        {step === 4 && import_result && (
+        {can_import && step === 4 && import_result && (
           <ResultStep result={import_result} />
         )}
       </div>
