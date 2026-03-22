@@ -1,5 +1,5 @@
-import { Link, usePage } from '@inertiajs/react'
-import { ReactNode, useState } from 'react'
+import { Link, usePage, router } from '@inertiajs/react'
+import { ReactNode, useState, useEffect, useCallback, useRef } from 'react'
 
 interface User {
   id: number
@@ -123,92 +123,215 @@ const PLAN_BADGES: Record<string, { label: string; bg: string; text: string }> =
 export default function AppLayout({ children }: { children: ReactNode }) {
   const { current_user } = usePage<PageProps>().props
   const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const currentPath = window.location.pathname
+
+  const touchStartX = useRef(0)
+  const touchCurrentX = useRef(0)
+  const isSwiping = useRef(false)
+
+  const closeSidebar = useCallback(() => setSidebarOpen(false), [])
+
+  // Close sidebar on Inertia navigation
+  useEffect(() => {
+    const removeListener = router.on('start', closeSidebar)
+    return () => { removeListener() }
+  }, [closeSidebar])
+
+  // Close sidebar on Escape key
+  useEffect(() => {
+    if (!sidebarOpen) return
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeSidebar()
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [sidebarOpen, closeSidebar])
+
+  // Close sidebar when resizing above md breakpoint
+  useEffect(() => {
+    const mql = window.matchMedia('(min-width: 768px)')
+    const handler = (e: MediaQueryListEvent) => {
+      if (e.matches) closeSidebar()
+    }
+    mql.addEventListener('change', handler)
+    return () => mql.removeEventListener('change', handler)
+  }, [closeSidebar])
+
+  // Body scroll lock when sidebar is open on mobile
+  useEffect(() => {
+    if (sidebarOpen) {
+      document.body.classList.add('overflow-hidden')
+    } else {
+      document.body.classList.remove('overflow-hidden')
+    }
+    return () => document.body.classList.remove('overflow-hidden')
+  }, [sidebarOpen])
+
+  // Touch gestures for swipe open/close
+  useEffect(() => {
+    const handleTouchStart = (e: TouchEvent) => {
+      const x = e.touches[0].clientX
+      touchStartX.current = x
+      touchCurrentX.current = x
+      if (x <= 20 || sidebarOpen) {
+        isSwiping.current = true
+      }
+    }
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!isSwiping.current) return
+      touchCurrentX.current = e.touches[0].clientX
+    }
+    const handleTouchEnd = () => {
+      if (!isSwiping.current) return
+      isSwiping.current = false
+      const deltaX = touchCurrentX.current - touchStartX.current
+      if (!sidebarOpen && deltaX > 50 && touchStartX.current <= 20) {
+        setSidebarOpen(true)
+      } else if (sidebarOpen && deltaX < -50) {
+        setSidebarOpen(false)
+      }
+    }
+    document.addEventListener('touchstart', handleTouchStart, { passive: true })
+    document.addEventListener('touchmove', handleTouchMove, { passive: true })
+    document.addEventListener('touchend', handleTouchEnd, { passive: true })
+    return () => {
+      document.removeEventListener('touchstart', handleTouchStart)
+      document.removeEventListener('touchmove', handleTouchMove)
+      document.removeEventListener('touchend', handleTouchEnd)
+    }
+  }, [sidebarOpen])
 
   const planBadge = PLAN_BADGES[current_user?.effective_plan || 'free'] || PLAN_BADGES.free
 
+  const sidebarContent = (
+    <>
+      <div className="p-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-bold text-white tracking-tight">LendSolo</h1>
+          <span className={`px-1.5 py-0.5 text-[9px] font-bold rounded ${planBadge.bg} ${planBadge.text}`}>
+            {planBadge.label}
+          </span>
+        </div>
+        <p className="text-xs text-gray-500 mt-1">Loan Management</p>
+      </div>
+
+      <nav className="flex-1 px-3 space-y-1" role="navigation">
+        {navItems.map((item) => {
+          const isActive = currentPath.startsWith(item.href)
+          const Icon = item.icon
+          return (
+            <Link
+              key={item.name}
+              href={item.href}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                isActive
+                  ? 'text-white'
+                  : 'text-gray-400 hover:text-white hover:bg-white/5'
+              }`}
+              style={isActive ? { backgroundColor: 'rgba(52, 211, 153, 0.15)', color: '#34D399' } : {}}
+            >
+              <Icon />
+              {item.name}
+            </Link>
+          )
+        })}
+      </nav>
+
+      {/* Trial / Plan info */}
+      <div className="px-3 pb-2">
+        {current_user?.on_trial && (
+          <Link
+            href="/billing"
+            className="block p-3 rounded-lg bg-gradient-to-r from-emerald-900/50 to-indigo-900/50 border border-emerald-800/30 mb-2"
+          >
+            <p className="text-[10px] font-semibold text-emerald-400 uppercase tracking-wider">Free Trial</p>
+            <p className="text-xs text-gray-300 mt-0.5">
+              {current_user.trial_days_remaining} day{current_user.trial_days_remaining !== 1 ? 's' : ''} remaining
+            </p>
+            <div className="h-1 bg-gray-700 rounded-full mt-2 overflow-hidden">
+              <div
+                className="h-full bg-emerald-500 rounded-full"
+                style={{ width: `${Math.max(5, ((14 - current_user.trial_days_remaining) / 14) * 100)}%` }}
+              />
+            </div>
+          </Link>
+        )}
+        {current_user?.trial_expired && (
+          <Link
+            href="/billing"
+            className="block p-3 rounded-lg bg-red-950/50 border border-red-800/30 mb-2"
+          >
+            <p className="text-[10px] font-semibold text-red-400">Trial expired</p>
+            <p className="text-xs text-gray-400 mt-0.5">Upgrade to keep creating loans</p>
+          </Link>
+        )}
+        {current_user?.loan_limit && (
+          <div className="px-3 py-2">
+            <p className="text-[10px] text-gray-500">
+              {current_user.active_loan_count} / {current_user.loan_limit} active loans
+            </p>
+          </div>
+        )}
+      </div>
+
+      <div className="p-4 border-t border-gray-800">
+        <p className="text-xs text-gray-500">v1.0.0</p>
+      </div>
+    </>
+  )
+
   return (
     <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
-      <aside className="w-64 flex-shrink-0 flex flex-col" style={{ backgroundColor: '#0F1419' }}>
-        <div className="p-6">
-          <div className="flex items-center justify-between">
-            <h1 className="text-xl font-bold text-white tracking-tight">LendSolo</h1>
-            <span className={`px-1.5 py-0.5 text-[9px] font-bold rounded ${planBadge.bg} ${planBadge.text}`}>
-              {planBadge.label}
-            </span>
-          </div>
-          <p className="text-xs text-gray-500 mt-1">Loan Management</p>
-        </div>
-
-        <nav className="flex-1 px-3 space-y-1">
-          {navItems.map((item) => {
-            const isActive = currentPath.startsWith(item.href)
-            const Icon = item.icon
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                  isActive
-                    ? 'text-white'
-                    : 'text-gray-400 hover:text-white hover:bg-white/5'
-                }`}
-                style={isActive ? { backgroundColor: 'rgba(52, 211, 153, 0.15)', color: '#34D399' } : {}}
-              >
-                <Icon />
-                {item.name}
-              </Link>
-            )
-          })}
-        </nav>
-
-        {/* Trial / Plan info */}
-        <div className="px-3 pb-2">
-          {current_user?.on_trial && (
-            <Link
-              href="/billing"
-              className="block p-3 rounded-lg bg-gradient-to-r from-emerald-900/50 to-indigo-900/50 border border-emerald-800/30 mb-2"
-            >
-              <p className="text-[10px] font-semibold text-emerald-400 uppercase tracking-wider">Free Trial</p>
-              <p className="text-xs text-gray-300 mt-0.5">
-                {current_user.trial_days_remaining} day{current_user.trial_days_remaining !== 1 ? 's' : ''} remaining
-              </p>
-              <div className="h-1 bg-gray-700 rounded-full mt-2 overflow-hidden">
-                <div
-                  className="h-full bg-emerald-500 rounded-full"
-                  style={{ width: `${Math.max(5, ((14 - current_user.trial_days_remaining) / 14) * 100)}%` }}
-                />
-              </div>
-            </Link>
-          )}
-          {current_user?.trial_expired && (
-            <Link
-              href="/billing"
-              className="block p-3 rounded-lg bg-red-950/50 border border-red-800/30 mb-2"
-            >
-              <p className="text-[10px] font-semibold text-red-400">Trial expired</p>
-              <p className="text-xs text-gray-400 mt-0.5">Upgrade to keep creating loans</p>
-            </Link>
-          )}
-          {current_user?.loan_limit && (
-            <div className="px-3 py-2">
-              <p className="text-[10px] text-gray-500">
-                {current_user.active_loan_count} / {current_user.loan_limit} active loans
-              </p>
-            </div>
-          )}
-        </div>
-
-        <div className="p-4 border-t border-gray-800">
-          <p className="text-xs text-gray-500">v1.0.0</p>
-        </div>
+      {/* Desktop Sidebar — hidden on mobile */}
+      <aside className="hidden md:flex w-64 flex-shrink-0 flex-col" style={{ backgroundColor: '#0F1419' }}>
+        {sidebarContent}
       </aside>
+
+      {/* Mobile Sidebar Drawer */}
+      <div className="md:hidden">
+        {/* Backdrop */}
+        <div
+          className={`fixed inset-0 z-40 bg-black/50 transition-opacity duration-200 ${
+            sidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          }`}
+          aria-hidden="true"
+          onClick={closeSidebar}
+        />
+        {/* Drawer */}
+        <aside
+          className={`fixed inset-y-0 left-0 z-50 w-[280px] flex flex-col transition-transform duration-200 ease-out ${
+            sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
+          style={{ backgroundColor: '#0F1419' }}
+        >
+          {sidebarContent}
+        </aside>
+      </div>
 
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top bar */}
-        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 flex-shrink-0">
+        {/* Mobile Top Bar */}
+        <div className="md:hidden h-14 flex items-center justify-between px-4 flex-shrink-0 z-30" style={{ backgroundColor: '#0F1419' }}>
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="text-white p-1"
+            aria-label="Toggle navigation"
+          >
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
+          </button>
+          <span className="text-white font-bold text-lg tracking-tight">LendSolo</span>
+          <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center">
+            <span className="text-emerald-700 font-medium text-sm">
+              {current_user?.email?.charAt(0).toUpperCase() || 'U'}
+            </span>
+          </div>
+        </div>
+
+        {/* Desktop Top bar */}
+        <header className="hidden md:flex h-16 bg-white border-b border-gray-200 items-center justify-between px-6 flex-shrink-0">
           <h2 className="text-lg font-semibold text-gray-800">
             {current_user?.business_name || 'My Lending Business'}
           </h2>
@@ -257,7 +380,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         </header>
 
         {/* Page content */}
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className="flex-1 overflow-y-auto p-4 md:p-6">
           {children}
         </main>
       </div>
