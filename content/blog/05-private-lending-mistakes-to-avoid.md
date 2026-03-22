@@ -1,6 +1,6 @@
 ---
 title: "5 Mistakes New Private Lenders Make (And How to Avoid Them)"
-date: 2026-03-21
+date: "2026-03-21"
 excerpt: "The most common and costly mistakes new private lenders make — poor collateral evaluation, concentration risk, missing documentation, legal blind spots, and poor tracking — and exactly how to avoid them."
 category: "Getting Started"
 meta_title: "5 Mistakes New Private Lenders Make"
@@ -44,7 +44,7 @@ Order a broker price opinion (BPO) or appraisal from someone with no connection 
 
 For fix-and-flip loans specifically, evaluate the ARV conservatively. Use the median comparable sale in the area, not the high. Apply a 5–10% haircut to account for market softness and selling costs. Then check your LTV against that conservative number.
 
-Our free [loan pricing calculator](/tools/loan-pricing) is built around LTV as the primary risk input — because it is.
+Our free [loan pricing calculator](/tools/loan-comparison) is built around LTV as the primary risk input — because it is.
 
 ---
 
@@ -178,4 +178,4 @@ Build it right from the start.
 
 ---
 
-*LendSolo is loan management software for private lenders managing 1–15 loans. It tracks balances, payment history, interest income, and includes smart guardrails that flag LTV issues, concentration risk, and missing documentation. Free calculators at [/tools](/tools). No account required.*
+*LendSolo is loan management software for private lenders managing 1–15 loans. It tracks balances, payment history, interest income, and includes smart guardrails that flag LTV issues, concentration risk, and missing documentation. Free calculators at [/tools](/calculators). No account required.*

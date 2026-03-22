@@ -1,6 +1,6 @@
 ---
 title: "Private Lending Tax Guide: What You Need to Know"
-date: 2026-03-21
+date: "2026-02-21"
 excerpt: "How to report interest income from private loans, when you're required to file a 1098, what you can deduct, and how to structure your tax reporting — whether you're on Schedule C or Schedule E."
 category: "Tax & Compliance"
 meta_title: "Private Lending Tax Guide: Interest & 1098 Rules"
@@ -194,4 +194,4 @@ Everything above has focused on federal taxes. Your state likely has its own inc
 
 ---
 
-*LendSolo tracks interest income, payment history, and outstanding balances per loan — and generates year-end summaries designed to make tax time faster. Free calculators are available at [/tools](/tools) with no account required.*
+*LendSolo tracks interest income, payment history, and outstanding balances per loan — and generates year-end summaries designed to make tax time faster. Free calculators are available at [/tools](/calculators) with no account required.*

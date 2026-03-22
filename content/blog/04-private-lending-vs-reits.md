@@ -1,6 +1,6 @@
 ---
 title: "Private Lending vs REITs: Where Should You Put Your Capital?"
-date: 2026-03-21
+date: "2026-03-07"
 excerpt: "An honest side-by-side comparison of private lending and REITs across returns, risk, liquidity, effort required, and tax treatment — to help you decide where your capital actually belongs."
 category: "Portfolio Strategy"
 meta_title: "Private Lending vs REITs: Honest Comparison"
@@ -184,4 +184,4 @@ If your lending qualifies as a business (Schedule C), you may owe self-employmen
 
 ---
 
-*LendSolo is loan management software for micro-lenders. Use our free [ROI calculator](/tools/roi-calculator) and [loan pricing tool](/tools/loan-pricing) to model your deal math — no account required.*
+*LendSolo is loan management software for micro-lenders. Use our free [ROI calculator](/tools/roi-calculator) and [loan pricing tool](/tools/loan-comparison) to model your deal math — no account required.*

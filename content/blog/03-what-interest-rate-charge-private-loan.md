@@ -1,8 +1,8 @@
 ---
 title: "What Interest Rate Should I Charge on a Private Loan?"
-date: 2026-03-21
+date: "2026-02-28"
 excerpt: "How to set interest rates on private loans — market rate benchmarks by deal type, how LTV affects pricing, usury law considerations, worked examples, and a free loan pricing calculator."
-category: "Loan Structures"
+category: "Deal Analysis"
 meta_title: "What Rate to Charge on a Private Loan?"
 meta_description: "Market rate benchmarks for private loans by deal type, LTV impact on pricing, usury law basics, and worked examples to help you set your rate."
 slug: "what-interest-rate-charge-private-loan"
@@ -71,7 +71,7 @@ At 80% LTV on the same property, your $240,000 loan has only $60,000 in equity c
 - 65–75% LTV: Standard range, no adjustment needed if deal is otherwise sound
 - Above 75% LTV: Significant risk premium required, or decline the loan
 
-Use our free [loan pricing calculator](/tools/loan-pricing) to see how LTV feeds into a suggested rate range for your specific deal.
+Use our free [loan pricing calculator](/tools/loan-comparison) to see how LTV feeds into a suggested rate range for your specific deal.
 
 ### 2. Borrower Experience and Track Record
 
@@ -208,10 +208,10 @@ Private lending returns are made by avoiding bad loans, not by charging higher r
 
 ## Tools to Help You Price
 
-Our free [loan pricing calculator](/tools/loan-pricing) takes your LTV, term, property type, and borrower experience level as inputs and returns a suggested rate range based on current market conditions. No account required — it's there to help you think through the deal, not to sell you anything.
+Our free [loan pricing calculator](/tools/loan-comparison) takes your LTV, term, property type, and borrower experience level as inputs and returns a suggested rate range based on current market conditions. No account required — it's there to help you think through the deal, not to sell you anything.
 
 The [ROI calculator](/tools/roi-calculator) lets you model the deal from the borrower's side, which is equally useful — if their profit margin on the flip is only $8,000, you want to know that before you price the loan at 13%.
 
 ---
 
-*LendSolo is loan management software built for private lenders managing 1–15 loans. The loan pricing and amortization calculators are free at [/tools](/tools).*
+*LendSolo is loan management software built for private lenders managing 1–15 loans. The loan pricing and amortization calculators are free at [/tools](/calculators).*

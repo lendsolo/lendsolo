@@ -1,6 +1,6 @@
 ---
 title: "How to Start a Private Lending Business: A Practical Guide"
-date: 2026-03-21
+date: "2026-02-14"
 excerpt: "A step-by-step guide to starting a private lending business — legal structure, capital requirements, finding borrowers, setting rates, essential documents, and the mistakes that sink new lenders."
 category: "Getting Started"
 meta_title: "How to Start a Private Lending Business"
@@ -113,7 +113,7 @@ Before you evaluate your first deal, write down what you will and won't lend on.
 
 *Geographic focus.* Stick to markets you understand. It's much easier to evaluate a deal in your own city than somewhere you've never been.
 
-Use our [free loan pricing calculator](/tools/loan-pricing) to think through how rate, LTV, and term interact before you set your policy in stone.
+Use our [free loan pricing calculator](/tools/loan-comparison) to think through how rate, LTV, and term interact before you set your policy in stone.
 
 ---
 
@@ -209,4 +209,4 @@ Private lending isn't a get-rich-quick strategy — it's a business. Built caref
 
 ---
 
-*LendSolo is loan management software built for micro-lenders. Free calculators are available at [/tools](/tools) with no account required.*
+*LendSolo is loan management software built for micro-lenders. Free calculators are available at [/tools](/calculators) with no account required.*
