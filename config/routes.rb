@@ -85,6 +85,7 @@ Rails.application.routes.draw do
   post "waitlist", to: "waitlist#create"
 
   # Public calculator tools (no auth required)
+  get "calculators", to: "tools#index", as: :calculators
   get "tools/loan-amortization-calculator", to: "tools#amortization_calculator"
   get "tools/roi-calculator", to: "tools#roi_calculator"
   get "tools/loan-comparison", to: "tools#loan_comparison"

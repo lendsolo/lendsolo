@@ -28,7 +28,7 @@ export default function PublicLayout({ children, title, description }: Props) {
               Blog
             </Link>
             <Link
-              href="/tools/loan-amortization-calculator"
+              href="/calculators"
               className="hidden sm:inline-block text-sm text-gray-600 hover:text-gray-900 px-3 py-2"
             >
               Calculators
