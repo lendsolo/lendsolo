@@ -3,6 +3,7 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable
 
   validates :borrower_notification_email, format: { with: URI::MailTo::EMAIL_REGEXP, message: "must be a valid email address" }, allow_blank: true
+  validates :total_capital, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
 
   has_many :loans, dependent: :destroy
   has_many :borrowers, dependent: :destroy

@@ -62,7 +62,6 @@ Rails.application.routes.draw do
   get "exports/quickbooks.qbo", to: "exports#quickbooks_qbo", as: :export_qbo
   get "exports/expenses.csv", to: "exports#expenses_csv", as: :export_expenses_csv
 
-  get "calculators", to: "calculators#index"
   get "settings", to: "settings#index"
   patch "settings", to: "settings#update"
   post "settings/send_test_email", to: "settings#send_test_email"
