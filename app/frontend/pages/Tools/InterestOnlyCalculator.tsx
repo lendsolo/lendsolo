@@ -58,9 +58,16 @@ export default function InterestOnlyCalculatorPage() {
       description="See your monthly payment, balloon amount, and how interest-only compares to a fully amortizing loan."
     >
       <SeoHead
-        title="Interest-Only Loan Calculator — Private Lending"
+        title="Interest-Only Loan Calculator — Private Lending | LendSolo"
         description="Calculate monthly payments, balloon amount, and total interest for interest-only private loans. Free calculator for hard money and bridge loan structures."
-        canonicalPath="/tools/interest-only-calculator"
+        canonicalUrl="https://lendsolo.com/tools/interest-only-calculator"
+        schema={{
+          '@type': 'FinancialProduct',
+          name: 'Interest-Only Loan Calculator',
+          description: 'Calculate monthly payments, balloon amount, and total interest for interest-only private loans. Free calculator for hard money and bridge loan structures.',
+          url: 'https://lendsolo.com/tools/interest-only-calculator',
+          provider: { '@type': 'Organization', name: 'LendSolo' },
+        }}
       />
 
       <div className="grid lg:grid-cols-[400px_1fr] gap-8">
