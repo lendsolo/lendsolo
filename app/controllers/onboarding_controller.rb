@@ -84,6 +84,15 @@ class OnboardingController < ApplicationController
         )
       end
 
+      # Sample document statuses for loan 1: all on_file except personal_guarantee
+      loan1.loan_documents.find_by(document_type: "promissory_note")&.update!(status: "on_file")
+      loan1.loan_documents.find_by(document_type: "deed_of_trust")&.update!(status: "on_file")
+      loan1.loan_documents.find_by(document_type: "title_insurance")&.update!(status: "on_file", notes: "Policy #TI-2026-0412")
+      loan1.loan_documents.find_by(document_type: "hazard_insurance")&.update!(status: "on_file", notes: "Exp 12/31/2026")
+
+      # Sample document statuses for loan 2: only promissory_note on_file
+      loan2.loan_documents.find_by(document_type: "promissory_note")&.update!(status: "on_file")
+
       # Loan 3: New standard loan, $20K at 11%, 0 payments (triggers guardrails)
       current_user.loans.create!(
         borrower: priya,

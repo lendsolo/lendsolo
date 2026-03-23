@@ -47,3 +47,14 @@ demo_user.capital_transactions.create!(
 demo_user.sync_total_capital!
 
 puts "Sample capital transactions created: $60k + $20k - $5k = $75k total capital"
+
+# Ensure any existing loans have loan documents
+demo_user.loans.each do |loan|
+  LoanDocument::DOCUMENT_TYPES.each do |doc_type|
+    loan.loan_documents.find_or_create_by!(document_type: doc_type) do |doc|
+      doc.status = "missing"
+    end
+  end
+end
+
+puts "Loan documents ensured for all demo loans"

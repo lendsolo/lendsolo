@@ -30,6 +30,7 @@ Rails.application.routes.draw do
       patch :mark_defaulted
     end
     resources :payments, only: %i[create]
+    resources :loan_documents, only: %i[update], path: "documents"
   end
   resources :payments, only: %i[index] do
     collection do

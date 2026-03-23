@@ -82,6 +82,38 @@ class DashboardController < ApplicationController
       }
     end
 
+    # Document coverage stats
+    total_loan_count = loans.count
+    if total_loan_count > 0
+      # Count loans where all 5 docs are on_file
+      complete_loan_ids = LoanDocument.where(loan_id: loans.select(:id))
+        .group(:loan_id)
+        .having("COUNT(CASE WHEN status = 'on_file' THEN 1 END) = 5")
+        .pluck(:loan_id)
+
+      # Loans with 3+ not on file
+      loans_needing_attention = LoanDocument.where(loan_id: loans.select(:id))
+        .where.not(status: "on_file")
+        .group(:loan_id)
+        .having("COUNT(*) >= 3")
+        .count # returns {loan_id => count}
+
+      attention_loans = if loans_needing_attention.any?
+        Loan.where(id: loans_needing_attention.keys).map { |l| { id: l.id, borrower_name: l.display_borrower_name } }
+      else
+        []
+      end
+
+      document_coverage = {
+        complete_count: complete_loan_ids.size,
+        total_count: total_loan_count,
+        percentage: ((complete_loan_ids.size.to_f / total_loan_count) * 100).round(0),
+        attention_loans: attention_loans
+      }
+    else
+      document_coverage = { complete_count: 0, total_count: 0, percentage: 0, attention_loans: [] }
+    end
+
     # Portfolio guardrail alerts
     portfolio_alerts = GuardrailService.check_portfolio(current_user)
     # Sort: danger first, then warning, then info
@@ -91,6 +123,7 @@ class DashboardController < ApplicationController
     render inertia: "Dashboard/Index", props: {
       recent_capital_transactions: recent_capital_transactions,
       portfolio_alerts: portfolio_alerts,
+      document_coverage: document_coverage,
       stats: {
         active_loans: active_loans.count,
         total_deployed: total_deployed,

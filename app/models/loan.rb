@@ -2,6 +2,7 @@ class Loan < ApplicationRecord
   belongs_to :user
   belongs_to :borrower, optional: true
   has_many :payments, dependent: :destroy
+  has_many :loan_documents, dependent: :destroy
 
   enum :loan_type, { standard: "standard", interest_only: "interest_only", balloon: "balloon" }
   enum :status, { active: "active", paid_off: "paid_off", defaulted: "defaulted", written_off: "written_off" }
@@ -12,6 +13,7 @@ class Loan < ApplicationRecord
   validates :term_months, numericality: { greater_than: 0, less_than_or_equal_to: 360, only_integer: true }
 
   after_commit :refresh_payment_cache!, on: [:create, :update]
+  after_create :create_default_loan_documents
 
   # ── Payment cache ───────────────────────────────────────────────────────
 
@@ -260,6 +262,14 @@ class Loan < ApplicationRecord
   end
 
   private
+
+  def create_default_loan_documents
+    LoanDocument::DOCUMENT_TYPES.each do |doc_type|
+      loan_documents.find_or_create_by!(document_type: doc_type) do |doc|
+        doc.status = "missing"
+      end
+    end
+  end
 
   def amortization
     @amortization ||= Calculations::AmortizationCalculator.call(
