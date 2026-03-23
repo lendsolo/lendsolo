@@ -70,7 +70,7 @@ class SettingsController < ApplicationController
   private
 
   def settings_params
-    params.require(:user).permit(
+    params.require(:setting).permit(
       :business_name,
       :total_capital,
       :email_reminders_enabled,
