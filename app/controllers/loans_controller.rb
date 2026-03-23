@@ -12,16 +12,22 @@ class LoansController < ApplicationController
   end
 
   def show
+    guardrails = GuardrailService.new(@loan).check_all.map do |alert|
+      { type: alert.type.to_s, severity: alert.severity.to_s, message: alert.message, detail: alert.detail }
+    end
+
     render inertia: "Loans/Show", props: {
       loan: @loan.as_inertia_props(total_capital: current_user.total_capital),
       total_capital: current_user.total_capital.to_f,
-      can_generate_reports: %w[pro fund].include?(current_user.effective_plan)
+      can_generate_reports: %w[pro fund].include?(current_user.effective_plan),
+      guardrails: guardrails
     }
   end
 
   def new
     render inertia: "Loans/New", props: {
-      borrowers: current_user.borrowers.active.order(:name).map { |b| { id: b.id, name: b.name } }
+      borrowers: current_user.borrowers.active.order(:name).map { |b| { id: b.id, name: b.name } },
+      pricing_ranges: pricing_ranges_by_type
     }
   end
 
@@ -43,7 +49,8 @@ class LoansController < ApplicationController
   def edit
     render inertia: "Loans/Edit", props: {
       loan: @loan.as_inertia_props(total_capital: current_user.total_capital),
-      borrowers: current_user.borrowers.active.order(:name).map { |b| { id: b.id, name: b.name } }
+      borrowers: current_user.borrowers.active.order(:name).map { |b| { id: b.id, name: b.name } },
+      pricing_ranges: pricing_ranges_by_type
     }
   end
 
@@ -82,6 +89,16 @@ class LoansController < ApplicationController
       :borrower_id, :borrower_name, :principal, :annual_rate, :term_months,
       :loan_type, :start_date, :purpose, :collateral_description, :notes
     )
+  end
+
+  def pricing_ranges_by_type
+    %w[standard interest_only balloon].each_with_object({}) do |loan_type, hash|
+      property_type = loan_type == "interest_only" ? :commercial : :single_family
+      result = Calculations::LoanPricingCalculator.call(
+        ltv: 70, term_months: 12, property_type: property_type, borrower_experience: :experienced
+      )
+      hash[loan_type] = { min: result.suggested_rate_min.to_f, max: result.suggested_rate_max.to_f }
+    end
   end
 
   def resolve_borrower(loan, attrs = nil)
