@@ -1,81 +1,58 @@
 import { Link } from '@inertiajs/react'
-import { useEffect, useRef } from 'react'
 
 export default function Hero() {
-  const counterRef = useRef<HTMLSpanElement>(null)
-
-  useEffect(() => {
-    let count = 1247
-    const interval = setInterval(() => {
-      count += Math.floor(Math.random() * 3)
-      if (counterRef.current) {
-        counterRef.current.textContent = count.toLocaleString()
-      }
-    }, 3000)
-    return () => clearInterval(interval)
-  }, [])
-
   return (
-    <section className="relative overflow-hidden" style={{ background: 'linear-gradient(180deg, #0E4D30 0%, #081C12 100%)' }}>
-      {/* Background counter */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden">
-        <span
-          ref={counterRef}
-          className="text-[20rem] sm:text-[28rem] lg:text-[36rem] font-mono font-bold text-white/[0.02] leading-none"
-        >
-          1,247
-        </span>
-      </div>
+    <section className="relative overflow-hidden pt-24 sm:pt-28 pb-20 sm:pb-24" style={{ backgroundColor: '#f8f7f4' }}>
+      {/* Subtle green radial gradient */}
+      <div
+        className="absolute top-[-40%] left-1/2 -translate-x-1/2 w-[800px] h-[800px] pointer-events-none"
+        style={{ background: 'radial-gradient(circle, rgba(26,122,76,0.06) 0%, transparent 70%)' }}
+      />
 
-      {/* Subtle noise texture overlay */}
-      <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\' opacity=\'1\'/%3E%3C/svg%3E")' }} />
+      <div className="relative max-w-[1140px] mx-auto px-8 text-center">
+        {/* Eyebrow */}
+        <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[2px] text-[#1a7a4c] font-medium mb-5">
+          <span className="w-2 h-2 rounded-full bg-[#22c55e] shadow-[0_0_8px_rgba(34,197,94,0.5)] animate-pulse" />
+          Built by a lender, for lenders
+        </div>
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 sm:pt-40 lg:pt-48 pb-20 sm:pb-28 lg:pb-36">
-        <div className="max-w-4xl">
-          <h1 className="font-display text-4xl sm:text-5xl lg:text-7xl font-bold text-white leading-[1.1] tracking-tight">
-            Stop managing your loans in{' '}
-            <span className="relative inline-block">
-              <span className="text-white/60">spreadsheets.</span>
-              {/* Strikethrough line */}
-              <span
-                className="absolute left-0 right-0 top-1/2 h-[3px] sm:h-[4px] bg-white/50 -rotate-1"
-                aria-hidden="true"
-              />
+        <h1 className="font-display text-4xl sm:text-5xl lg:text-[56px] leading-[1.1] text-[#0f1a2e] max-w-[700px] mx-auto tracking-tight">
+          Stop managing your loans in{' '}
+          <em className="italic text-[#1a7a4c]">spreadsheets</em>
+        </h1>
+
+        <p className="mt-6 text-lg leading-relaxed text-[#5a6578] max-w-[540px] mx-auto">
+          Never miss a payment, miscalculate interest, or scramble at tax season again. LendSolo replaces every spreadsheet, calculator site, and mental note — in one place.
+        </p>
+
+        <div className="mt-10 flex gap-3 justify-center flex-wrap">
+          <Link
+            href="/tools/amortization"
+            className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#0f1a2e] text-white rounded-[10px] text-[15px] font-semibold hover:-translate-y-0.5 hover:shadow-lg transition-all"
+          >
+            Try the free calculators
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8h10m0 0L9 4m4 4L9 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </Link>
+          <Link
+            href="/signup"
+            className="inline-flex items-center gap-2 px-8 py-3.5 bg-transparent text-[#0f1a2e] rounded-[10px] text-[15px] font-semibold border-[1.5px] border-[#e2e0d8] hover:border-[#5a6578] hover:bg-white transition-all"
+          >
+            Start your 14-day free trial
+          </Link>
+        </div>
+
+        {/* Proof bar */}
+        <div className="mt-10 flex items-center justify-center gap-6 flex-wrap text-[13px] text-[#8c95a6]">
+          {['Free calculators — no signup', 'Import your spreadsheet', 'No credit card required'].map((text) => (
+            <span key={text} className="flex items-center gap-1.5">
+              <svg className="w-4 h-4 text-[#1a7a4c]" viewBox="0 0 16 16" fill="none">
+                <path d="M13.3 4.3L6 11.6 2.7 8.3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              {text}
             </span>
-          </h1>
-
-          <div className="mt-8 sm:mt-10 max-w-2xl space-y-4">
-            <p className="text-lg sm:text-xl text-white/75 leading-relaxed font-body">
-              You've got real money out there — $40K to a house flipper, $25K to a friend's rental rehab,
-              another $60K on a bridge loan closing next week. Your spreadsheet doesn't know any of that is late.
-              It doesn't warn you when one borrower is 70% of your capital. It can't tell you what you earned
-              last year without an hour of manual math.
-            </p>
-            <p className="text-lg sm:text-xl text-white/80 font-medium font-body">
-              LendSolo was built by a private lender who got tired of the same thing.
-            </p>
-          </div>
-
-          <div className="mt-10 sm:mt-12 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <Link
-              href="/tools/loan-amortization-calculator"
-              className="inline-flex items-center gap-2 px-8 py-4 text-base font-semibold text-[#081C12] bg-[#34D399] hover:bg-[#2fc48d] rounded-xl transition-all shadow-[0_0_30px_rgba(52,211,153,0.3)] hover:shadow-[0_0_40px_rgba(52,211,153,0.4)]"
-            >
-              Try the free calculators
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-            </Link>
-            <a
-              href="#problem"
-              className="inline-flex items-center gap-2 px-6 py-4 text-base text-white/70 hover:text-white transition-colors"
-            >
-              See how it works
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-              </svg>
-            </a>
-          </div>
+          ))}
         </div>
       </div>
     </section>
