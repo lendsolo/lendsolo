@@ -32,7 +32,7 @@ gem "prawn-table", "~> 0.2"
 gem "rubyzip", "~> 2.3"
 
 # Transactional email via Resend
-gem "resend", "~> 0.17"
+gem "resend", "~> 1.0"
 
 # Anthropic API for AI features
 gem "anthropic", "~> 0.3"
