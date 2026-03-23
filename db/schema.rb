@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_22_214201) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_23_015358) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -83,6 +83,17 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_22_214201) do
     t.index ["recurring", "active", "next_occurrence_date"], name: "index_expenses_on_recurring_active_next_date"
     t.index ["recurring_parent_id"], name: "index_expenses_on_recurring_parent_id"
     t.index ["user_id"], name: "index_expenses_on_user_id"
+  end
+
+  create_table "loan_documents", force: :cascade do |t|
+    t.bigint "loan_id", null: false
+    t.string "document_type", null: false
+    t.string "status", default: "missing", null: false
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["loan_id", "document_type"], name: "index_loan_documents_on_loan_id_and_document_type", unique: true
+    t.index ["loan_id"], name: "index_loan_documents_on_loan_id"
   end
 
   create_table "loans", force: :cascade do |t|
@@ -264,6 +275,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_22_214201) do
     t.integer "late_notice_days_after", default: 3, null: false
     t.string "borrower_notification_email"
     t.boolean "admin", default: false, null: false
+    t.string "lender_tin"
+    t.string "lender_street_address"
+    t.string "lender_city"
+    t.string "lender_state"
+    t.string "lender_zip"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["stripe_customer_id"], name: "index_users_on_stripe_customer_id", unique: true
@@ -283,6 +299,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_22_214201) do
   add_foreign_key "email_logs", "users"
   add_foreign_key "expenses", "expenses", column: "recurring_parent_id"
   add_foreign_key "expenses", "users"
+  add_foreign_key "loan_documents", "loans"
   add_foreign_key "loans", "borrowers"
   add_foreign_key "loans", "users"
   add_foreign_key "payments", "loans"

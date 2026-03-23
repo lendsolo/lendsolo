@@ -78,7 +78,11 @@ class BorrowersController < ApplicationController
   end
 
   def update
-    if @borrower.update(borrower_params)
+    filtered = borrower_params
+    # Don't overwrite existing TIN with blank (user left the masked field untouched)
+    filtered = filtered.except(:tin) if filtered[:tin].blank? && @borrower.tin.present?
+
+    if @borrower.update(filtered)
       # Keep borrower_name in sync on associated loans
       @borrower.loans.update_all(borrower_name: @borrower.name)
       redirect_to borrower_path(@borrower), notice: "Borrower updated successfully."

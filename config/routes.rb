@@ -61,6 +61,8 @@ Rails.application.routes.draw do
   get "exports/year_end_summary.csv", to: "exports#year_end_summary_csv", as: :export_csv
   get "exports/quickbooks.qbo", to: "exports#quickbooks_qbo", as: :export_qbo
   get "exports/expenses.csv", to: "exports#expenses_csv", as: :export_expenses_csv
+  get "exports/form_1098s.zip", to: "exports#form_1098s_zip", as: :export_1098s_zip
+  get "exports/form_1098/:borrower_id.pdf", to: "exports#form_1098_pdf", as: :export_1098_pdf
 
   get "settings", to: "settings#index"
   patch "settings", to: "settings#update"
