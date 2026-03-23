@@ -15,6 +15,15 @@ class Borrower < ApplicationRecord
 
   before_validation :normalize_tin
 
+  def tin_masked
+    return nil if tin.blank?
+    "•••-••-#{tin.last(4)}"
+  end
+
+  def full_address
+    [address_line1, city, state, zip].select(&:present?).join(", ")
+  end
+
   def archive!
     update!(archived: true)
   end

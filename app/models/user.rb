@@ -2,8 +2,13 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
 
+  encrypts :lender_tin
+
   validates :borrower_notification_email, format: { with: URI::MailTo::EMAIL_REGEXP, message: "must be a valid email address" }, allow_blank: true
   validates :total_capital, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
+
+  validate :lender_tin_format, if: -> { lender_tin.present? }
+  before_validation :normalize_lender_tin
 
   has_many :loans, dependent: :destroy
   has_many :borrowers, dependent: :destroy
@@ -99,5 +104,32 @@ class User < ApplicationRecord
     )
     update!(stripe_customer_id: customer.id)
     customer.id
+  end
+
+  # ── Tax filing helpers ────────────────────────────────────────────────────
+
+  def lender_tin_masked
+    return nil if lender_tin.blank?
+    "•••-••-#{lender_tin.last(4)}"
+  end
+
+  def lender_full_address
+    [lender_street_address, lender_city, lender_state, lender_zip].select(&:present?).join(", ")
+  end
+
+  def tax_info_complete?
+    lender_tin.present? && lender_street_address.present? && lender_city.present? && lender_state.present? && lender_zip.present?
+  end
+
+  private
+
+  def normalize_lender_tin
+    self.lender_tin = lender_tin.gsub(/\D/, "") if lender_tin.present?
+  end
+
+  def lender_tin_format
+    unless lender_tin.match?(/\A\d{9}\z/)
+      errors.add(:lender_tin, "must be 9 digits (SSN or EIN)")
+    end
   end
 end

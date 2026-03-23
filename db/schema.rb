@@ -275,6 +275,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_23_015358) do
     t.integer "late_notice_days_after", default: 3, null: false
     t.string "borrower_notification_email"
     t.boolean "admin", default: false, null: false
+    t.string "lender_tin"
+    t.string "lender_street_address"
+    t.string "lender_city"
+    t.string "lender_state"
+    t.string "lender_zip"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["stripe_customer_id"], name: "index_users_on_stripe_customer_id", unique: true

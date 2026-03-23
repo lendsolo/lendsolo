@@ -4,6 +4,7 @@ class ExportsController < ApplicationController
 
   def index
     year_data = compute_year_data
+    form_1098_data = compute_1098_data
 
     render inertia: "Exports/Index", props: {
       year: @year,
@@ -16,6 +17,12 @@ class ExportsController < ApplicationController
         loans_count: year_data[:loan_summaries].length,
         payments_count: year_data[:payments_count],
         has_data: year_data[:payments_count] > 0 || year_data[:expenses].any?
+      },
+      form_1098: {
+        qualifying_borrowers: form_1098_data[:qualifying],
+        missing_tin_count: form_1098_data[:missing_tin_count],
+        lender_tax_info_complete: current_user.tax_info_complete?,
+        lender_tin_present: current_user.lender_tin.present?
       },
       can_export: can_export?
     }
@@ -64,6 +71,66 @@ class ExportsController < ApplicationController
               disposition: "attachment"
   end
 
+  def form_1098_pdf
+    borrower = current_user.borrowers.find(params[:borrower_id])
+
+    unless current_user.tax_info_complete?
+      redirect_to exports_path(year: @year), alert: "Your tax ID and address are required to generate 1098s. Update them in Settings."
+      return
+    end
+
+    unless borrower.tin.present? && borrower.address_line1.present?
+      redirect_to exports_path(year: @year), alert: "Borrower #{borrower.name} is missing tax ID or address information."
+      return
+    end
+
+    pdf = Pdf::Form1098Pdf.new(borrower: borrower, lender: current_user, year: @year).generate
+
+    Rails.logger.info("[1098] Generated Form 1098 for borrower_id=#{borrower.id} year=#{@year} by user_id=#{current_user.id}")
+
+    send_data pdf.render,
+              filename: "1098_#{borrower.name.parameterize}_#{@year}.pdf",
+              type: "application/pdf",
+              disposition: "attachment"
+  end
+
+  def form_1098s_zip
+    unless current_user.tax_info_complete?
+      redirect_to exports_path(year: @year), alert: "Your tax ID and address are required to generate 1098s. Update them in Settings."
+      return
+    end
+
+    data = compute_1098_data
+    eligible = data[:qualifying].select { |b| b[:tin_present] && b[:address_present] }
+
+    if eligible.empty?
+      redirect_to exports_path(year: @year), alert: "No qualifying borrowers with complete tax information for #{@year}."
+      return
+    end
+
+    require "zip"
+    zip_buffer = Zip::OutputStream.write_buffer do |zip|
+      eligible.each do |entry|
+        borrower = current_user.borrowers.find(entry[:id])
+        pdf = Pdf::Form1098Pdf.new(borrower: borrower, lender: current_user, year: @year).generate
+        filename = "1098_#{borrower.name.parameterize}_#{@year}.pdf"
+        zip.put_next_entry(filename)
+        zip.write(pdf.render)
+      end
+    end
+    zip_buffer.rewind
+
+    generated_count = eligible.length
+    skipped_count = data[:qualifying].length - eligible.length
+
+    Rails.logger.info("[1098] Bulk generated #{generated_count} Form 1098s for year=#{@year} by user_id=#{current_user.id} (#{skipped_count} skipped)")
+
+    send_data zip_buffer.read,
+              filename: "lendsolo_1098s_#{@year}.zip",
+              type: "application/zip",
+              disposition: "attachment"
+  end
+
   private
 
   def set_year
@@ -77,6 +144,45 @@ class ExportsController < ApplicationController
   def available_years
     current_year = Date.current.year
     (current_year - 3..current_year).to_a.reverse
+  end
+
+  def compute_1098_data
+    year_start = Date.new(@year, 1, 1)
+    year_end = Date.new(@year, 12, 31)
+
+    borrowers = current_user.borrowers.active.includes(loans: :payments)
+
+    qualifying = borrowers.filter_map do |borrower|
+      loans = borrower.loans
+      next if loans.empty?
+
+      total_interest = 0.0
+      loan_count = 0
+
+      loans.each do |loan|
+        year_payments = loan.payments.where(date: year_start..year_end)
+        interest = year_payments.sum(:interest_portion).to_f
+        if interest > 0
+          total_interest += interest
+          loan_count += 1
+        end
+      end
+
+      next unless total_interest > 600
+
+      {
+        id: borrower.id,
+        name: borrower.name,
+        total_interest: total_interest.round(2),
+        loan_count: loan_count,
+        tin_present: borrower.tin.present?,
+        address_present: borrower.address_line1.present? && borrower.city.present? && borrower.state.present? && borrower.zip.present?
+      }
+    end
+
+    missing_tin_count = qualifying.count { |b| !b[:tin_present] }
+
+    { qualifying: qualifying, missing_tin_count: missing_tin_count }
   end
 
   def compute_year_data

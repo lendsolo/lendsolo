@@ -429,6 +429,7 @@ DEPENDENCIES
   rouge (~> 4.7)
   rspec-rails
   rubocop-rails-omakase
+  rubyzip (~> 2.3)
   solid_queue
   stripe (~> 13.0)
   thruster

@@ -14,6 +14,12 @@ interface Props {
     reminder_days_before: number
     late_notice_days_after: number
     borrower_notification_email: string
+    lender_tin: string | null
+    lender_tin_present: boolean
+    lender_street_address: string
+    lender_city: string
+    lender_state: string
+    lender_zip: string
   }
 }
 
@@ -32,6 +38,11 @@ export default function SettingsIndex({ user }: Props) {
     reminder_days_before: user.reminder_days_before.toString(),
     late_notice_days_after: user.late_notice_days_after.toString(),
     borrower_notification_email: user.borrower_notification_email,
+    lender_tin: '',
+    lender_street_address: user.lender_street_address,
+    lender_city: user.lender_city,
+    lender_state: user.lender_state,
+    lender_zip: user.lender_zip,
   })
 
   function handleSubmit(e: React.FormEvent) {
@@ -262,6 +273,88 @@ export default function SettingsIndex({ user }: Props) {
                   </button>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* Tax Filing Information Section */}
+          <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+            <div className="flex items-center gap-2 mb-1">
+              <svg className="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+              </svg>
+              <h2 className="text-sm font-semibold text-gray-900">Tax Filing Information</h2>
+            </div>
+            <p className="text-xs text-gray-500 mb-5">Your EIN or SSN and business address appear on 1098 forms you generate. This information is encrypted.</p>
+
+            <div className="space-y-5">
+              <div>
+                <label htmlFor="lender_tin" className="block text-xs font-medium text-gray-500 mb-1.5">
+                  SSN or EIN
+                </label>
+                <input
+                  id="lender_tin"
+                  type="password"
+                  value={form.data.lender_tin}
+                  onChange={(e) => form.setData('lender_tin', e.target.value)}
+                  placeholder={user.lender_tin_present ? '•••-••-' + (user.lender_tin?.slice(-4) || '****') : '9 digits'}
+                  maxLength={11}
+                  className="w-full text-sm px-3 py-2.5 border border-gray-200 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                />
+                <p className="text-[10px] text-gray-400 mt-1">
+                  {user.lender_tin_present ? 'TIN on file. Enter a new value to change it, or leave blank to keep current.' : 'Required for 1098 generation. Encrypted at rest.'}
+                </p>
+              </div>
+
+              <div>
+                <label htmlFor="lender_street_address" className="block text-xs font-medium text-gray-500 mb-1.5">
+                  Street Address
+                </label>
+                <input
+                  id="lender_street_address"
+                  type="text"
+                  value={form.data.lender_street_address}
+                  onChange={(e) => form.setData('lender_street_address', e.target.value)}
+                  placeholder="123 Main St"
+                  className="w-full text-sm px-3 py-2.5 border border-gray-200 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                />
+              </div>
+
+              <div className="grid sm:grid-cols-3 gap-4">
+                <div>
+                  <label htmlFor="lender_city" className="block text-xs font-medium text-gray-500 mb-1.5">City</label>
+                  <input
+                    id="lender_city"
+                    type="text"
+                    value={form.data.lender_city}
+                    onChange={(e) => form.setData('lender_city', e.target.value)}
+                    className="w-full text-sm px-3 py-2.5 border border-gray-200 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="lender_state" className="block text-xs font-medium text-gray-500 mb-1.5">State</label>
+                  <input
+                    id="lender_state"
+                    type="text"
+                    value={form.data.lender_state}
+                    onChange={(e) => form.setData('lender_state', e.target.value)}
+                    maxLength={2}
+                    placeholder="CA"
+                    className="w-full text-sm px-3 py-2.5 border border-gray-200 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="lender_zip" className="block text-xs font-medium text-gray-500 mb-1.5">ZIP</label>
+                  <input
+                    id="lender_zip"
+                    type="text"
+                    value={form.data.lender_zip}
+                    onChange={(e) => form.setData('lender_zip', e.target.value)}
+                    maxLength={10}
+                    placeholder="90210"
+                    className="w-full text-sm px-3 py-2.5 border border-gray-200 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                  />
+                </div>
+              </div>
             </div>
           </div>
 

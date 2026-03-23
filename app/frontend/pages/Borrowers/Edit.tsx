@@ -121,19 +121,26 @@ export default function EditBorrower({ borrower }: Props) {
           </div>
 
           <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
-            <h2 className="text-lg font-semibold text-gray-900">Additional</h2>
+            <h2 className="text-lg font-semibold text-gray-900">Tax Information</h2>
+            <p className="text-xs text-gray-500 -mt-3">Required for 1098 generation. This information is encrypted and never shared.</p>
 
-            <Field label="TIN (SSN/EIN)" error={errors.tin}>
+            <Field label="SSN or EIN" error={errors.tin}>
               <input
                 type="password"
                 value={data.tin}
                 onChange={(e) => setData('tin', e.target.value)}
-                placeholder={borrower.tin ? '***-**-****' : '9 digits'}
+                placeholder={borrower.tin ? '•••-••-' + borrower.tin.slice(-4) : '9 digits'}
                 maxLength={11}
                 className={inputClass(errors.tin)}
               />
-              <p className="mt-1 text-xs text-gray-400">Encrypted at rest. Needed for 1098 forms.</p>
+              <p className="mt-1 text-xs text-gray-400">
+                {borrower.tin ? 'TIN on file. Enter a new value to change it, or leave blank to keep current.' : 'Encrypted at rest. Needed for 1098 forms.'}
+              </p>
             </Field>
+          </div>
+
+          <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
+            <h2 className="text-lg font-semibold text-gray-900">Notes</h2>
 
             <Field label="Notes" error={errors.notes}>
               <textarea

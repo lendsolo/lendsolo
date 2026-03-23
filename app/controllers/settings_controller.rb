@@ -12,13 +12,24 @@ class SettingsController < ApplicationController
         email_monthly_summary_enabled: current_user.email_monthly_summary_enabled,
         reminder_days_before: current_user.reminder_days_before,
         late_notice_days_after: current_user.late_notice_days_after,
-        borrower_notification_email: current_user.borrower_notification_email || ""
+        borrower_notification_email: current_user.borrower_notification_email || "",
+        # Tax filing info
+        lender_tin: current_user.lender_tin_masked,
+        lender_tin_present: current_user.lender_tin.present?,
+        lender_street_address: current_user.lender_street_address || "",
+        lender_city: current_user.lender_city || "",
+        lender_state: current_user.lender_state || "",
+        lender_zip: current_user.lender_zip || ""
       }
     }
   end
 
   def update
-    if current_user.update(settings_params)
+    filtered = settings_params
+    # Don't overwrite existing TIN with blank (user left the masked field untouched)
+    filtered = filtered.except(:lender_tin) if filtered[:lender_tin].blank?
+
+    if current_user.update(filtered)
       redirect_to settings_path, notice: "Settings saved."
     else
       redirect_to settings_path, alert: current_user.errors.full_messages.join(", ")
@@ -68,7 +79,12 @@ class SettingsController < ApplicationController
       :email_monthly_summary_enabled,
       :reminder_days_before,
       :late_notice_days_after,
-      :borrower_notification_email
+      :borrower_notification_email,
+      :lender_tin,
+      :lender_street_address,
+      :lender_city,
+      :lender_state,
+      :lender_zip
     )
   end
 end
