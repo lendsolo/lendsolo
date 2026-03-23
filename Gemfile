@@ -22,7 +22,7 @@ gem "devise"
 gem "roo", "~> 3.0"
 
 # Stripe payments
-gem "stripe", "~> 13.0"
+gem "stripe", "~> 18.4"
 
 # PDF generation
 gem "prawn", "~> 2.5"
