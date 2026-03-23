@@ -35,7 +35,7 @@ gem "rubyzip", "~> 2.3"
 gem "resend", "~> 1.0"
 
 # Anthropic API for AI features
-gem "anthropic", "~> 0.3"
+gem "anthropic", "~> 1.25"
 
 group :development, :test do
   gem "dotenv-rails"
