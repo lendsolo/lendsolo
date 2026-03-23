@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link } from '@inertiajs/react'
 import AppLayout from '@/layouts/AppLayout'
 import AnimatedNumber from '@/components/AnimatedNumber'
@@ -35,8 +36,18 @@ interface CapitalTransaction {
   source: string | null
 }
 
+interface PortfolioAlert {
+  type: string
+  severity: string
+  message: string
+  detail: string | null
+  loan_id: number
+  borrower_name: string
+}
+
 interface Props {
   recent_capital_transactions: CapitalTransaction[]
+  portfolio_alerts: PortfolioAlert[]
   stats: {
     active_loans: number
     total_deployed: number
@@ -61,7 +72,8 @@ const ALLOCATION_COLORS = [
   '#ca8a04', '#4f46e5', '#dc2626', '#16a34a', '#9333ea',
 ]
 
-export default function DashboardIndex({ stats, monthly_interest_data, upcoming_payments, portfolio_allocation, recent_capital_transactions }: Props) {
+export default function DashboardIndex({ stats, monthly_interest_data, upcoming_payments, portfolio_allocation, recent_capital_transactions, portfolio_alerts }: Props) {
+  const [alertsExpanded, setAlertsExpanded] = useState(false)
   const hasLoans = stats.total_loans > 0
   const utilizationPercent = stats.total_capital > 0
     ? Math.min((stats.total_deployed / stats.total_capital) * 100, 100)
@@ -123,6 +135,13 @@ export default function DashboardIndex({ stats, monthly_interest_data, upcoming_
                 color={stats.net_profit >= 0 ? 'text-emerald-600' : 'text-red-600'}
               />
             </div>
+
+            {/* Portfolio Alerts */}
+            <PortfolioAlertsCard
+              alerts={portfolio_alerts}
+              expanded={alertsExpanded}
+              onToggle={() => setAlertsExpanded(!alertsExpanded)}
+            />
 
             {/* Middle Row: Chart + Upcoming Payments */}
             <div className="grid lg:grid-cols-3 gap-4 mb-6">
@@ -398,6 +417,120 @@ export default function DashboardIndex({ stats, monthly_interest_data, upcoming_
         )}
       </div>
     </AppLayout>
+  )
+}
+
+function PortfolioAlertsCard({ alerts, expanded, onToggle }: { alerts: PortfolioAlert[]; expanded: boolean; onToggle: () => void }) {
+  if (alerts.length === 0) {
+    return (
+      <div className="bg-white rounded-xl border border-gray-200 p-5 mb-6">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center">
+            <svg className="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+            </svg>
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-gray-900">All clear</p>
+            <p className="text-xs text-gray-400">No portfolio alerts</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  const dangerCount = alerts.filter(a => a.severity === 'danger').length
+  const warningCount = alerts.filter(a => a.severity === 'warning').length
+  const infoCount = alerts.filter(a => a.severity === 'info').length
+
+  const summaryParts: string[] = []
+  if (dangerCount > 0) summaryParts.push(`${dangerCount} critical`)
+  if (warningCount > 0) summaryParts.push(`${warningCount} warning${warningCount !== 1 ? 's' : ''}`)
+  if (infoCount > 0) summaryParts.push(`${infoCount} info`)
+
+  const topAlerts = alerts.slice(0, 3)
+
+  const severityStyles: Record<string, { border: string; icon: string; bg: string }> = {
+    danger: { border: 'border-l-red-500', icon: 'text-red-500', bg: 'bg-red-50' },
+    warning: { border: 'border-l-amber-500', icon: 'text-amber-500', bg: 'bg-amber-50' },
+    info: { border: 'border-l-blue-500', icon: 'text-blue-500', bg: 'bg-blue-50' },
+  }
+
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 p-5 mb-6">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-sm font-semibold text-gray-900">Portfolio Alerts</h3>
+        <span className="text-xs text-gray-400">{summaryParts.join(', ')}</span>
+      </div>
+
+      <div className="space-y-2">
+        {topAlerts.map((alert, i) => {
+          const style = severityStyles[alert.severity] || severityStyles.info
+          return (
+            <Link
+              key={i}
+              href={`/loans/${alert.loan_id}`}
+              className={`block border-l-3 ${style.border} ${style.bg} rounded-r-lg px-3 py-2 hover:opacity-80 transition-opacity`}
+              style={{ borderLeftWidth: '3px' }}
+            >
+              <div className="flex items-start gap-2">
+                <svg className={`w-4 h-4 mt-0.5 shrink-0 ${style.icon}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  {alert.severity === 'info' ? (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+                  ) : (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                  )}
+                </svg>
+                <div className="min-w-0">
+                  <p className="text-xs font-medium text-gray-700 truncate">{alert.borrower_name}</p>
+                  <p className="text-xs text-gray-500">{alert.message}</p>
+                </div>
+              </div>
+            </Link>
+          )
+        })}
+      </div>
+
+      {alerts.length > 3 && (
+        <>
+          {expanded && (
+            <div className="space-y-2 mt-2">
+              {alerts.slice(3).map((alert, i) => {
+                const style = severityStyles[alert.severity] || severityStyles.info
+                return (
+                  <Link
+                    key={i + 3}
+                    href={`/loans/${alert.loan_id}`}
+                    className={`block border-l-3 ${style.border} ${style.bg} rounded-r-lg px-3 py-2 hover:opacity-80 transition-opacity`}
+                    style={{ borderLeftWidth: '3px' }}
+                  >
+                    <div className="flex items-start gap-2">
+                      <svg className={`w-4 h-4 mt-0.5 shrink-0 ${style.icon}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        {alert.severity === 'info' ? (
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+                        ) : (
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                        )}
+                      </svg>
+                      <div className="min-w-0">
+                        <p className="text-xs font-medium text-gray-700 truncate">{alert.borrower_name}</p>
+                        <p className="text-xs text-gray-500">{alert.message}</p>
+                      </div>
+                    </div>
+                  </Link>
+                )
+              })}
+            </div>
+          )}
+          <button
+            onClick={onToggle}
+            className="mt-2 text-xs text-emerald-600 hover:text-emerald-700 font-medium"
+          >
+            {expanded ? 'Show less' : `View all ${alerts.length} alerts`}
+          </button>
+        </>
+      )}
+    </div>
   )
 }
 

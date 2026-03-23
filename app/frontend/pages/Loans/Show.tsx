@@ -5,10 +5,18 @@ import RecordPaymentModal from '@/components/RecordPaymentModal'
 import type { LoanProps, PaymentRecord } from '@/types/loan'
 import { calculateAmortization, type LoanType } from '@/lib/calculations'
 
+interface GuardrailAlert {
+  type: string
+  severity: 'danger' | 'warning' | 'info'
+  message: string
+  detail: string | null
+}
+
 interface Props {
   loan: LoanProps
   total_capital: number
   can_generate_reports: boolean
+  guardrails: GuardrailAlert[]
 }
 
 const STATUS_BADGES: Record<string, { label: string; bg: string; text: string }> = {
@@ -24,7 +32,7 @@ const LOAN_TYPE_LABELS: Record<string, string> = {
   balloon: 'Balloon',
 }
 
-export default function LoansShow({ loan, total_capital, can_generate_reports }: Props) {
+export default function LoansShow({ loan, total_capital, can_generate_reports, guardrails }: Props) {
   const { current_user } = usePage<{ current_user: { effective_plan: string } }>().props
   const isPro = current_user?.effective_plan === 'pro' || current_user?.effective_plan === 'fund'
 
@@ -54,27 +62,29 @@ export default function LoansShow({ loan, total_capital, can_generate_reports }:
     [loan],
   )
 
-  const guardrails = useMemo(() => {
-    const alerts: { type: 'red' | 'amber' | 'blue'; message: string }[] = []
+  const [alertsExpanded, setAlertsExpanded] = useState(true)
 
+  // Map server guardrails to display colors, plus add overdue alert (real-time from loan props)
+  const allAlerts = useMemo(() => {
+    const mapped: { color: 'red' | 'amber' | 'blue'; message: string }[] = []
+
+    // Overdue alert from live loan data (not in GuardrailService since it's payment-timing based)
     if (loan.overdue && loan.days_overdue > 0) {
       const expectedAmt = loan.expected_next_payment?.amount
-      alerts.push({
-        type: 'red',
+      mapped.push({
+        color: 'red',
         message: `Payment is ${loan.days_overdue} days overdue${expectedAmt ? ` — $${expectedAmt.toLocaleString('en-US', { minimumFractionDigits: 2 })} expected` : ''}.`,
       })
-    } else if (loan.status === 'active' && loan.payments_made_count === 0 && loan.days_since_start >= 30) {
-      alerts.push({ type: 'red', message: 'No payments recorded — is this loan current?' })
-    }
-    if (loan.capital_percentage > 50) {
-      alerts.push({ type: 'amber', message: `This loan represents ${loan.capital_percentage}% of your total capital.` })
-    }
-    if (!loan.collateral_description || loan.collateral_description.trim() === '') {
-      alerts.push({ type: 'blue', message: 'Consider documenting collateral for this loan.' })
     }
 
-    return alerts
-  }, [loan])
+    // Server-side guardrails
+    for (const g of guardrails) {
+      const color = g.severity === 'danger' ? 'red' : g.severity === 'warning' ? 'amber' : 'blue'
+      mapped.push({ color, message: g.message })
+    }
+
+    return mapped
+  }, [loan, guardrails])
 
   // Fetch risk narrative on load (Pro only, async)
   useEffect(() => {
@@ -160,9 +170,38 @@ export default function LoansShow({ loan, total_capital, can_generate_reports }:
     <AppLayout>
       <div className="max-w-6xl mx-auto">
         {/* Guardrail Alerts */}
-        {guardrails.map((alert, i) => (
-          <AlertBanner key={i} type={alert.type} message={alert.message} />
-        ))}
+        {allAlerts.length > 0 && (
+          <div className="mb-4">
+            {alertsExpanded ? (
+              <>
+                {allAlerts.map((alert, i) => (
+                  <AlertBanner key={i} type={alert.color} message={alert.message} />
+                ))}
+                {allAlerts.length > 1 && (
+                  <button
+                    onClick={() => setAlertsExpanded(false)}
+                    className="text-xs text-gray-400 hover:text-gray-600 mt-1"
+                  >
+                    Collapse alerts
+                  </button>
+                )}
+              </>
+            ) : (
+              <button
+                onClick={() => setAlertsExpanded(true)}
+                className="flex items-center gap-2 px-4 py-2.5 w-full rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-600 hover:bg-gray-100 transition-colors"
+              >
+                <svg className="w-4 h-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                </svg>
+                <span className="font-medium">{allAlerts.length} alert{allAlerts.length !== 1 ? 's' : ''}</span>
+                <svg className="w-3.5 h-3.5 ml-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">

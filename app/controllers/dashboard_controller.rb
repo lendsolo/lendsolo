@@ -82,8 +82,15 @@ class DashboardController < ApplicationController
       }
     end
 
+    # Portfolio guardrail alerts
+    portfolio_alerts = GuardrailService.check_portfolio(current_user)
+    # Sort: danger first, then warning, then info
+    severity_order = { "danger" => 0, "warning" => 1, "info" => 2 }
+    portfolio_alerts.sort_by! { |a| severity_order[a[:severity]] || 3 }
+
     render inertia: "Dashboard/Index", props: {
       recent_capital_transactions: recent_capital_transactions,
+      portfolio_alerts: portfolio_alerts,
       stats: {
         active_loans: active_loans.count,
         total_deployed: total_deployed,
