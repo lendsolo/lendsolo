@@ -19,7 +19,7 @@ gem "vite_rails"
 gem "devise"
 
 # Spreadsheet parsing for imports
-gem "roo", "~> 2.10"
+gem "roo", "~> 3.0"
 
 # Stripe payments
 gem "stripe", "~> 13.0"
@@ -29,7 +29,7 @@ gem "prawn", "~> 2.5"
 gem "prawn-table", "~> 0.2"
 
 # ZIP archive generation
-gem "rubyzip", "~> 2.3"
+gem "rubyzip", "~> 3.2"
 
 # Transactional email via Resend
 gem "resend", "~> 1.0"
