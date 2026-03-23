@@ -45,9 +45,22 @@ interface PortfolioAlert {
   borrower_name: string
 }
 
+interface AttentionLoan {
+  id: number
+  borrower_name: string
+}
+
+interface DocumentCoverage {
+  complete_count: number
+  total_count: number
+  percentage: number
+  attention_loans: AttentionLoan[]
+}
+
 interface Props {
   recent_capital_transactions: CapitalTransaction[]
   portfolio_alerts: PortfolioAlert[]
+  document_coverage: DocumentCoverage
   stats: {
     active_loans: number
     total_deployed: number
@@ -72,7 +85,7 @@ const ALLOCATION_COLORS = [
   '#ca8a04', '#4f46e5', '#dc2626', '#16a34a', '#9333ea',
 ]
 
-export default function DashboardIndex({ stats, monthly_interest_data, upcoming_payments, portfolio_allocation, recent_capital_transactions, portfolio_alerts }: Props) {
+export default function DashboardIndex({ stats, monthly_interest_data, upcoming_payments, portfolio_allocation, recent_capital_transactions, portfolio_alerts, document_coverage }: Props) {
   const [alertsExpanded, setAlertsExpanded] = useState(false)
   const hasLoans = stats.total_loans > 0
   const utilizationPercent = stats.total_capital > 0
@@ -142,6 +155,43 @@ export default function DashboardIndex({ stats, monthly_interest_data, upcoming_
               expanded={alertsExpanded}
               onToggle={() => setAlertsExpanded(!alertsExpanded)}
             />
+
+            {/* Document Coverage */}
+            {document_coverage.total_count > 0 && (
+              <div className="bg-white rounded-xl border border-gray-200 p-5 mb-6">
+                <h3 className="text-sm font-semibold text-gray-900 mb-3">Document Coverage</h3>
+                <p className="text-sm text-gray-600 mb-2">
+                  {document_coverage.complete_count} of {document_coverage.total_count} loans have complete documentation
+                </p>
+                <div className="h-3 bg-gray-100 rounded-full overflow-hidden mb-2">
+                  <div
+                    className="h-full bg-emerald-500 rounded-full transition-all duration-700"
+                    style={{ width: `${document_coverage.percentage}%` }}
+                  />
+                </div>
+                <div className="flex items-center justify-between text-xs text-gray-400">
+                  <span>{document_coverage.percentage}% complete</span>
+                </div>
+                {document_coverage.attention_loans.length > 0 && (
+                  <div className="mt-3 pt-3 border-t border-gray-100">
+                    <p className="text-xs font-medium text-amber-700 mb-1">
+                      {document_coverage.attention_loans.length} loan{document_coverage.attention_loans.length !== 1 ? 's' : ''} need{document_coverage.attention_loans.length === 1 ? 's' : ''} attention
+                    </p>
+                    <div className="space-y-1">
+                      {document_coverage.attention_loans.map((l) => (
+                        <Link
+                          key={l.id}
+                          href={`/loans/${l.id}`}
+                          className="block text-xs text-emerald-600 hover:text-emerald-700"
+                        >
+                          {l.borrower_name} →
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Middle Row: Chart + Upcoming Payments */}
             <div className="grid lg:grid-cols-3 gap-4 mb-6">

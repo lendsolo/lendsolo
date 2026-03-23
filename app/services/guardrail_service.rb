@@ -13,11 +13,12 @@ class GuardrailService
     alerts.concat(check_rate_reasonableness)
     alerts.concat(check_maturity)
     alerts.concat(check_no_payments)
+    alerts.concat(check_missing_documents)
     alerts
   end
 
   def self.check_portfolio(user)
-    user.loans.where(status: :active).includes(:user).flat_map do |loan|
+    user.loans.where(status: :active).includes(:user, :loan_documents).flat_map do |loan|
       new(loan).check_all.map { |alert| alert_to_hash(alert).merge(loan_id: loan.id, borrower_name: loan.display_borrower_name) }
     end
   end
@@ -115,6 +116,28 @@ class GuardrailService
       message: "No payments have been recorded for this loan since origination #{days_since} days ago.",
       detail: nil
     )]
+  end
+
+  def check_missing_documents
+    not_on_file = @loan.loan_documents.where.not(status: "on_file").count
+    return [] if not_on_file <= 0
+
+    if not_on_file == 1
+      [Alert.new(
+        type: :missing_documents,
+        severity: :info,
+        message: "1 of 5 loan documents is not on file.",
+        detail: nil
+      )]
+    else
+      severity = not_on_file >= 3 ? :danger : :warning
+      [Alert.new(
+        type: :missing_documents,
+        severity: severity,
+        message: "#{not_on_file} of 5 loan documents are not on file.",
+        detail: nil
+      )]
+    end
   end
 
   def suggested_rate_range

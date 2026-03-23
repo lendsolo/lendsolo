@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useCallback } from 'react'
-import { Link, router, usePage } from '@inertiajs/react'
+import { Link, router, useForm, usePage } from '@inertiajs/react'
 import AppLayout from '@/layouts/AppLayout'
 import RecordPaymentModal from '@/components/RecordPaymentModal'
 import type { LoanProps, PaymentRecord } from '@/types/loan'
@@ -12,11 +12,19 @@ interface GuardrailAlert {
   detail: string | null
 }
 
+interface LoanDocumentRecord {
+  id: number
+  document_type: string
+  status: 'on_file' | 'missing' | 'expired'
+  notes: string | null
+}
+
 interface Props {
   loan: LoanProps
   total_capital: number
   can_generate_reports: boolean
   guardrails: GuardrailAlert[]
+  loan_documents: LoanDocumentRecord[]
 }
 
 const STATUS_BADGES: Record<string, { label: string; bg: string; text: string }> = {
@@ -32,7 +40,21 @@ const LOAN_TYPE_LABELS: Record<string, string> = {
   balloon: 'Balloon',
 }
 
-export default function LoansShow({ loan, total_capital, can_generate_reports, guardrails }: Props) {
+const DOCUMENT_TYPE_LABELS: Record<string, string> = {
+  promissory_note: 'Promissory Note',
+  deed_of_trust: 'Deed of Trust',
+  title_insurance: 'Title Insurance',
+  hazard_insurance: 'Hazard Insurance',
+  personal_guarantee: 'Personal Guarantee',
+}
+
+const DOC_STATUS_DISPLAY: Record<string, { icon: string; label: string; color: string }> = {
+  on_file: { icon: '\u2705', label: 'On File', color: 'text-emerald-700' },
+  missing: { icon: '\u26A0\uFE0F', label: 'Missing', color: 'text-amber-700' },
+  expired: { icon: '\uD83D\uDD34', label: 'Expired', color: 'text-red-700' },
+}
+
+export default function LoansShow({ loan, total_capital, can_generate_reports, guardrails, loan_documents }: Props) {
   const { current_user } = usePage<{ current_user: { effective_plan: string } }>().props
   const isPro = current_user?.effective_plan === 'pro' || current_user?.effective_plan === 'fund'
 
@@ -479,6 +501,18 @@ export default function LoansShow({ loan, total_capital, can_generate_reports, g
           )}
         </div>
 
+        {/* Documents on File */}
+        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden mb-6">
+          <div className="p-5 border-b border-gray-100">
+            <h3 className="text-lg font-semibold text-gray-900">Documents on File</h3>
+          </div>
+          <div className="divide-y divide-gray-50">
+            {loan_documents.map((doc) => (
+              <DocumentRow key={doc.id} doc={doc} loanId={loan.id} />
+            ))}
+          </div>
+        </div>
+
         {/* Collateral & Notes (collapsible) */}
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden mb-6">
           <button
@@ -669,6 +703,85 @@ function StatCard({ label, value, prefix = '', textValue, color }: { label: stri
       <p className={`text-lg font-bold font-mono ${color}`}>
         {textValue ?? `${prefix}${(value ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`}
       </p>
+    </div>
+  )
+}
+
+function DocumentRow({ doc, loanId }: { doc: LoanDocumentRecord; loanId: number }) {
+  const [editing, setEditing] = useState(false)
+  const display = DOC_STATUS_DISPLAY[doc.status] || DOC_STATUS_DISPLAY.missing
+  const form = useForm({
+    status: doc.status,
+    notes: doc.notes || '',
+  })
+
+  function handleSave(e: React.FormEvent) {
+    e.preventDefault()
+    form.patch(`/loans/${loanId}/documents/${doc.id}`, {
+      preserveScroll: true,
+      onSuccess: () => setEditing(false),
+    })
+  }
+
+  return (
+    <div className="px-5 py-3">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3 min-w-0">
+          <span className="text-base shrink-0">{display.icon}</span>
+          <div className="min-w-0">
+            <p className="text-sm font-medium text-gray-900">
+              {DOCUMENT_TYPE_LABELS[doc.document_type] || doc.document_type}
+            </p>
+            <p className={`text-xs ${display.color}`}>{display.label}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          {doc.notes && !editing && (
+            <span className="text-xs text-gray-400 hidden sm:inline truncate max-w-[200px]">{doc.notes}</span>
+          )}
+          <button
+            onClick={() => setEditing(!editing)}
+            className="text-xs font-medium text-emerald-600 hover:text-emerald-700"
+          >
+            {editing ? 'Cancel' : 'Edit'}
+          </button>
+        </div>
+      </div>
+
+      {editing && (
+        <form onSubmit={handleSave} className="mt-3 flex flex-col sm:flex-row items-start sm:items-end gap-3">
+          <div className="w-full sm:w-40">
+            <label className="text-xs text-gray-500 mb-1 block">Status</label>
+            <select
+              value={form.data.status}
+              onChange={(e) => form.setData('status', e.target.value as 'on_file' | 'missing' | 'expired')}
+              className="w-full text-sm border border-gray-300 rounded-lg px-3 py-1.5 focus:ring-emerald-500 focus:border-emerald-500"
+            >
+              <option value="on_file">On File</option>
+              <option value="missing">Missing</option>
+              <option value="expired">Expired</option>
+            </select>
+          </div>
+          <div className="flex-1 w-full">
+            <label className="text-xs text-gray-500 mb-1 block">Notes</label>
+            <input
+              type="text"
+              value={form.data.notes}
+              onChange={(e) => form.setData('notes', e.target.value)}
+              maxLength={500}
+              placeholder="Optional note (e.g. Policy #1234)"
+              className="w-full text-sm border border-gray-300 rounded-lg px-3 py-1.5 focus:ring-emerald-500 focus:border-emerald-500"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={form.processing}
+            className="px-4 py-1.5 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors disabled:opacity-50 shrink-0"
+          >
+            Save
+          </button>
+        </form>
+      )}
     </div>
   )
 }

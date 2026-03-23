@@ -16,11 +16,16 @@ class LoansController < ApplicationController
       { type: alert.type.to_s, severity: alert.severity.to_s, message: alert.message, detail: alert.detail }
     end
 
+    loan_documents = @loan.loan_documents.order(:document_type).map do |doc|
+      { id: doc.id, document_type: doc.document_type, status: doc.status, notes: doc.notes }
+    end
+
     render inertia: "Loans/Show", props: {
       loan: @loan.as_inertia_props(total_capital: current_user.total_capital),
       total_capital: current_user.total_capital.to_f,
       can_generate_reports: %w[pro fund].include?(current_user.effective_plan),
-      guardrails: guardrails
+      guardrails: guardrails,
+      loan_documents: loan_documents
     }
   end
 
