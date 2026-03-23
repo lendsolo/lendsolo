@@ -113,6 +113,30 @@ class LoanMailer < ApplicationMailer
     )
   end
 
+  # ── 5. Borrower Interest Statement ────────────────────────────────────────
+  # Annual interest statement PDF sent to borrower
+  def borrower_interest_statement(borrower:, lender:, year:)
+    @borrower = borrower
+    @user = lender
+    @business_name = lender.business_name
+    @year = year
+
+    pdf = Pdf::BorrowerInterestStatementPdf.new(borrower: borrower, lender: lender, year: year).generate
+
+    attachments["interest_statement_#{year}.pdf"] = {
+      mime_type: "application/pdf",
+      content: pdf.render
+    }
+
+    from_name = @business_name.presence || "LendSolo"
+
+    mail(
+      to: borrower.email,
+      from: "#{from_name} <#{default_from_address}>",
+      subject: "Your #{year} Interest Statement from #{from_name}"
+    )
+  end
+
   # ── Preview (sends test to lender) ─────────────────────────────────────────
   def preview_email(user, email_type)
     @user = user

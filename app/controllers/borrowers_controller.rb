@@ -1,5 +1,6 @@
 class BorrowersController < ApplicationController
-  before_action :set_borrower, only: %i[show edit update archive unarchive update_notes reveal_tin]
+  before_action :set_borrower, only: %i[show edit update archive unarchive update_notes reveal_tin interest_statement email_interest_statement]
+  before_action :enforce_pro_gate!, only: %i[interest_statement email_interest_statement]
 
   def index
     scope = params[:show_archived] == "true" ? current_user.borrowers : current_user.borrowers.active
@@ -31,6 +32,21 @@ class BorrowersController < ApplicationController
     weighted_sum = loans.sum("principal * annual_rate").to_f
     avg_rate = total_principal > 0 ? (weighted_sum / total_principal).round(2) : 0.0
 
+    # Tax document years: any year with payment activity
+    tax_years = Payment.where(loan_id: loans.select(:id))
+                       .select("DISTINCT EXTRACT(YEAR FROM date)::integer AS yr")
+                       .map(&:yr)
+                       .sort
+                       .reverse
+
+    # Check which years have 1098s (interest > $600)
+    years_with_1098 = tax_years.select do |yr|
+      year_interest = Payment.where(loan_id: loans.select(:id))
+                             .where(date: Date.new(yr, 1, 1)..Date.new(yr, 12, 31))
+                             .sum(:interest_portion).to_f
+      year_interest > 600
+    end
+
     respond_to do |format|
       format.json { render json: serialize_borrower_detail(@borrower) }
       format.any do
@@ -43,6 +59,13 @@ class BorrowersController < ApplicationController
             total_principal: total_principal,
             interest_earned: all_payments.sum(:interest_portion).to_f,
             avg_rate: avg_rate
+          },
+          tax_documents: {
+            years: tax_years,
+            years_with_1098: years_with_1098,
+            can_download: pro_or_above?,
+            email_enabled: current_user.email_reminders_enabled,
+            borrower_has_email: @borrower.email.present?
           }
         }
       end
@@ -111,6 +134,51 @@ class BorrowersController < ApplicationController
 
   def reveal_tin
     render json: { tin: @borrower.tin }
+  end
+
+  def interest_statement
+    year = params[:year].to_i
+    pdf = Pdf::BorrowerInterestStatementPdf.new(borrower: @borrower, lender: current_user, year: year).generate
+
+    Rails.logger.info("[Statement] Generated interest statement for borrower_id=#{@borrower.id} year=#{year} by user_id=#{current_user.id}")
+
+    send_data pdf.render,
+              filename: "statement_#{@borrower.name.parameterize}_#{year}.pdf",
+              type: "application/pdf",
+              disposition: "attachment"
+  end
+
+  def email_interest_statement
+    year = params[:year].to_i
+
+    unless current_user.email_reminders_enabled
+      render json: { error: "Email notifications are disabled. Enable them in Settings to send statements." }, status: :unprocessable_entity
+      return
+    end
+
+    unless @borrower.email.present?
+      render json: { error: "This borrower has no email address on file." }, status: :unprocessable_entity
+      return
+    end
+
+    if EmailLog.already_sent?(user: current_user, email_type: "borrower_interest_statement", reference_date: Date.new(year, 1, 1), payment_number: @borrower.id)
+      render json: { error: "Statement for #{year} has already been emailed to this borrower." }, status: :unprocessable_entity
+      return
+    end
+
+    LoanMailer.borrower_interest_statement(borrower: @borrower, lender: current_user, year: year).deliver_now
+
+    EmailLog.record_send!(
+      user: current_user,
+      email_type: "borrower_interest_statement",
+      recipient_email: @borrower.email,
+      reference_date: Date.new(year, 1, 1),
+      payment_number: @borrower.id
+    )
+
+    Rails.logger.info("[Statement] Emailed interest statement to borrower_id=#{@borrower.id} (#{@borrower.email}) year=#{year} by user_id=#{current_user.id}")
+
+    render json: { message: "Statement sent to #{@borrower.email}" }
   end
 
   private

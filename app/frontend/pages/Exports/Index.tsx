@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link, router } from '@inertiajs/react'
 import AppLayout from '@/layouts/AppLayout'
 
@@ -8,6 +9,17 @@ interface QualifyingBorrower {
   loan_count: number
   tin_present: boolean
   address_present: boolean
+}
+
+interface StatementBorrower {
+  id: number
+  name: string
+  loan_count: number
+  total_interest: number
+  total_principal: number
+  has_email: boolean
+  email: string | null
+  already_emailed: boolean
 }
 
 interface Props {
@@ -28,10 +40,14 @@ interface Props {
     lender_tax_info_complete: boolean
     lender_tin_present: boolean
   }
+  borrower_statements: {
+    borrowers: StatementBorrower[]
+  }
+  email_enabled: boolean
   can_export: boolean
 }
 
-export default function ExportsIndex({ year, available_years, preview, form_1098, can_export }: Props) {
+export default function ExportsIndex({ year, available_years, preview, form_1098, borrower_statements, email_enabled, can_export }: Props) {
   const currentYear = new Date().getFullYear()
   const isPartialYear = year === currentYear
 
@@ -130,6 +146,14 @@ export default function ExportsIndex({ year, available_years, preview, form_1098
           year={year}
           form1098={form_1098}
           canExport={can_export}
+        />
+
+        {/* Borrower Statements Section */}
+        <BorrowerStatementsSection
+          year={year}
+          borrowers={borrower_statements.borrowers}
+          canExport={can_export}
+          emailEnabled={email_enabled}
         />
 
         {/* Export Cards */}
@@ -337,6 +361,264 @@ function Form1098Section({
         </div>
       )}
     </div>
+  )
+}
+
+function BorrowerStatementsSection({
+  year,
+  borrowers,
+  canExport,
+  emailEnabled,
+}: {
+  year: number
+  borrowers: StatementBorrower[]
+  canExport: boolean
+  emailEnabled: boolean
+}) {
+  const [sending, setSending] = useState(false)
+  const [bulkSending, setBulkSending] = useState(false)
+  const [bulkResult, setBulkResult] = useState<string | null>(null)
+  const [emailedIds, setEmailedIds] = useState<Set<number>>(
+    new Set(borrowers.filter((b) => b.already_emailed).map((b) => b.id))
+  )
+  const [confirmBulk, setConfirmBulk] = useState(false)
+
+  const emailableBorrowers = borrowers.filter((b) => b.has_email && !emailedIds.has(b.id))
+
+  function csrfToken() {
+    return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+  }
+
+  async function handleEmailSingle(borrower: StatementBorrower) {
+    setSending(true)
+    try {
+      const res = await fetch(`/borrowers/${borrower.id}/email_interest_statement`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken(), 'Accept': 'application/json' },
+        body: JSON.stringify({ year }),
+      })
+      if (res.ok) {
+        setEmailedIds((prev) => new Set([...prev, borrower.id]))
+      } else {
+        const data = await res.json()
+        alert(data.error || 'Failed to send email')
+      }
+    } catch {
+      alert('Failed to send email')
+    } finally {
+      setSending(false)
+    }
+  }
+
+  async function handleBulkEmail() {
+    setBulkSending(true)
+    setBulkResult(null)
+    try {
+      const res = await fetch(`/exports/email_borrower_statements?year=${year}`, {
+        method: 'POST',
+        headers: { 'X-CSRF-Token': csrfToken(), 'Accept': 'application/json' },
+      })
+      const data = await res.json()
+      if (res.ok) {
+        const noEmail = borrowers.filter((b) => !b.has_email).length
+        const msg = noEmail > 0
+          ? `${data.message} ${noEmail} borrower${noEmail !== 1 ? 's have' : ' has'} no email address on file.`
+          : data.message
+        setBulkResult(msg)
+        setEmailedIds(new Set(borrowers.filter((b) => b.has_email).map((b) => b.id)))
+      } else {
+        setBulkResult(data.error || 'Failed to send emails')
+      }
+    } catch {
+      setBulkResult('Failed to send emails')
+    } finally {
+      setBulkSending(false)
+      setConfirmBulk(false)
+    }
+  }
+
+  return (
+    <div className="mb-8">
+      <h2 className="text-lg font-semibold text-gray-900 mb-4">Borrower Statements</h2>
+
+      {borrowers.length > 0 ? (
+        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-gray-50 border-b border-gray-200">
+                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Borrower</th>
+                  <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Loans</th>
+                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Interest Paid</th>
+                  <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {borrowers.map((b) => (
+                  <tr key={b.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 font-medium text-gray-900">{b.name}</td>
+                    <td className="px-4 py-3 text-center text-gray-600">{b.loan_count}</td>
+                    <td className="px-4 py-3 text-right font-mono text-gray-900">
+                      ${b.total_interest.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      {b.has_email ? (
+                        <span className="inline-flex items-center gap-1 text-xs text-emerald-600">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                          Email on file
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-xs text-gray-400">
+                          <span className="w-1.5 h-1.5 rounded-full bg-gray-300" />
+                          No email
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      {canExport ? (
+                        <div className="flex items-center justify-end gap-2">
+                          <a
+                            href={`/borrowers/${b.id}/interest_statement/${year}`}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg transition-colors"
+                          >
+                            <DownloadIcon />
+                            PDF
+                          </a>
+                          {b.has_email && emailEnabled ? (
+                            emailedIds.has(b.id) ? (
+                              <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-100 text-gray-400 text-xs font-semibold rounded-lg">
+                                <CheckIcon />
+                                Sent
+                              </span>
+                            ) : (
+                              <button
+                                onClick={() => handleEmailSingle(b)}
+                                disabled={sending}
+                                className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition-colors disabled:opacity-50"
+                              >
+                                <EmailIcon />
+                                Email
+                              </button>
+                            )
+                          ) : b.has_email && !emailEnabled ? (
+                            <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-100 text-gray-400 text-xs font-semibold rounded-lg cursor-not-allowed" title="Email notifications are disabled in Settings">
+                              <EmailIcon />
+                              Email off
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-100 text-gray-400 text-xs font-semibold rounded-lg cursor-not-allowed" title="Add an email address to this borrower's profile to send statements">
+                              <EmailIcon />
+                              No email
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-100 text-gray-400 text-xs font-semibold rounded-lg cursor-not-allowed">
+                          <LockIcon />
+                          Pro Feature
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Bulk actions footer */}
+          <div className="px-4 py-3 bg-gray-50 border-t border-gray-200 flex items-center justify-between gap-3 flex-wrap">
+            <p className="text-xs text-gray-500">
+              {borrowers.length} borrower{borrowers.length !== 1 ? 's' : ''} with activity in {year}
+            </p>
+            {bulkResult && (
+              <p className="text-xs text-emerald-600 font-medium w-full">{bulkResult}</p>
+            )}
+            {canExport && (
+              <div className="flex items-center gap-2">
+                <form method="post" action={`/exports/borrower_statements?year=${year}`}>
+                  <input type="hidden" name="authenticity_token" value={csrfToken()} />
+                  <button
+                    type="submit"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg transition-colors"
+                  >
+                    <DownloadIcon />
+                    Download All Statements
+                  </button>
+                </form>
+
+                {emailEnabled ? (
+                  confirmBulk ? (
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-600">
+                        Send to {emailableBorrowers.length} borrower{emailableBorrowers.length !== 1 ? 's' : ''}?
+                      </span>
+                      <button
+                        onClick={handleBulkEmail}
+                        disabled={bulkSending}
+                        className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition-colors disabled:opacity-50"
+                      >
+                        {bulkSending ? 'Sending...' : 'Confirm'}
+                      </button>
+                      <button
+                        onClick={() => setConfirmBulk(false)}
+                        className="px-3 py-1.5 text-xs text-gray-500 hover:text-gray-700"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setConfirmBulk(true)}
+                      disabled={emailableBorrowers.length === 0}
+                      className={`inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-lg transition-colors ${
+                        emailableBorrowers.length > 0
+                          ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                          : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      }`}
+                    >
+                      <EmailIcon />
+                      Email All Statements
+                    </button>
+                  )
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 px-4 py-2 bg-gray-100 text-gray-400 text-xs font-semibold rounded-lg cursor-not-allowed" title="Enable email notifications in Settings">
+                    <EmailIcon />
+                    Email disabled
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      ) : (
+        <div className="text-center py-8 bg-white rounded-xl border border-gray-200">
+          <div className="w-12 h-12 mx-auto mb-3 rounded-2xl bg-gray-100 flex items-center justify-center">
+            <svg className="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+            </svg>
+          </div>
+          <h3 className="text-sm font-semibold text-gray-900 mb-1">No borrower activity for {year}</h3>
+          <p className="text-xs text-gray-500">No borrowers have payment activity this year.</p>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function CheckIcon() {
+  return (
+    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+    </svg>
+  )
+}
+
+function EmailIcon() {
+  return (
+    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+    </svg>
   )
 }
 
