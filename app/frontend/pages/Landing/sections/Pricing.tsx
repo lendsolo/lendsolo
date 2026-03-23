@@ -1,43 +1,7 @@
 import { Link } from '@inertiajs/react'
 import { useState } from 'react'
 
-const TIERS = [
-  {
-    name: 'Solo',
-    monthlyPrice: 29,
-    annualPrice: 290,
-    annualSavings: 58,
-    description: 'For lenders just getting started',
-    features: [
-      'Up to 5 active loans',
-      'Deal calculators + ROI tools',
-      'Full amortization engine (standard, interest-only, balloon)',
-      'Payment tracking + guardrails',
-      'Dashboard & basic reports',
-      'Spreadsheet import (CSV & Excel)',
-    ],
-    highlighted: false,
-  },
-  {
-    name: 'Pro',
-    monthlyPrice: 49,
-    annualPrice: 490,
-    annualSavings: 98,
-    description: 'For active lenders running a real portfolio',
-    badge: 'Best Value',
-    features: [
-      'Up to 25 active loans',
-      'Everything in Solo',
-      'CSV exports (payments & expenses)',
-      'Branded PDF statements',
-      'Automated email reminders',
-      'Accountant-ready tax exports (.pdf, .csv, .qbo)',
-    ],
-    highlighted: true,
-  },
-]
-
-function FundWaitlistCard({ isAnnual }: { isAnnual: boolean }) {
+function FundWaitlistCard() {
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
   const [message, setMessage] = useState('')
@@ -71,37 +35,19 @@ function FundWaitlistCard({ isAnnual }: { isAnnual: boolean }) {
   }
 
   return (
-    <div className="rounded-2xl p-6 sm:p-8 flex flex-col bg-white border border-dashed border-[#D1D0C8] relative opacity-90">
-      {/* Coming Soon badge */}
-      <div className="absolute -top-3 right-4">
-        <span className="px-3 py-1 bg-[#F5F0E6] text-[#8A7A50] text-xs font-bold rounded-full border border-[#E4DCC8]">
-          Coming Soon
-        </span>
+    <div className="bg-white border border-dashed border-[#d4d2c9] rounded-[14px] p-7 sm:p-9 flex flex-col relative opacity-90">
+      <span className="font-mono text-[10px] uppercase tracking-[1px] text-[#b45309] font-medium">Coming Soon</span>
+      <h3 className="text-xl font-bold text-[#0f1a2e] mt-1">Fund</h3>
+      <p className="text-sm text-[#5a6578] mt-1">Managing outside capital?</p>
+      <div className="mt-5 flex items-baseline gap-1">
+        <span className="font-display text-5xl text-[#0f1a2e]">$99</span>
+        <span className="text-base text-[#5a6578]">/mo</span>
       </div>
+      <p className="mt-4 text-sm text-[#5a6578] leading-relaxed flex-1">
+        The Fund tier is built for lenders who raise capital from investors — multi-investor tracking, investor portals, IRR reporting, and compliance tools. We're building it now.
+      </p>
 
-      <div>
-        <h3 className="text-lg font-bold text-[#1C1C19] font-display">Fund</h3>
-        <p className="mt-1 text-sm text-[#8A8A7E] font-body">Managing outside capital?</p>
-      </div>
-
-      <div className="mt-6 flex items-baseline gap-1">
-        <span className="text-4xl font-bold text-[#8A8A7E] font-mono line-through decoration-[#C4C4BC]">
-          ${isAnnual ? 990 : 99}
-        </span>
-        <span className="text-sm text-[#8A8A7E] font-body">{isAnnual ? '/yr' : '/mo'}</span>
-      </div>
-      {isAnnual && (
-        <p className="mt-1 text-xs font-semibold text-[#1A7A50] font-body">Save $198/yr</p>
-      )}
-
-      <div className="mt-6 flex-1">
-        <p className="text-sm text-[#4D4D45] font-body leading-relaxed">
-          The Fund tier is built for lenders who raise capital from investors — multi-investor tracking,
-          investor portals, IRR reporting, and compliance tools. We're building it now.
-        </p>
-      </div>
-
-      <div className="mt-8">
+      <div className="mt-6">
         {status === 'success' ? (
           <div className="text-center py-4 px-3 rounded-xl bg-[#ECFDF5] border border-[#A7F3D0]">
             <svg className="w-6 h-6 text-[#34D399] mx-auto mb-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -117,21 +63,21 @@ function FundWaitlistCard({ isAnnual }: { isAnnual: boolean }) {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="your@email.com"
               required
-              className="w-full text-sm px-3.5 py-3 rounded-xl border border-[#E4E3DB] bg-white text-[#1C1C19] placeholder-[#B0B0A6] focus:outline-none focus:ring-2 focus:ring-[#34D399] focus:border-[#34D399] font-body"
+              className="w-full text-sm px-3.5 py-3 rounded-xl border border-[#e2e0d8] bg-white text-[#0f1a2e] placeholder-[#8c95a6] focus:outline-none focus:ring-2 focus:ring-[#1a7a4c] focus:border-[#1a7a4c]"
             />
             <button
               type="submit"
               disabled={status === 'submitting'}
-              className="w-full py-3 rounded-xl text-sm font-semibold bg-[#1C1C19] text-white hover:bg-[#2a2a26] transition-colors disabled:opacity-50"
+              className="w-full py-3.5 rounded-lg text-[15px] font-semibold bg-transparent text-[#0f1a2e] border-[1.5px] border-[#c5c3ba] hover:border-[#5a6578] hover:bg-[#f8f7f4] transition-all disabled:opacity-50"
             >
               {status === 'submitting' ? 'Joining...' : 'Join the waitlist'}
             </button>
             {status === 'error' && (
-              <p className="text-xs text-red-600 text-center font-body">{message}</p>
+              <p className="text-xs text-red-600 text-center">{message}</p>
             )}
           </form>
         )}
-        <p className="mt-3 text-[11px] text-[#B0B0A6] text-center font-body">
+        <p className="mt-3 text-xs text-[#8c95a6] text-center">
           We'll notify you when Fund launches. No spam, ever.
         </p>
       </div>
@@ -143,127 +89,129 @@ export default function Pricing() {
   const [isAnnual, setIsAnnual] = useState(false)
 
   return (
-    <section id="pricing" className="py-20 sm:py-28" style={{ backgroundColor: '#F6F5F0' }}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section header */}
-        <div className="text-center max-w-2xl mx-auto">
-          <p className="text-sm font-semibold uppercase tracking-widest text-[#1A7A50] font-body">
-            Simple pricing. No surprises.
-          </p>
-          <h2 className="mt-4 text-3xl sm:text-4xl font-bold text-[#1C1C19] font-display">
-            Start with the free calculators. Pay when you're tracking real loans.
-          </h2>
-        </div>
+    <section id="pricing" className="py-20 sm:py-24" style={{ backgroundColor: '#f8f7f4' }}>
+      <div className="max-w-[1140px] mx-auto px-8">
+        <p className="text-[11px] font-mono uppercase tracking-[2px] text-[#1a7a4c] font-medium mb-3">
+          Pricing
+        </p>
+        <h2 className="font-display text-3xl sm:text-[40px] leading-[1.15] text-[#0f1a2e] tracking-tight mb-4">
+          Simple pricing. No surprises.
+        </h2>
+        <p className="text-[17px] leading-relaxed text-[#5a6578] max-w-[600px] mb-9">
+          Start with the free calculators. Pay when you're tracking real loans.
+        </p>
 
         {/* Billing toggle */}
-        <div className="mt-10 flex justify-center">
-          <div className="inline-flex items-center gap-1 rounded-full bg-white border border-[#E4E3DB] p-1 shadow-sm">
-            <button
-              onClick={() => setIsAnnual(false)}
-              className={`px-5 py-2 rounded-full text-sm font-semibold transition-colors font-body ${
-                !isAnnual
-                  ? 'bg-[#1C1C19] text-white'
-                  : 'text-[#8A8A7E] hover:text-[#4D4D45]'
+        <div className="flex items-center gap-3 mb-9">
+          <span
+            className={`text-sm ${!isAnnual ? 'font-semibold text-[#0f1a2e]' : 'font-medium text-[#8c95a6]'}`}
+          >
+            Monthly
+          </span>
+          <button
+            onClick={() => setIsAnnual(!isAnnual)}
+            className="relative w-12 h-[26px] rounded-full bg-[#1a7a4c] cursor-pointer transition-colors"
+          >
+            <span
+              className={`absolute top-[3px] w-5 h-5 rounded-full bg-white shadow-sm transition-all duration-200 ${
+                isAnnual ? 'left-[25px]' : 'left-[3px]'
               }`}
-            >
-              Monthly
-            </button>
-            <button
-              onClick={() => setIsAnnual(true)}
-              className={`px-5 py-2 rounded-full text-sm font-semibold transition-colors font-body flex items-center gap-2 ${
-                isAnnual
-                  ? 'bg-[#1C1C19] text-white'
-                  : 'text-[#8A8A7E] hover:text-[#4D4D45]'
-              }`}
-            >
-              Annual
-              <span className={`px-2 py-0.5 text-[10px] font-bold rounded-full ${
-                isAnnual
-                  ? 'bg-[#34D399] text-[#081C12]'
-                  : 'bg-[#ECFDF5] text-[#1A7A50]'
-              }`}>
-                2 months free
+            />
+          </button>
+          <span
+            className={`text-sm ${isAnnual ? 'font-semibold text-[#0f1a2e]' : 'font-medium text-[#8c95a6]'}`}
+          >
+            Annual
+          </span>
+          <span className="font-mono text-[11px] bg-[#e8f5ee] text-[#1a7a4c] px-2.5 py-0.5 rounded-full font-medium">
+            2 months free
+          </span>
+        </div>
+
+        {/* Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-[1000px]">
+          {/* Pro — Best Value (featured, first) */}
+          <div className="bg-white border-[1.5px] border-[#1a7a4c] rounded-[14px] p-7 sm:p-9 flex flex-col relative shadow-[0_0_0_1px_#1a7a4c,0_8px_32px_rgba(26,122,76,0.12)] order-first lg:order-none hover:-translate-y-1 hover:shadow-[0_0_0_1px_#1a7a4c,0_8px_32px_rgba(26,122,76,0.18)] transition-all">
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+              <span className="px-4 py-1 bg-[#1a7a4c] text-white font-mono text-[10px] uppercase tracking-[1px] rounded-full font-medium">
+                Best Value
               </span>
-            </button>
-          </div>
-        </div>
-
-        {/* Cards - On mobile, Pro shows first */}
-        <div className="mt-10 sm:mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6">
-          {/* Mobile reorder: Pro first */}
-          {[TIERS[1], TIERS[0]].map((tier) => (
-            <div
-              key={tier.name}
-              className={`rounded-2xl p-6 sm:p-8 flex flex-col ${
-                tier.highlighted
-                  ? 'bg-white border-2 border-[#34D399] shadow-lg order-first lg:order-none relative'
-                  : 'bg-white border border-[#E4E3DB]'
-              }`}
-            >
-              {tier.badge && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <span className="px-3 py-1 bg-[#34D399] text-[#081C12] text-xs font-bold rounded-full">
-                    {tier.badge}
-                  </span>
-                </div>
-              )}
-
-              <div>
-                <h3 className="text-lg font-bold text-[#1C1C19] font-display">{tier.name}</h3>
-                <p className="mt-1 text-sm text-[#8A8A7E] font-body">{tier.description}</p>
-              </div>
-
-              <div className="mt-6 flex items-baseline gap-1">
-                <span className="text-4xl font-bold text-[#1A7A50] font-mono">
-                  ${isAnnual ? tier.annualPrice : tier.monthlyPrice}
-                </span>
-                <span className="text-sm text-[#8A8A7E] font-body">{isAnnual ? '/yr' : '/mo'}</span>
-              </div>
-              {isAnnual && (
-                <p className="mt-1 text-xs font-semibold text-[#1A7A50] font-body">
-                  Save ${tier.annualSavings}/yr
-                </p>
-              )}
-
-              <ul className="mt-6 space-y-3 flex-1">
-                {tier.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2.5 text-sm text-[#4D4D45] font-body">
-                    <svg className="w-4 h-4 text-[#34D399] shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                    </svg>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-
-              <Link
-                href="/users/sign_up"
-                className={`mt-8 block text-center py-3 rounded-xl text-sm font-semibold transition-colors ${
-                  tier.highlighted
-                    ? 'bg-[#34D399] text-[#081C12] hover:bg-[#2fc48d] shadow-[0_0_20px_rgba(52,211,153,0.2)]'
-                    : 'bg-[#1C1C19] text-white hover:bg-[#2a2a26]'
-                }`}
-              >
-                Start free trial
-              </Link>
             </div>
-          ))}
+            <h3 className="text-xl font-bold text-[#0f1a2e]">Pro</h3>
+            <p className="text-sm text-[#5a6578] mt-1">For active lenders running a real portfolio</p>
+            <div className="mt-5 flex items-baseline gap-1">
+              <span className="font-display text-5xl text-[#0f1a2e]">${isAnnual ? '41' : '49'}</span>
+              <span className="text-base text-[#5a6578]">/mo</span>
+            </div>
+            {isAnnual && (
+              <p className="text-sm text-[#5a6578] mt-1">$490/year — save $98</p>
+            )}
+            <p className="text-sm text-[#5a6578] mt-1">Up to 25 active loans</p>
+            <ul className="mt-6 space-y-2 flex-1">
+              {[
+                'Everything in Solo',
+                'CSV exports (payments & expenses)',
+                'Branded PDF statements',
+                'Automated email reminders',
+                'Accountant-ready tax exports (.pdf, .csv, .qbo)',
+              ].map((f) => (
+                <li key={f} className="flex items-start gap-2.5 text-[15px] text-[#2d3a4f] leading-relaxed">
+                  <span className="text-[#1a7a4c] font-bold text-sm mt-0.5 min-w-4">✓</span>
+                  {f}
+                </li>
+              ))}
+            </ul>
+            <Link
+              href="/signup"
+              className="mt-7 block text-center py-3.5 rounded-lg text-[15px] font-semibold bg-[#0f1a2e] text-white hover:-translate-y-0.5 hover:shadow-lg transition-all"
+            >
+              Start free trial
+            </Link>
+          </div>
 
-          {/* Fund - Coming Soon Waitlist */}
-          <FundWaitlistCard isAnnual={isAnnual} />
+          {/* Solo */}
+          <div className="bg-white border-[1.5px] border-[#d4d2c9] rounded-[14px] p-7 sm:p-9 flex flex-col shadow-[0_2px_12px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)] hover:-translate-y-1 hover:shadow-[0_8px_32px_rgba(0,0,0,0.1),0_2px_6px_rgba(0,0,0,0.05)] transition-all">
+            <h3 className="text-xl font-bold text-[#0f1a2e]">Solo</h3>
+            <p className="text-sm text-[#5a6578] mt-1">For lenders just getting started</p>
+            <div className="mt-5 flex items-baseline gap-1">
+              <span className="font-display text-5xl text-[#0f1a2e]">${isAnnual ? '24' : '29'}</span>
+              <span className="text-base text-[#5a6578]">/mo</span>
+            </div>
+            {isAnnual && (
+              <p className="text-sm text-[#5a6578] mt-1">$290/year — save $58</p>
+            )}
+            <p className="text-sm text-[#5a6578] mt-1">Up to 5 active loans</p>
+            <ul className="mt-6 space-y-2 flex-1">
+              {[
+                'Deal calculators + ROI tools',
+                'Full amortization engine (standard, interest-only, balloon)',
+                'Payment tracking + guardrails',
+                'Dashboard & basic reports',
+                'Spreadsheet import (CSV & Excel)',
+              ].map((f) => (
+                <li key={f} className="flex items-start gap-2.5 text-[15px] text-[#2d3a4f] leading-relaxed">
+                  <span className="text-[#1a7a4c] font-bold text-sm mt-0.5 min-w-4">✓</span>
+                  {f}
+                </li>
+              ))}
+            </ul>
+            <Link
+              href="/signup"
+              className="mt-7 block text-center py-3.5 rounded-lg text-[15px] font-semibold bg-transparent text-[#0f1a2e] border-[1.5px] border-[#c5c3ba] hover:border-[#5a6578] hover:bg-[#f8f7f4] transition-all"
+            >
+              Start free trial
+            </Link>
+          </div>
+
+          {/* Fund — Coming Soon */}
+          <FundWaitlistCard />
         </div>
 
-        {/* Free tier callout */}
-        <div className="mt-10 text-center space-y-2">
-          <p className="text-sm text-[#4D4D45] font-body">
-            The deal calculator, ROI tool, and loan comparison tool are{' '}
-            <span className="font-semibold text-[#1A7A50]">free forever</span> — no account required.
-            Start there. You'll know when you're ready for the rest.
-          </p>
-          <p className="text-xs text-[#8A8A7E] font-body">
-            All paid plans include a 14-day free trial. No credit card required to start.
-          </p>
-        </div>
+        {/* Footer note */}
+        <p className="mt-6 text-[13px] text-[#8c95a6] leading-relaxed max-w-[800px]">
+          The deal calculator, ROI tool, and loan comparison tool are free forever — no account required. Start there. You'll know when you're ready for the rest.<br />
+          All paid plans include a 14-day free trial. No credit card required to start.
+        </p>
       </div>
     </section>
   )

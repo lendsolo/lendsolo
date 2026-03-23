@@ -4,14 +4,16 @@ import Hero from './sections/Hero'
 import Problem from './sections/Problem'
 import WhyNotSpreadsheets from './sections/WhyNotSpreadsheets'
 import ProductShowcase from './sections/ProductShowcase'
+import TriggerSection from './sections/TriggerSection'
 import FeaturesGrid from './sections/FeaturesGrid'
+import NowLive from './sections/NowLive'
 import Pricing from './sections/Pricing'
 import SocialProof from './sections/SocialProof'
 import Faq from './sections/Faq'
 import FinalCta from './sections/FinalCta'
 
 const LANDING_DESCRIPTION =
-  'Track private loans, automate amortization, and get tax-ready reports. Built for solo lenders managing 1–15 loans. Free to start.'
+  'Stop managing your private loans in spreadsheets. LendSolo gives micro-lenders real loan tracking, amortization, guardrails, and tax reporting — built by a lender, for lenders.'
 
 export default function LandingPage() {
   return (
@@ -38,7 +40,9 @@ export default function LandingPage() {
         <Problem />
         <WhyNotSpreadsheets />
         <ProductShowcase />
+        <TriggerSection />
         <FeaturesGrid />
+        <NowLive />
         <Pricing />
         <SocialProof />
         <Faq />

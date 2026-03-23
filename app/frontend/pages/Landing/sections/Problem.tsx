@@ -1,82 +1,74 @@
 const CARDS = [
   {
     emoji: '📊',
-    title: 'The Spreadsheet Lender',
+    bgColor: '#e8f5ee',
+    title: 'Google Sheets',
     description:
-      "Works fine at loan #1. By loan #3 you're copy-pasting amortization formulas and hoping nothing breaks. By tax season you're manually adding up interest columns and hoping your accountant doesn't ask too many questions.",
-    breaksWhen:
-      'You miss a payment date, or your accountant asks how much interest you earned last year.',
+      "Works until it doesn't. Formulas break. Amortization schedules are manual. You're copy-pasting between tabs hoping nothing slips.",
+    breakPoint: 'Breaks at tax season',
   },
   {
-    emoji: '📒',
-    title: 'The QuickBooks Lender',
+    emoji: '📘',
+    bgColor: '#e8f0fc',
+    title: 'QuickBooks Hacks',
     description:
-      'You set up loans as "invoices" and payments as "income." It sort of tracks cash flow. But it can\'t split principal from interest, can\'t generate an amortization schedule, and definitely can\'t produce a borrower statement that looks like it came from an actual lender.',
-    breaksWhen:
-      'A borrower asks for a payment history or you need to prove income to anyone.',
+      "You shoved loans into an accounting tool. It tracks income fine but doesn't know what an amortization schedule is, what LTV means, or when a payment is actually late.",
+    breakPoint: 'Breaks past 3 loans',
   },
   {
     emoji: '🧠',
-    title: 'The Mental Accountant',
+    bgColor: '#fef3c7',
+    title: 'Mental Accounting',
     description:
-      '"Bob owes me $20K, pays $500 a month, been doing it for about a year." No records, no paper trail, no amortization. More common than anyone admits, especially for loans to family or close friends.',
-    breaksWhen:
-      "Bob misses a payment and suddenly there's a dispute about the balance.",
+      '"I know where everything is." You probably do — until you add a loan, take on an investor, or your accountant asks for a year-end summary.',
+    breakPoint: 'Breaks when life gets busy',
   },
   {
-    emoji: '🔧',
-    title: 'The Cobbled Lender',
+    emoji: '🧩',
+    bgColor: '#fee2e2',
+    title: 'Cobbled Together',
     description:
-      'A loan calculator website, a notes app, a shared Google Doc with the borrower, and bank statements as your source of truth. Each piece technically works. The system doesn\'t.',
-    breaksWhen:
-      'You bring in an outside investor or try to scale past 5 loans.',
+      "A spreadsheet for tracking, a calculator site for amortization, email for reminders, a folder of PDFs. Five tools doing one tool's job.",
+    breakPoint: 'Breaks at every seam',
   },
 ]
 
 export default function Problem() {
   return (
-    <section id="problem" className="py-20 sm:py-28" style={{ backgroundColor: '#1C1C19' }}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section header */}
-        <div className="max-w-3xl">
-          <p className="text-sm font-semibold uppercase tracking-widest text-[#34D399] font-body">
-            Why spreadsheets fail micro-lenders
-          </p>
-          <h2 className="mt-4 text-3xl sm:text-4xl font-bold text-white font-display leading-tight">
-            Most private lenders managing under 15 loans aren't using loan software.
-          </h2>
-          <p className="mt-4 text-lg text-white/70 font-body leading-relaxed">
-            They're using one of four things — and each one breaks at a specific, predictable moment.
-          </p>
-        </div>
+    <section className="py-20 sm:py-24" style={{ backgroundColor: '#f8f7f4' }}>
+      <div className="max-w-[1140px] mx-auto px-8">
+        <p className="text-[11px] font-mono uppercase tracking-[2px] text-[#1a7a4c] font-medium mb-3">
+          The Problem
+        </p>
+        <h2 className="font-display text-3xl sm:text-[40px] leading-[1.15] text-[#0f1a2e] tracking-tight mb-4">
+          Four ways lenders manage today.<br />All four break.
+        </h2>
+        <p className="text-[17px] leading-relaxed text-[#5a6578] max-w-[600px] mb-12">
+          You're managing real money across real deals. The tools you're using weren't built for this.
+        </p>
 
-        {/* Cards grid */}
-        <div className="mt-12 sm:mt-16 grid sm:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {CARDS.map((card) => (
             <div
               key={card.title}
-              className="group bg-white/[0.04] border border-white/[0.06] rounded-2xl p-6 sm:p-8 hover:-translate-y-1 transition-all duration-300 hover:bg-white/[0.06]"
+              className="bg-white border border-[#e2e0d8] rounded-xl p-7 hover:-translate-y-1 hover:shadow-md transition-all duration-200"
             >
-              <span className="text-4xl">{card.emoji}</span>
-              <h3 className="mt-4 text-lg font-bold text-white font-display">{card.title}</h3>
-              <p className="mt-3 text-sm text-white/70 leading-relaxed font-body">
-                {card.description}
-              </p>
-              <div className="mt-5 px-4 py-3 rounded-lg" style={{ backgroundColor: 'rgba(181, 133, 10, 0.1)' }}>
-                <p className="text-sm">
-                  <span className="font-semibold" style={{ color: '#E0A80D' }}>Breaks when: </span>
-                  <span style={{ color: '#D4A017' }}>{card.breaksWhen}</span>
-                </p>
+              <div
+                className="w-10 h-10 rounded-[10px] flex items-center justify-center text-xl mb-4"
+                style={{ background: card.bgColor }}
+              >
+                {card.emoji}
+              </div>
+              <h3 className="text-base font-semibold text-[#0f1a2e] mb-2">{card.title}</h3>
+              <p className="text-sm leading-relaxed text-[#5a6578]">{card.description}</p>
+              <div className="mt-3 pt-3 border-t border-[#e2e0d8] flex items-center gap-1.5 font-mono text-xs text-[#b91c1c]">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                  <path d="M8 4v5m0 2.5v.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                </svg>
+                {card.breakPoint}
               </div>
             </div>
           ))}
-        </div>
-
-        {/* Transition line */}
-        <div className="mt-12 sm:mt-16 text-center">
-          <p className="text-lg sm:text-xl text-white/80 font-body max-w-2xl mx-auto">
-            LendSolo replaces all of it — without the learning curve of enterprise software built for mortgage companies.
-          </p>
         </div>
       </div>
     </section>

@@ -1,95 +1,108 @@
 const FEATURES = [
   {
     icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25v-.008zm2.498-6h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008v-.008zm2.504-6h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008v-.008zm2.498-6h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008v-.008zM8.25 6h7.5v2.25h-7.5V6zM12 2.25c-1.892 0-3.758.11-5.593.322C5.307 2.7 4.5 3.65 4.5 4.757V19.5a2.25 2.25 0 002.25 2.25h10.5a2.25 2.25 0 002.25-2.25V4.757c0-1.108-.806-2.057-1.907-2.185A48.507 48.507 0 0012 2.25z" />
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+        <rect x="3" y="3" width="18" height="18" rx="2" />
+        <line x1="3" y1="9" x2="21" y2="9" />
+        <line x1="9" y1="21" x2="9" y2="9" />
       </svg>
     ),
-    title: 'Deal Calculator',
+    title: "Always know exactly what you're owed",
     description:
-      'Run ROI projections, compare loan structures side-by-side, and figure out what rate to charge based on LTV and risk — before you wire a dollar. Free, no account required.',
+      'Precise amortization schedules for standard, interest-only, and balloon loans. Every payment auto-splits into principal and interest — down to the penny.',
   },
   {
     icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
       </svg>
     ),
-    title: 'Smart Guardrails',
+    title: 'Catch problems before they cost you',
     description:
-      "LTV creeping above 80%? One borrower representing 60% of your capital? No collateral documented? LendSolo flags it — not after the fact, but while you're setting up the deal.",
+      "LTV creeping above 80%? One borrower at 60% of your capital? No collateral documented? LendSolo flags it while you're setting up the deal — not after.",
   },
   {
     icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
       </svg>
     ),
-    title: 'Payment Tracking',
+    title: 'Never miss a payment again',
     description:
-      'Record payments in seconds. LendSolo automatically splits principal from interest, tracks running balances, flags overdue loans, and keeps a complete payment history per borrower.',
+      'Record payments in two clicks. Automated email reminders to borrowers before due dates, late notices when they miss, and receipts when they pay.',
   },
   {
     icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6" />
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+        <rect x="2" y="3" width="20" height="14" rx="2" />
+        <line x1="8" y1="21" x2="16" y2="21" />
+        <line x1="12" y1="17" x2="12" y2="21" />
       </svg>
     ),
-    title: 'Amortization Engine',
+    title: 'Run the numbers before you wire the money',
     description:
-      'Generate precise amortization schedules for any loan structure. Handles early payoffs, partial payments, and overpayments without manual recalculation.',
+      'ROI projections, loan comparisons, and interest-only calculators. Free, no account required — evaluate your next deal right now.',
   },
   {
     icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+        <polyline points="14 2 14 8 20 8" />
+        <line x1="16" y1="13" x2="8" y2="13" />
+        <line x1="16" y1="17" x2="8" y2="17" />
       </svg>
     ),
-    title: 'Tax Reporting',
+    title: 'Tax season in 30 seconds, not 3 hours',
     description:
-      'Year-end interest summary, expense tracking by category, and PDF statements your accountant can actually use. No more adding up columns in January.',
+      'Year-end interest income summary, expense reports for Schedule C, and accountant-ready exports in PDF, CSV, and QBO. Hit download, send to your CPA, done.',
+    badge: 'Pro plan',
   },
   {
     icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+        <circle cx="12" cy="12" r="3" />
+        <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
       </svg>
     ),
-    title: 'Borrower Portal',
+    title: 'A second opinion on every deal',
     description:
-      'Give borrowers read-only access to their loan — balance, schedule, payment history. Fewer "what do I owe?" texts. More professional.',
+      'AI-generated deal memos and risk narratives that analyze your loan structure, flag concerns, and assess portfolio impact — before you commit.',
+    badge: 'Pro plan',
   },
 ]
 
 export default function FeaturesGrid() {
   return (
-    <section id="features" className="py-20 sm:py-28 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section header */}
-        <div className="max-w-3xl">
-          <p className="text-sm font-semibold uppercase tracking-widest text-[#1A7A50] font-body">
-            Everything a private lender actually needs
-          </p>
-          <h2 className="mt-4 text-3xl sm:text-4xl font-bold text-[#1C1C19] font-display leading-tight">
-            No bloat. No features built for banks.
-          </h2>
-          <p className="mt-4 text-lg text-[#4D4D45] font-body">
-            Just the six things that make the difference between running your lending business and just surviving it.
-          </p>
-        </div>
+    <section id="features" className="py-20 sm:py-24" style={{ backgroundColor: '#f8f7f4' }}>
+      <div className="max-w-[1140px] mx-auto px-8">
+        <p className="text-[11px] font-mono uppercase tracking-[2px] text-[#1a7a4c] font-medium mb-3">
+          What changes
+        </p>
+        <h2 className="font-display text-3xl sm:text-[40px] leading-[1.15] text-[#0f1a2e] tracking-tight mb-4">
+          Everything a private lender actually needs
+        </h2>
+        <p className="text-[17px] leading-relaxed text-[#5a6578] max-w-[600px] mb-12">
+          No bloat. No features built for banks. Just the six things that make the difference between running your lending business and just surviving it.
+        </p>
 
-        {/* Grid */}
-        <div className="mt-12 sm:mt-16 grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {FEATURES.map((f) => (
             <div
               key={f.title}
-              className="group border border-[#E4E3DB] rounded-2xl p-6 sm:p-8 hover:border-[#34D399]/40 hover:shadow-sm transition-all duration-200"
+              className="bg-white border border-[#e2e0d8] rounded-xl p-8 flex gap-4 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200"
             >
-              <div className="w-10 h-10 rounded-xl bg-[#1A7A50]/10 text-[#1A7A50] flex items-center justify-center">
+              <div className="w-11 h-11 min-w-[44px] rounded-[10px] bg-[#e8f5ee] text-[#1a7a4c] flex items-center justify-center">
                 {f.icon}
               </div>
-              <h3 className="mt-4 text-lg font-bold text-[#1C1C19] font-display">{f.title}</h3>
-              <p className="mt-2 text-sm text-[#4D4D45] leading-relaxed font-body">{f.description}</p>
+              <div>
+                <h3 className="text-base font-semibold text-[#0f1a2e] mb-1.5">{f.title}</h3>
+                <p className="text-sm leading-relaxed text-[#5a6578]">{f.description}</p>
+                {f.badge && (
+                  <span className="inline-block mt-2 font-mono text-[10px] tracking-wide px-2 py-0.5 rounded bg-[#e8f0fc] text-[#1e5fa6]">
+                    {f.badge}
+                  </span>
+                )}
+              </div>
             </div>
           ))}
         </div>

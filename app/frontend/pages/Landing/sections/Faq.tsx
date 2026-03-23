@@ -2,24 +2,28 @@ import { useState } from 'react'
 
 const QUESTIONS = [
   {
-    q: 'Is this for me if I only have 2–3 loans?',
-    a: "Yes — especially if you're planning to do more. The loan limit on our Solo plan is 5, which covers most people starting out. More importantly, the habits you build now (documenting collateral, tracking principal/interest separately, keeping records for tax time) matter even at 2 loans. Starting on a real system is easier than migrating from a spreadsheet later.",
+    q: 'Is this for me?',
+    a: "LendSolo is built for solo private lenders and small lending operations — people managing $50K to $500K across 1 to 15 loans. If you're doing fix-and-flip bridge loans, long-term holds, or any kind of private lending and currently using a spreadsheet, this was built for you.",
   },
   {
-    q: "What about compliance? I'm worried about lending laws.",
-    a: "LendSolo is a tracking and reporting tool — it doesn't provide legal advice and isn't a compliance engine. What it does do is nudge you toward better practices: documenting collateral, keeping payment records, flagging unusual rate structures. For actual compliance (state lending laws, usury limits, licensing requirements), you need an attorney in your state. We'll publish guides on this — but we're a software tool, not a law firm.",
+    q: 'What about regulatory compliance?',
+    a: "LendSolo is a loan tracking and management tool — it doesn't originate loans, collect payments on your behalf, or provide legal advice. Compliance with state lending laws is your responsibility, just as it is with a spreadsheet. That said, the guardrails and documentation features can help you maintain good practices.",
   },
   {
     q: 'Can I import my existing spreadsheet?',
-    a: "Yes. LendSolo has a spreadsheet import tool that accepts .csv and .xlsx files. You map your columns to our fields, review the loans before they're created, and import in one click. We try to auto-detect column names (\"borrower,\" \"principal,\" \"rate\") to minimize the manual mapping. It's not perfect for every spreadsheet format, but it handles the common patterns well.",
+    a: "Yes. Upload a CSV or XLSX file and LendSolo will auto-detect your columns — borrower name, principal, rate, term, and more. Review the mapping, confirm, and your loans are imported in minutes. Solo plan and above.",
   },
   {
     q: 'How is this different from QuickBooks?',
-    a: "QuickBooks is accounting software that can track money coming in and going out. It can't generate amortization schedules, split payments into principal and interest automatically, produce borrower statements, calculate your portfolio's LTV exposure, or tell you when a payment is overdue based on loan terms. It also can't warn you that one borrower represents 70% of your capital. For a private lender, QuickBooks tracks the money — LendSolo understands the loans.",
+    a: "QuickBooks is accounting software — it tracks income and expenses. LendSolo is lending software — it understands loan structures, amortization, LTV ratios, and borrower relationships. It generates the reports your accountant needs, but it thinks in loans, not journal entries.",
   },
   {
-    q: 'What happens to my data if I cancel?',
-    a: "You can export everything as CSV at any time. If you cancel, your account goes into read-only mode for 30 days so you can export before we delete anything. We'll always give you a way out with your data intact.",
+    q: 'Is my data secure?',
+    a: "Your data is encrypted at rest and in transit. Each user's data is fully isolated. We don't share, sell, or use your loan data for anything other than running the product. You can export all your data at any time.",
+  },
+  {
+    q: 'What if I outgrow LendSolo?',
+    a: "If you scale past 25 loans or need multi-investor fund management, the Fund tier ($99/month, unlimited loans) is on the way. Get on the waitlist and we'll notify you when it launches.",
   },
 ]
 
@@ -27,44 +31,37 @@ export default function Faq() {
   const [openIndex, setOpenIndex] = useState<number | null>(null)
 
   return (
-    <section className="py-20 sm:py-28 bg-white">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section header */}
-        <div className="text-center">
-          <p className="text-sm font-semibold uppercase tracking-widest text-[#1A7A50] font-body">
-            Questions we actually get
-          </p>
-        </div>
+    <section id="faq" className="py-20 sm:py-24" style={{ backgroundColor: '#f8f7f4' }}>
+      <div className="max-w-[720px] mx-auto px-8">
+        <p className="text-[11px] font-mono uppercase tracking-[2px] text-[#1a7a4c] font-medium mb-3">
+          FAQ
+        </p>
+        <h2 className="font-display text-3xl sm:text-[40px] leading-[1.15] text-[#0f1a2e] tracking-tight mb-10">
+          Common questions
+        </h2>
 
-        {/* Accordion */}
-        <div className="mt-10 sm:mt-12 divide-y divide-[#E4E3DB]">
+        <div className="divide-y divide-[#e2e0d8]">
           {QUESTIONS.map((item, i) => {
             const isOpen = openIndex === i
             return (
-              <div key={i}>
+              <div key={i} className="py-6">
                 <button
                   onClick={() => setOpenIndex(isOpen ? null : i)}
-                  className="w-full flex items-center justify-between py-5 sm:py-6 text-left group"
+                  className="w-full flex items-center justify-between text-left group"
                 >
-                  <span className="text-base sm:text-lg font-semibold text-[#1C1C19] pr-8 font-display group-hover:text-[#1A7A50] transition-colors">
+                  <span className="text-base font-semibold text-[#0f1a2e] pr-4">
                     {item.q}
                   </span>
-                  <svg
-                    className={`w-5 h-5 text-[#8A8A7E] shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
+                  <span className="text-xl font-light text-[#8c95a6] min-w-[24px] text-center transition-transform duration-200">
+                    {isOpen ? '−' : '+'}
+                  </span>
                 </button>
-
                 <div
                   className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                    isOpen ? 'max-h-96 opacity-100 pb-6' : 'max-h-0 opacity-0'
+                    isOpen ? 'max-h-[300px] pt-4 opacity-100' : 'max-h-0 opacity-0'
                   }`}
                 >
-                  <p className="text-[15px] text-[#4D4D45] leading-relaxed font-body">{item.a}</p>
+                  <p className="text-[15px] leading-relaxed text-[#5a6578]">{item.a}</p>
                 </div>
               </div>
             )

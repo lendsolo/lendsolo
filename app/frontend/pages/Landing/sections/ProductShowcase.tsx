@@ -1,210 +1,346 @@
-const SCREENSHOTS = [
-  {
-    label: 'Dashboard Overview',
-    caption:
-      "Your whole portfolio at a glance. Capital deployed, interest earned, what's due next week — without opening a single spreadsheet.",
-    description:
-      'Dark-sidebar layout with Dashboard, Loans, Payments, Expenses, Settings nav. Four stat cards: Capital Deployed ($185,000), Available Capital ($65,000), Interest Earned YTD ($14,200), Active Loans (4). Bar chart of monthly interest income. Upcoming payments panel with 3 loans. Portfolio allocation bar.',
-    mockContent: (
-      <div className="bg-[#0F1419] rounded-lg p-4 text-sm">
-        <div className="flex gap-3">
-          {/* Sidebar mock */}
-          <div className="hidden sm:flex flex-col gap-2 w-36 shrink-0">
-            {['Dashboard', 'Loans', 'Payments', 'Expenses', 'Settings'].map((item, i) => (
-              <div key={item} className={`px-3 py-2 rounded-md text-xs ${i === 0 ? 'bg-white/10 text-[#34D399]' : 'text-white/60'}`}>
-                {item}
-              </div>
-            ))}
-          </div>
-          {/* Main content mock */}
-          <div className="flex-1 space-y-3">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
-              {[
-                ['Capital Deployed', '$185,000'],
-                ['Available Capital', '$65,000'],
-                ['Interest Earned YTD', '$14,200'],
-                ['Active Loans', '4'],
-              ].map(([label, value]) => (
-                <div key={label} className="bg-white/5 rounded-lg p-3">
-                  <div className="text-[10px] text-white/60">{label}</div>
-                  <div className="text-sm font-bold text-white mt-1 font-mono">{value}</div>
-                </div>
-              ))}
-            </div>
-            <div className="bg-white/5 rounded-lg p-3 h-24 flex items-end gap-1">
-              {[40, 65, 55, 78, 60, 72].map((h, i) => (
-                <div key={i} className="flex-1 bg-[#34D399]/60 rounded-t" style={{ height: `${h}%` }} />
-              ))}
-            </div>
-            <div className="space-y-1.5">
-              {['Marcus W. — $3,987 due Mar 15', 'Sarah K. — $1,250 due Mar 18', 'Tom R. — $2,100 due Mar 22'].map((item) => (
-                <div key={item} className="bg-white/5 rounded-md px-3 py-2 text-xs text-white/70">{item}</div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    ),
-  },
-  {
-    label: 'Loan Detail View',
-    caption:
-      'Every loan has its own page. Amortization schedule, payment history, collateral notes, and smart alerts if something looks off.',
-    description:
-      'Loan detail for "Marcus Williams — Bridge Loan." Active badge, key metrics, repayment progress bar at 42%, amortization table, capital concentration warning.',
-    mockContent: (
-      <div className="bg-white rounded-lg p-4 text-sm">
-        <div className="flex items-center justify-between mb-3">
-          <div>
-            <div className="text-xs text-gray-400">Loan Detail</div>
-            <div className="font-bold text-gray-900">Marcus Williams — Bridge Loan</div>
-          </div>
-          <span className="px-2 py-1 bg-emerald-50 text-emerald-700 text-xs font-medium rounded-full">Active</span>
-        </div>
-        <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-xs text-amber-800 mb-3">
-          ⚠️ This loan represents 62% of your total capital.
-        </div>
-        <div className="grid grid-cols-4 gap-2 mb-3">
-          {[['Principal', '$45,000'], ['Rate', '11%'], ['Term', '12 mo'], ['Monthly', '$3,987']].map(([k, v]) => (
-            <div key={k} className="text-center">
-              <div className="text-[10px] text-gray-400">{k}</div>
-              <div className="text-xs font-bold text-gray-900 font-mono">{v}</div>
-            </div>
-          ))}
-        </div>
-        <div className="mb-3">
-          <div className="flex justify-between text-[10px] text-gray-400 mb-1"><span>Repayment Progress</span><span>42%</span></div>
-          <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-            <div className="h-full bg-[#34D399] rounded-full" style={{ width: '42%' }} />
-          </div>
-        </div>
-        <div className="space-y-1">
-          {[1, 2, 3, 4, 5].map((m) => (
-            <div key={m} className={`flex justify-between px-2 py-1.5 rounded text-[10px] ${m <= 5 ? 'bg-emerald-50 text-emerald-700' : 'text-gray-500'}`}>
-              <span>Month {m}</span>
-              <span className="font-mono">$3,987</span>
-              <span className="font-mono text-emerald-600">$3,575 P</span>
-              <span className="font-mono text-indigo-500">$412 I</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    ),
-  },
-  {
-    label: 'Amortization Schedule',
-    caption:
-      "Exact principal/interest splits for every payment, automatically. Share the schedule with your borrower at closing — or download it as a PDF.",
-    description:
-      'Clean table: Month 1–12, $45,000 at 11%. Paid rows green, current amber, future standard. Total Interest: $2,638. Download PDF button.',
-    mockContent: (
-      <div className="bg-white rounded-lg p-4 text-sm">
-        <div className="flex items-center justify-between mb-3">
-          <div className="font-bold text-gray-900 text-xs">Amortization Schedule</div>
-          <button className="px-3 py-1 bg-gray-100 text-gray-600 text-[10px] font-medium rounded-md">Download PDF</button>
-        </div>
-        <table className="w-full text-[10px]">
-          <thead>
-            <tr className="border-b border-gray-100 text-gray-400">
-              <th className="text-left py-1.5 font-medium">Month</th>
-              <th className="text-left py-1.5 font-medium">Due Date</th>
-              <th className="text-right py-1.5 font-medium">Payment</th>
-              <th className="text-right py-1.5 font-medium">Principal</th>
-              <th className="text-right py-1.5 font-medium">Interest</th>
-              <th className="text-right py-1.5 font-medium">Balance</th>
-            </tr>
-          </thead>
-          <tbody className="font-mono">
-            {[
-              { m: 1, d: 'Jan 15', paid: true, p: '$3,575', i: '$412', b: '$41,425' },
-              { m: 2, d: 'Feb 15', paid: true, p: '$3,608', i: '$379', b: '$37,817' },
-              { m: 3, d: 'Mar 15', paid: true, p: '$3,641', i: '$346', b: '$34,176' },
-              { m: 4, d: 'Apr 15', paid: true, p: '$3,674', i: '$313', b: '$30,502' },
-              { m: 5, d: 'May 15', paid: true, p: '$3,708', i: '$279', b: '$26,794' },
-              { m: 6, d: 'Jun 15', paid: false, current: true, p: '$3,742', i: '$245', b: '$23,052' },
-              { m: 7, d: 'Jul 15', paid: false, p: '$3,776', i: '$211', b: '$19,276' },
-            ].map((row) => (
-              <tr key={row.m} className={`border-b border-gray-50 ${row.paid ? 'bg-emerald-50/50 text-emerald-700' : row.current ? 'bg-amber-50/50 text-amber-700' : 'text-gray-500'}`}>
-                <td className="py-1.5">{row.m}</td>
-                <td className="py-1.5">{row.d}</td>
-                <td className="text-right py-1.5">$3,987</td>
-                <td className="text-right py-1.5">{row.p}</td>
-                <td className="text-right py-1.5">{row.i}</td>
-                <td className="text-right py-1.5">{row.b}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <div className="mt-2 pt-2 border-t border-gray-100 flex justify-between text-[10px]">
-          <span className="text-gray-400">Total Interest</span>
-          <span className="font-mono font-bold text-gray-900">$2,638</span>
-        </div>
-      </div>
-    ),
-  },
-]
+import { useState } from 'react'
+
+const TABS = ['Dashboard', 'Loan Detail', 'Amortization'] as const
+
+function Sidebar({ activeItem }: { activeItem: string }) {
+  const navItems = ['Dashboard', 'Loans', 'Borrowers', 'Payments', 'Expenses', 'Import', 'Reports', 'Exports', 'Calculators', 'Billing', 'Settings']
+  return (
+    <>
+      <rect x="0" y="0" width="230" height="620" fill="#0c1a16" />
+      <rect x="0" y="0" width="230" height="620" fill="rgba(0,0,0,0.65)" />
+      <text x="24" y="38" fontFamily="sans-serif" fontSize="18" fill="white" fontWeight="bold" letterSpacing="-0.3">LendSolo</text>
+      <rect x="170" y="22" width="38" height="22" rx="5" fill="rgba(99,102,241,0.7)" />
+      <text x="189" y="38" fontFamily="sans-serif" fontSize="10" fill="white" textAnchor="middle" fontWeight="600">Pro</text>
+      <text x="24" y="56" fontFamily="sans-serif" fontSize="11" fill="rgba(255,255,255,0.3)">Loan Management</text>
+      {navItems.map((item, i) => {
+        const y = 74 + i * 38
+        const isActive = item === activeItem
+        return (
+          <g key={item}>
+            {isActive && <rect x="12" y={y} width="206" height="40" rx="8" fill="rgba(34,197,94,0.12)" />}
+            <text x="52" y={y + 25} fontFamily="sans-serif" fontSize="13" fill={isActive ? '#22c55e' : 'rgba(255,255,255,0.4)'} fontWeight={isActive ? '500' : '400'}>{item}</text>
+          </g>
+        )
+      })}
+      <line x1="230" y1="0" x2="230" y2="620" stroke="rgba(255,255,255,0.06)" />
+    </>
+  )
+}
+
+function DashboardScreen() {
+  return (
+    <svg viewBox="0 0 1100 620" xmlns="http://www.w3.org/2000/svg" className="w-full block">
+      <defs>
+        <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#22c55e" stopOpacity="0.3" />
+          <stop offset="100%" stopColor="#22c55e" stopOpacity="0.02" />
+        </linearGradient>
+      </defs>
+      <rect width="1100" height="620" fill="#111827" />
+      <Sidebar activeItem="Dashboard" />
+
+      <text x="262" y="46" fontFamily="Georgia,serif" fontSize="22" fill="white" fontWeight="bold">Portfolio Overview</text>
+      <text x="262" y="66" fontFamily="sans-serif" fontSize="12" fill="rgba(255,255,255,0.4)">March 2026</text>
+
+      {/* Metric cards */}
+      <rect x="262" y="88" width="195" height="96" rx="12" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+      <text x="282" y="116" fontFamily="sans-serif" fontSize="11" fill="rgba(255,255,255,0.4)">DEPLOYED</text>
+      <text x="282" y="148" fontFamily="Georgia,serif" fontSize="28" fill="white">$187,500</text>
+      <text x="282" y="170" fontFamily="monospace" fontSize="11" fill="#22c55e">↑ 12% from last month</text>
+
+      <rect x="473" y="88" width="195" height="96" rx="12" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+      <text x="493" y="116" fontFamily="sans-serif" fontSize="11" fill="rgba(255,255,255,0.4)">ACTIVE LOANS</text>
+      <text x="493" y="148" fontFamily="Georgia,serif" fontSize="28" fill="white">6</text>
+      <text x="493" y="170" fontFamily="monospace" fontSize="11" fill="rgba(255,255,255,0.5)">avg 10.8% rate</text>
+
+      <rect x="684" y="88" width="195" height="96" rx="12" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+      <text x="704" y="116" fontFamily="sans-serif" fontSize="11" fill="rgba(255,255,255,0.4)">MONTHLY INCOME</text>
+      <text x="704" y="148" fontFamily="Georgia,serif" fontSize="28" fill="white">$1,842</text>
+      <text x="704" y="170" fontFamily="monospace" fontSize="11" fill="#22c55e">$22,104 annualized</text>
+
+      <rect x="895" y="88" width="185" height="96" rx="12" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+      <text x="915" y="116" fontFamily="sans-serif" fontSize="11" fill="rgba(255,255,255,0.4)">AVG LTV</text>
+      <text x="915" y="148" fontFamily="Georgia,serif" fontSize="28" fill="white">68%</text>
+      <rect x="915" y="158" width="145" height="6" rx="3" fill="rgba(255,255,255,0.08)" />
+      <rect x="915" y="158" width="99" height="6" rx="3" fill="#22c55e" opacity="0.7" />
+
+      {/* Chart */}
+      <rect x="262" y="208" width="400" height="240" rx="12" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+      <text x="282" y="236" fontFamily="sans-serif" fontSize="13" fill="rgba(255,255,255,0.7)" fontWeight="600">Interest Income</text>
+      <text x="622" y="236" fontFamily="sans-serif" fontSize="11" fill="rgba(255,255,255,0.3)" textAnchor="end">Last 6 months</text>
+      <polyline points="302,400 358,385 414,375 470,358 526,340 582,320 638,305" fill="none" stroke="#22c55e" strokeWidth="2" opacity="0.8" />
+      <path d="M302,400 L358,385 L414,375 L470,358 L526,340 L582,320 L638,305 L638,430 L302,430 Z" fill="url(#g1)" />
+      <line x1="302" y1="430" x2="638" y2="430" stroke="rgba(255,255,255,0.06)" />
+      {['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'].map((m, i) => (
+        <text key={m} x={302 + i * 56} y="444" fontFamily="monospace" fontSize="9" fill="rgba(255,255,255,0.25)">{m}</text>
+      ))}
+      {[[302, 400], [358, 385], [414, 375], [470, 358], [526, 340], [582, 320]].map(([cx, cy], i) => (
+        <circle key={i} cx={cx} cy={cy} r="4" fill="#111827" stroke="#22c55e" strokeWidth="2" />
+      ))}
+      <circle cx="638" cy="305" r="4" fill="#22c55e" stroke="#22c55e" strokeWidth="2" />
+
+      {/* Guardrails */}
+      <rect x="682" y="208" width="398" height="240" rx="12" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+      <text x="702" y="236" fontFamily="sans-serif" fontSize="13" fill="rgba(255,255,255,0.7)" fontWeight="600">Guardrails</text>
+
+      <rect x="702" y="252" width="358" height="52" rx="8" fill="rgba(245,158,11,0.08)" stroke="rgba(245,158,11,0.2)" strokeWidth="1" />
+      <circle cx="722" cy="278" r="8" fill="rgba(245,158,11,0.2)" />
+      <text x="722" y="282" fontSize="10" fill="#f59e0b" textAnchor="middle">!</text>
+      <text x="740" y="274" fontFamily="sans-serif" fontSize="12" fill="rgba(255,255,255,0.7)">High concentration: Baker loan is 32%</text>
+      <text x="740" y="292" fontFamily="monospace" fontSize="10" fill="rgba(255,255,255,0.3)">{'Recommended: <25% per borrower'}</text>
+
+      <rect x="702" y="316" width="358" height="52" rx="8" fill="rgba(34,197,94,0.06)" stroke="rgba(34,197,94,0.15)" strokeWidth="1" />
+      <circle cx="722" cy="342" r="8" fill="rgba(34,197,94,0.2)" />
+      <text x="722" y="346" fontSize="10" fill="#22c55e" textAnchor="middle">✓</text>
+      <text x="740" y="338" fontFamily="sans-serif" fontSize="12" fill="rgba(255,255,255,0.7)">LTV ratios within safe range</text>
+      <text x="740" y="356" fontFamily="monospace" fontSize="10" fill="rgba(255,255,255,0.3)">All loans under 75% LTV threshold</text>
+
+      <rect x="702" y="380" width="358" height="52" rx="8" fill="rgba(34,197,94,0.06)" stroke="rgba(34,197,94,0.15)" strokeWidth="1" />
+      <circle cx="722" cy="406" r="8" fill="rgba(34,197,94,0.2)" />
+      <text x="722" y="410" fontSize="10" fill="#22c55e" textAnchor="middle">✓</text>
+      <text x="740" y="402" fontFamily="sans-serif" fontSize="12" fill="rgba(255,255,255,0.7)">No overdue payments</text>
+      <text x="740" y="420" fontFamily="monospace" fontSize="10" fill="rgba(255,255,255,0.3)">Next payment due: Apr 1 — Rivera ($625)</text>
+
+      {/* Loan table */}
+      <rect x="262" y="468" width="818" height="140" rx="12" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+      <text x="282" y="496" fontFamily="sans-serif" fontSize="13" fill="rgba(255,255,255,0.7)" fontWeight="600">Active Loans</text>
+      {[['BORROWER', 282], ['PRINCIPAL', 440], ['RATE', 570], ['TYPE', 650], ['REMAINING', 780], ['STATUS', 920]].map(([label, x]) => (
+        <text key={label as string} x={x as number} y="524" fontFamily="monospace" fontSize="10" fill="rgba(255,255,255,0.25)">{label}</text>
+      ))}
+      <line x1="282" y1="532" x2="1060" y2="532" stroke="rgba(255,255,255,0.06)" />
+
+      <text x="282" y="554" fontFamily="sans-serif" fontSize="12" fill="rgba(255,255,255,0.8)">Baker, T.</text>
+      <text x="440" y="554" fontFamily="monospace" fontSize="12" fill="rgba(255,255,255,0.6)">$60,000</text>
+      <text x="570" y="554" fontFamily="monospace" fontSize="12" fill="rgba(255,255,255,0.6)">11.0%</text>
+      <text x="650" y="554" fontFamily="sans-serif" fontSize="11" fill="rgba(255,255,255,0.4)">Interest-Only</text>
+      <text x="780" y="554" fontFamily="monospace" fontSize="12" fill="rgba(255,255,255,0.6)">$60,000</text>
+      <rect x="920" y="542" width="66" height="20" rx="4" fill="rgba(34,197,94,0.12)" />
+      <text x="953" y="556" fontFamily="monospace" fontSize="10" fill="#22c55e" textAnchor="middle">Current</text>
+
+      <text x="282" y="580" fontFamily="sans-serif" fontSize="12" fill="rgba(255,255,255,0.8)">Rivera, M.</text>
+      <text x="440" y="580" fontFamily="monospace" fontSize="12" fill="rgba(255,255,255,0.6)">$45,000</text>
+      <text x="570" y="580" fontFamily="monospace" fontSize="12" fill="rgba(255,255,255,0.6)">10.5%</text>
+      <text x="650" y="580" fontFamily="sans-serif" fontSize="11" fill="rgba(255,255,255,0.4)">Standard</text>
+      <text x="780" y="580" fontFamily="monospace" fontSize="12" fill="rgba(255,255,255,0.6)">$38,210</text>
+      <rect x="920" y="568" width="66" height="20" rx="4" fill="rgba(34,197,94,0.12)" />
+      <text x="953" y="582" fontFamily="monospace" fontSize="10" fill="#22c55e" textAnchor="middle">Current</text>
+
+      <text x="282" y="600" fontFamily="sans-serif" fontSize="12" fill="rgba(255,255,255,0.55)">+ 4 more loans</text>
+    </svg>
+  )
+}
+
+function LoanDetailScreen() {
+  return (
+    <svg viewBox="0 0 1100 620" xmlns="http://www.w3.org/2000/svg" className="w-full block">
+      <rect width="1100" height="620" fill="#111827" />
+      <Sidebar activeItem="Loans" />
+
+      <text x="262" y="42" fontFamily="sans-serif" fontSize="12" fill="rgba(255,255,255,0.35)">Loans ›</text>
+      <text x="262" y="70" fontFamily="Georgia,serif" fontSize="22" fill="white" fontWeight="bold">Baker, Thomas — Fix &amp; Flip Bridge</text>
+      <rect x="680" y="52" width="100" height="30" rx="6" fill="rgba(34,197,94,0.12)" stroke="rgba(34,197,94,0.3)" strokeWidth="1" />
+      <text x="730" y="72" fontFamily="monospace" fontSize="11" fill="#22c55e" textAnchor="middle">Current</text>
+      <rect x="795" y="52" width="120" height="30" rx="6" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
+      <text x="855" y="72" fontFamily="sans-serif" fontSize="11" fill="rgba(255,255,255,0.6)" textAnchor="middle">Record Payment</text>
+
+      {/* Info cards */}
+      {[
+        { label: 'PRINCIPAL', value: '$60,000', x: 262, w: 155 },
+        { label: 'RATE', value: '11.0%', x: 433, w: 125 },
+        { label: 'TERM', value: '12 mo', x: 574, w: 125 },
+        { label: 'MONTHLY PMT', value: '$550', x: 715, w: 155, color: '#22c55e' },
+        { label: 'LTV', value: '72%', x: 886, w: 125, color: '#f59e0b' },
+      ].map((card) => (
+        <g key={card.label}>
+          <rect x={card.x} y="98" width={card.w} height="80" rx="10" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+          <text x={card.x + 18} y="120" fontFamily="monospace" fontSize="10" fill="rgba(255,255,255,0.3)">{card.label}</text>
+          <text x={card.x + 18} y="148" fontFamily="Georgia,serif" fontSize="22" fill={card.color || 'white'}>{card.value}</text>
+        </g>
+      ))}
+
+      {/* Payment history */}
+      <rect x="262" y="200" width="510" height="280" rx="12" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+      <text x="282" y="228" fontFamily="sans-serif" fontSize="13" fill="rgba(255,255,255,0.7)" fontWeight="600">Payment History</text>
+      {[['DATE', 282], ['AMOUNT', 410], ['INTEREST', 520], ['PRINCIPAL', 640]].map(([label, x]) => (
+        <text key={label as string} x={x as number} y="260" fontFamily="monospace" fontSize="10" fill="rgba(255,255,255,0.25)">{label}</text>
+      ))}
+      <line x1="282" y1="268" x2="752" y2="268" stroke="rgba(255,255,255,0.06)" />
+      {[
+        { date: 'Mar 1, 2026', y: 290 },
+        { date: 'Feb 1, 2026', y: 316 },
+        { date: 'Jan 1, 2026', y: 342 },
+        { date: 'Dec 1, 2025', y: 368 },
+      ].map((row) => (
+        <g key={row.date}>
+          <text x="282" y={row.y} fontFamily="sans-serif" fontSize="12" fill="rgba(255,255,255,0.6)">{row.date}</text>
+          <text x="410" y={row.y} fontFamily="monospace" fontSize="12" fill="rgba(255,255,255,0.8)">$550.00</text>
+          <text x="520" y={row.y} fontFamily="monospace" fontSize="12" fill="rgba(255,255,255,0.5)">$550.00</text>
+          <text x="640" y={row.y} fontFamily="monospace" fontSize="12" fill="rgba(255,255,255,0.5)">$0.00</text>
+        </g>
+      ))}
+      <text x="282" y="404" fontFamily="sans-serif" fontSize="11" fill="rgba(255,255,255,0.25)">Interest-only — balloon due Nov 2026</text>
+      <rect x="282" y="420" width="470" height="40" rx="8" fill="rgba(34,197,94,0.06)" />
+      <text x="300" y="446" fontFamily="sans-serif" fontSize="12" fill="#22c55e">Total interest earned: $2,200.00 · 4 of 12 payments received</text>
+
+      {/* Collateral */}
+      <rect x="790" y="200" width="290" height="130" rx="12" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+      <text x="810" y="228" fontFamily="sans-serif" fontSize="13" fill="rgba(255,255,255,0.7)" fontWeight="600">Collateral</text>
+      <text x="810" y="254" fontFamily="sans-serif" fontSize="12" fill="rgba(255,255,255,0.5)">1247 Oak St, Springfield</text>
+      <text x="810" y="274" fontFamily="sans-serif" fontSize="12" fill="rgba(255,255,255,0.5)">Appraised: $83,000</text>
+      <text x="810" y="294" fontFamily="sans-serif" fontSize="12" fill="rgba(255,255,255,0.5)">Purpose: Fix &amp; Flip</text>
+      <text x="810" y="314" fontFamily="monospace" fontSize="11" fill="rgba(245,158,11,0.7)">LTV 72% — near threshold</text>
+
+      {/* AI Deal Memo */}
+      <rect x="790" y="346" width="290" height="134" rx="12" fill="rgba(99,102,241,0.06)" stroke="rgba(99,102,241,0.15)" strokeWidth="1" />
+      <text x="810" y="374" fontFamily="sans-serif" fontSize="13" fill="rgba(255,255,255,0.7)" fontWeight="600">AI Deal Memo</text>
+      <rect x="895" y="360" width="34" height="18" rx="4" fill="rgba(99,102,241,0.2)" />
+      <text x="912" y="374" fontFamily="monospace" fontSize="9" fill="rgba(99,102,241,0.8)" textAnchor="middle">PRO</text>
+      {[
+        'This bridge loan presents moderate risk',
+        'with a viable exit strategy. The 72% LTV',
+        'provides limited cushion. Key risk factor',
+        "is borrower's rehab timeline of 8 months",
+      ].map((line, i) => (
+        <text key={i} x="810" y={400 + i * 16} fontFamily="sans-serif" fontSize="11" fill="rgba(255,255,255,0.45)">{line}</text>
+      ))}
+      <text x="810" y="464" fontFamily="sans-serif" fontSize="11" fill="rgba(99,102,241,0.6)">Read full analysis →</text>
+    </svg>
+  )
+}
+
+function AmortizationScreen() {
+  return (
+    <svg viewBox="0 0 1100 620" xmlns="http://www.w3.org/2000/svg" className="w-full block">
+      <rect width="1100" height="620" fill="#111827" />
+      <Sidebar activeItem="Loans" />
+
+      <text x="262" y="42" fontFamily="sans-serif" fontSize="12" fill="rgba(255,255,255,0.35)">Rivera, M. › Amortization</text>
+      <text x="262" y="70" fontFamily="Georgia,serif" fontSize="22" fill="white" fontWeight="bold">Amortization Schedule</text>
+      <text x="262" y="92" fontFamily="sans-serif" fontSize="13" fill="rgba(255,255,255,0.4)">$45,000 at 10.5% for 24 months — Standard</text>
+
+      {/* Chart */}
+      <rect x="262" y="112" width="818" height="200" rx="12" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+      <text x="282" y="140" fontFamily="sans-serif" fontSize="13" fill="rgba(255,255,255,0.7)" fontWeight="600">Principal vs Interest Over Time</text>
+      <g transform="translate(302, 160)">
+        {[
+          { x: 0, ph: 80, ih: 20 },
+          { x: 34, ph: 82, ih: 18 },
+          { x: 68, ph: 85, ih: 15 },
+          { x: 102, ph: 88, ih: 12 },
+          { x: 136, ph: 90, ih: 10 },
+          { x: 170, ph: 92, ih: 8 },
+          { x: 204, ph: 94, ih: 6 },
+          { x: 238, ph: 95, ih: 5 },
+        ].map((bar, i) => (
+          <g key={i}>
+            <rect x={bar.x} y={100 - bar.ph} width="28" height={bar.ph} rx="2" fill="#22c55e" opacity={0.6 + i * 0.025} />
+            <rect x={bar.x} y={100 - bar.ph - bar.ih} width="28" height={bar.ih} rx="2" fill="#3b82f6" opacity="0.5" />
+          </g>
+        ))}
+        {['1', '3', '5', '7'].map((n, i) => (
+          <text key={n} x={i * 68} y="114" fontFamily="monospace" fontSize="9" fill="rgba(255,255,255,0.2)">{n}</text>
+        ))}
+        <text x="300" y="60" fontFamily="sans-serif" fontSize="16" fill="rgba(255,255,255,0.15)">· · ·</text>
+        <rect x="636" y="1" width="28" height="99" rx="2" fill="#22c55e" opacity="0.8" />
+        <rect x="636" y="0" width="28" height="1" rx="2" fill="#3b82f6" opacity="0.5" />
+        <rect x="670" y="0" width="28" height="100" rx="2" fill="#22c55e" opacity="0.85" />
+        <text x="670" y="114" fontFamily="monospace" fontSize="9" fill="rgba(255,255,255,0.2)">24</text>
+      </g>
+      <rect x="840" y="152" width="10" height="10" rx="2" fill="#22c55e" opacity="0.7" />
+      <text x="856" y="162" fontFamily="sans-serif" fontSize="11" fill="rgba(255,255,255,0.5)">Principal</text>
+      <rect x="930" y="152" width="10" height="10" rx="2" fill="#3b82f6" opacity="0.5" />
+      <text x="946" y="162" fontFamily="sans-serif" fontSize="11" fill="rgba(255,255,255,0.5)">Interest</text>
+
+      {/* Stats */}
+      {[
+        { label: 'TOTAL INTEREST', value: '$5,128', color: '#3b82f6', x: 262 },
+        { label: 'MONTHLY PAYMENT', value: '$2,089', color: 'white', x: 478 },
+        { label: 'TOTAL REPAYMENT', value: '$50,128', color: 'white', x: 694 },
+      ].map((stat) => (
+        <g key={stat.label}>
+          <rect x={stat.x} y="328" width="200" height="80" rx="10" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+          <text x={stat.x + 20} y="352" fontFamily="monospace" fontSize="10" fill="rgba(255,255,255,0.3)">{stat.label}</text>
+          <text x={stat.x + 20} y="384" fontFamily="Georgia,serif" fontSize="24" fill={stat.color}>{stat.value}</text>
+        </g>
+      ))}
+
+      {/* Schedule table */}
+      <rect x="262" y="426" width="818" height="180" rx="12" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+      <text x="282" y="454" fontFamily="sans-serif" fontSize="13" fill="rgba(255,255,255,0.7)" fontWeight="600">Schedule</text>
+      {[['#', 282], ['DATE', 320], ['PAYMENT', 450], ['PRINCIPAL', 570], ['INTEREST', 690], ['BALANCE', 810], ['STATUS', 940]].map(([label, x]) => (
+        <text key={label as string} x={x as number} y="480" fontFamily="monospace" fontSize="10" fill="rgba(255,255,255,0.25)">{label}</text>
+      ))}
+      <line x1="282" y1="488" x2="1060" y2="488" stroke="rgba(255,255,255,0.06)" />
+
+      {[
+        { n: '1', date: 'Apr 1, 2025', pmt: '$2,089.15', princ: '$1,695.40', interest: '$393.75', balance: '$43,304.60', status: 'Paid', statusColor: '#22c55e', y: 512 },
+        { n: '2', date: 'May 1, 2025', pmt: '$2,089.15', princ: '$1,710.26', interest: '$378.89', balance: '$41,594.34', status: 'Paid', statusColor: '#22c55e', y: 540 },
+        { n: '3', date: 'Jun 1, 2025', pmt: '$2,089.15', princ: '$1,725.24', interest: '$363.91', balance: '$39,869.10', status: 'Due', statusColor: '#f59e0b', y: 568 },
+      ].map((row) => (
+        <g key={row.n}>
+          {row.status === 'Paid' && row.n === '1' && (
+            <rect x="272" y="494" width="798" height="26" rx="4" fill="rgba(34,197,94,0.04)" />
+          )}
+          <text x="288" y={row.y} fontFamily="monospace" fontSize="11" fill="rgba(255,255,255,0.5)">{row.n}</text>
+          <text x="320" y={row.y} fontFamily="sans-serif" fontSize="11" fill="rgba(255,255,255,0.6)">{row.date}</text>
+          <text x="450" y={row.y} fontFamily="monospace" fontSize="11" fill="rgba(255,255,255,0.7)">{row.pmt}</text>
+          <text x="570" y={row.y} fontFamily="monospace" fontSize="11" fill="rgba(255,255,255,0.5)">{row.princ}</text>
+          <text x="690" y={row.y} fontFamily="monospace" fontSize="11" fill="rgba(255,255,255,0.5)">{row.interest}</text>
+          <text x="810" y={row.y} fontFamily="monospace" fontSize="11" fill="rgba(255,255,255,0.5)">{row.balance}</text>
+          <rect x="940" y={row.y - 12} width="44" height="18" rx="4" fill={`rgba(${row.statusColor === '#22c55e' ? '34,197,94' : '245,158,11'},0.15)`} />
+          <text x="962" y={row.y} fontFamily="monospace" fontSize="9" fill={row.statusColor} textAnchor="middle">{row.status}</text>
+        </g>
+      ))}
+      <text x="282" y="596" fontFamily="sans-serif" fontSize="11" fill="rgba(255,255,255,0.25)">Showing 3 of 24 payments · Download full schedule (PDF)</text>
+    </svg>
+  )
+}
+
+const SCREENS = [DashboardScreen, LoanDetailScreen, AmortizationScreen]
 
 export default function ProductShowcase() {
+  const [activeTab, setActiveTab] = useState(0)
+  const ActiveScreen = SCREENS[activeTab]
+
   return (
-    <section className="py-20 sm:py-28" style={{ backgroundColor: '#F6F5F0' }}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section header */}
-        <div className="max-w-3xl">
-          <p className="text-sm font-semibold uppercase tracking-widest text-[#1A7A50] font-body">
-            What it actually looks like
-          </p>
-          <h2 className="mt-4 text-3xl sm:text-4xl font-bold text-[#1C1C19] font-display leading-tight">
-            Clean. Fast. Built for someone managing a handful of loans.
-          </h2>
-          <p className="mt-4 text-lg text-[#4D4D45] font-body">
-            Not a mortgage servicer with 10,000.
-          </p>
+    <section id="product" className="py-20 sm:py-24 overflow-hidden" style={{ backgroundColor: '#0f1a2e' }}>
+      <div className="max-w-[1140px] mx-auto px-8">
+        <p className="text-[11px] font-mono uppercase tracking-[2px] text-[#22c55e] font-medium mb-3">
+          The Product
+        </p>
+        <h2 className="font-display text-3xl sm:text-[40px] leading-[1.15] text-white tracking-tight mb-4">
+          Everything in one place. Finally.
+        </h2>
+        <p className="text-[17px] leading-relaxed text-white/[0.55] max-w-[600px] mb-8">
+          Real screenshots. Real data. Built for how private lenders actually work.
+        </p>
+
+        {/* Tabs */}
+        <div className="inline-flex gap-1 bg-white/[0.06] rounded-[10px] p-1 mb-8">
+          {TABS.map((tab, i) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(i)}
+              className={`px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                activeTab === i
+                  ? 'bg-white/[0.12] text-white'
+                  : 'text-white/50 hover:text-white/75'
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
         </div>
 
-        {/* Screenshots */}
-        <div className="mt-16 space-y-20 sm:space-y-28">
-          {SCREENSHOTS.map((shot, i) => {
-            const reverse = i % 2 === 1
-            return (
-              <div
-                key={shot.label}
-                className={`flex flex-col ${reverse ? 'lg:flex-row-reverse' : 'lg:flex-row'} items-center gap-8 lg:gap-16`}
-              >
-                {/* Screenshot */}
-                <div className="flex-1 w-full">
-                  <div className="bg-white rounded-2xl shadow-xl border border-[#E4E3DB] overflow-hidden">
-                    {/* Browser chrome */}
-                    <div className="bg-gray-50 border-b border-gray-200 px-4 py-2.5 flex items-center gap-2">
-                      <div className="flex gap-1.5">
-                        <div className="w-3 h-3 rounded-full bg-red-400" />
-                        <div className="w-3 h-3 rounded-full bg-yellow-400" />
-                        <div className="w-3 h-3 rounded-full bg-green-400" />
-                      </div>
-                      <div className="flex-1 mx-4">
-                        <div className="bg-white border border-gray-200 rounded-md px-3 py-1 text-xs text-gray-400 max-w-xs">
-                          app.lendsolo.com
-                        </div>
-                      </div>
-                    </div>
-                    {/* Content */}
-                    <div className="p-2 sm:p-3">
-                      {shot.mockContent}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Text */}
-                <div className="flex-1 lg:max-w-md">
-                  <p className="text-xs font-semibold uppercase tracking-widest text-[#8A8A7E] font-body">
-                    {shot.label}
-                  </p>
-                  <p className="mt-4 text-lg text-[#4D4D45] leading-relaxed font-body">
-                    {shot.caption}
-                  </p>
-                </div>
-              </div>
-            )
-          })}
+        {/* Frame */}
+        <div className="rounded-2xl overflow-hidden border border-white/[0.08] shadow-[0_24px_80px_rgba(0,0,0,0.4)]" style={{ backgroundColor: '#1a2540' }}>
+          {/* Browser bar */}
+          <div className="h-10 bg-white/[0.04] border-b border-white/[0.06] flex items-center px-4 gap-2">
+            <div className="w-2.5 h-2.5 rounded-full bg-white/[0.12]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-white/[0.12]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-white/[0.12]" />
+          </div>
+          <ActiveScreen />
         </div>
       </div>
     </section>
