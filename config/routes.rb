@@ -22,6 +22,8 @@ Rails.application.routes.draw do
       patch :unarchive
       patch :update_notes
       post :reveal_tin
+      get "interest_statement/:year", action: :interest_statement, as: :interest_statement, defaults: { format: :pdf }
+      post :email_interest_statement
     end
   end
   resources :loans do
@@ -64,6 +66,8 @@ Rails.application.routes.draw do
   get "exports/expenses.csv", to: "exports#expenses_csv", as: :export_expenses_csv
   get "exports/form_1098s.zip", to: "exports#form_1098s_zip", as: :export_1098s_zip
   get "exports/form_1098/:borrower_id.pdf", to: "exports#form_1098_pdf", as: :export_1098_pdf
+  post "exports/borrower_statements", to: "exports#borrower_statements_zip", as: :export_borrower_statements_zip
+  post "exports/email_borrower_statements", to: "exports#email_borrower_statements", as: :export_email_borrower_statements
 
   get "settings", to: "settings#index"
   patch "settings", to: "settings#update"

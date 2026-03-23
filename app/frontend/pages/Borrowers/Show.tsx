@@ -4,11 +4,20 @@ import AppLayout from '@/layouts/AppLayout'
 import type { BorrowerDetail, BorrowerPayment, BorrowerStats } from '@/types/borrower'
 import type { LoanProps } from '@/types/loan'
 
+interface TaxDocuments {
+  years: number[]
+  years_with_1098: number[]
+  can_download: boolean
+  email_enabled: boolean
+  borrower_has_email: boolean
+}
+
 interface Props {
   borrower: BorrowerDetail
   loans: LoanProps[]
   payments: BorrowerPayment[]
   stats: BorrowerStats
+  tax_documents: TaxDocuments
 }
 
 const STATUS_BADGES: Record<string, { label: string; bg: string; text: string }> = {
@@ -20,7 +29,7 @@ const STATUS_BADGES: Record<string, { label: string; bg: string; text: string }>
 
 const PAYMENTS_PER_PAGE = 25
 
-export default function BorrowerShow({ borrower, loans, payments, stats }: Props) {
+export default function BorrowerShow({ borrower, loans, payments, stats, tax_documents }: Props) {
   const [paymentPage, setPaymentPage] = useState(1)
   const [paymentSort, setPaymentSort] = useState<'desc' | 'asc'>('desc')
 
@@ -172,6 +181,12 @@ export default function BorrowerShow({ borrower, loans, payments, stats }: Props
 
             {/* Notes — inline editable */}
             <NotesCard borrowerId={borrower.id} initialNotes={borrower.notes} />
+
+            {/* Tax Documents */}
+            <TaxDocumentsCard
+              borrowerId={borrower.id}
+              taxDocuments={tax_documents}
+            />
           </div>
 
           {/* Right Column: Loans + Payments */}
@@ -343,6 +358,104 @@ export default function BorrowerShow({ borrower, loans, payments, stats }: Props
 }
 
 // --- Sub-components ---
+
+function TaxDocumentsCard({
+  borrowerId,
+  taxDocuments,
+}: {
+  borrowerId: number
+  taxDocuments: TaxDocuments
+}) {
+  const [sendingYear, setSendingYear] = useState<number | null>(null)
+  const [sentYears, setSentYears] = useState<Set<number>>(new Set())
+
+  function csrfToken() {
+    return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+  }
+
+  async function handleEmail(year: number) {
+    setSendingYear(year)
+    try {
+      const res = await fetch(`/borrowers/${borrowerId}/email_interest_statement`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken(), 'Accept': 'application/json' },
+        body: JSON.stringify({ year }),
+      })
+      if (res.ok) {
+        setSentYears((prev) => new Set([...prev, year]))
+      } else {
+        const data = await res.json()
+        alert(data.error || 'Failed to send email')
+      }
+    } catch {
+      alert('Failed to send email')
+    } finally {
+      setSendingYear(null)
+    }
+  }
+
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 p-5">
+      <h3 className="text-sm font-semibold text-gray-900 mb-3">Tax Documents</h3>
+      {taxDocuments.years.length === 0 ? (
+        <p className="text-sm text-gray-300">No payment activity yet.</p>
+      ) : (
+        <div className="space-y-2">
+          {taxDocuments.years.map((year) => {
+            const has1098 = taxDocuments.years_with_1098.includes(year)
+            return (
+              <div key={year} className="flex items-center justify-between py-1.5">
+                <span className="text-sm font-mono text-gray-700">{year}</span>
+                <div className="flex items-center gap-1.5">
+                  {taxDocuments.can_download ? (
+                    <>
+                      <a
+                        href={`/borrowers/${borrowerId}/interest_statement/${year}`}
+                        className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-semibold rounded-md transition-colors"
+                      >
+                        Statement
+                      </a>
+                      {taxDocuments.borrower_has_email && taxDocuments.email_enabled && (
+                        sentYears.has(year) ? (
+                          <span className="px-2.5 py-1 bg-gray-100 text-gray-400 text-[11px] font-semibold rounded-md">
+                            Sent
+                          </span>
+                        ) : (
+                          <button
+                            onClick={() => handleEmail(year)}
+                            disabled={sendingYear === year}
+                            className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-semibold rounded-md transition-colors disabled:opacity-50"
+                          >
+                            {sendingYear === year ? '...' : 'Email'}
+                          </button>
+                        )
+                      )}
+                      {has1098 && (
+                        <a
+                          href={`/exports/form_1098/${borrowerId}.pdf?year=${year}`}
+                          className="px-2.5 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-[11px] font-semibold rounded-md transition-colors"
+                        >
+                          1098
+                        </a>
+                      )}
+                    </>
+                  ) : (
+                    <span className="text-[11px] text-gray-400 flex items-center gap-1">
+                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                      </svg>
+                      Pro
+                    </span>
+                  )}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </div>
+  )
+}
 
 function NotesCard({
   borrowerId,

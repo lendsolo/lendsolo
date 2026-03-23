@@ -5,6 +5,7 @@ class ExportsController < ApplicationController
   def index
     year_data = compute_year_data
     form_1098_data = compute_1098_data
+    statement_data = compute_borrower_statement_data
 
     render inertia: "Exports/Index", props: {
       year: @year,
@@ -24,6 +25,8 @@ class ExportsController < ApplicationController
         lender_tax_info_complete: current_user.tax_info_complete?,
         lender_tin_present: current_user.lender_tin.present?
       },
+      borrower_statements: statement_data,
+      email_enabled: current_user.email_reminders_enabled,
       can_export: can_export?
     }
   end
@@ -94,6 +97,56 @@ class ExportsController < ApplicationController
               disposition: "attachment"
   end
 
+  def borrower_statements_zip
+    statement_data = compute_borrower_statement_data
+    borrowers_with_activity = statement_data[:borrowers]
+
+    if borrowers_with_activity.empty?
+      redirect_to exports_path(year: @year), alert: "No borrowers with payment activity for #{@year}."
+      return
+    end
+
+    require "zip"
+    zip_buffer = Zip::OutputStream.write_buffer do |zip|
+      borrowers_with_activity.each do |entry|
+        borrower = current_user.borrowers.find(entry[:id])
+        pdf = Pdf::BorrowerInterestStatementPdf.new(borrower: borrower, lender: current_user, year: @year).generate
+        filename = "statement_#{borrower.name.parameterize}_#{@year}.pdf"
+        zip.put_next_entry(filename)
+        zip.write(pdf.render)
+      end
+    end
+    zip_buffer.rewind
+
+    Rails.logger.info("[Statement] Bulk generated #{borrowers_with_activity.length} borrower statements for year=#{@year} by user_id=#{current_user.id}")
+
+    send_data zip_buffer.read,
+              filename: "lendsolo_borrower_statements_#{@year}.zip",
+              type: "application/zip",
+              disposition: "attachment"
+  end
+
+  def email_borrower_statements
+    unless current_user.email_reminders_enabled
+      render json: { error: "Email notifications are disabled. Enable them in Settings to send statements." }, status: :unprocessable_entity
+      return
+    end
+
+    statement_data = compute_borrower_statement_data
+    emailable = statement_data[:borrowers].select { |b| b[:has_email] }
+
+    if emailable.empty?
+      render json: { error: "No borrowers with email addresses on file for #{@year}." }, status: :unprocessable_entity
+      return
+    end
+
+    BulkBorrowerStatementsEmailJob.perform_later(current_user.id, @year)
+
+    Rails.logger.info("[Statement] Queued bulk email of #{emailable.length} borrower statements for year=#{@year} by user_id=#{current_user.id}")
+
+    render json: { message: "Queued #{emailable.length} statement emails for delivery.", count: emailable.length }
+  end
+
   def form_1098s_zip
     unless current_user.tax_info_complete?
       redirect_to exports_path(year: @year), alert: "Your tax ID and address are required to generate 1098s. Update them in Settings."
@@ -144,6 +197,55 @@ class ExportsController < ApplicationController
   def available_years
     current_year = Date.current.year
     (current_year - 3..current_year).to_a.reverse
+  end
+
+  def compute_borrower_statement_data
+    year_start = Date.new(@year, 1, 1)
+    year_end = Date.new(@year, 12, 31)
+
+    borrowers = current_user.borrowers.active.includes(loans: :payments)
+
+    borrower_rows = borrowers.filter_map do |borrower|
+      loans = borrower.loans
+      next if loans.empty?
+
+      total_interest = 0.0
+      total_principal = 0.0
+      loan_count = 0
+
+      loans.each do |loan|
+        year_payments = loan.payments.where(date: year_start..year_end)
+        interest = year_payments.sum(:interest_portion).to_f
+        principal = year_payments.sum(:principal_portion).to_f
+        if interest > 0 || principal > 0
+          total_interest += interest
+          total_principal += principal
+          loan_count += 1
+        end
+      end
+
+      next if loan_count == 0
+
+      already_emailed = EmailLog.already_sent?(
+        user: current_user,
+        email_type: "borrower_interest_statement",
+        reference_date: year_start,
+        payment_number: borrower.id
+      )
+
+      {
+        id: borrower.id,
+        name: borrower.name,
+        loan_count: loan_count,
+        total_interest: total_interest.round(2),
+        total_principal: total_principal.round(2),
+        has_email: borrower.email.present?,
+        email: borrower.email,
+        already_emailed: already_emailed
+      }
+    end
+
+    { borrowers: borrower_rows }
   end
 
   def compute_1098_data
